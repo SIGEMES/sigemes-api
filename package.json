@@ -6,7 +6,8 @@
     "seed": "ts-node prisma/seeders/seed.ts"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start-dev": "ts-node src/main.ts"
   },
   "jest": {
     "transform": {
