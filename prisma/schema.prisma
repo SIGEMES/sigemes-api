@@ -19,18 +19,18 @@ enum Gender {
 }
 
 model Renter {
-  id                       Int       @id @default(autoincrement())
-  email                    String    @unique
-  password                 String
-  fullname                 String
-  gender                   Gender
-  profile_picture          String?   @default("./.temp-file-storage/avatar-default.png")
-  email_verified           Boolean   @default(false)
-  otp                      String?   @db.VarChar(5)
-  otp_expiry               DateTime?
-  forgot_password_verified Boolean   @default(false)
-  createdAt                DateTime  @default(now())
-  updatedAt                DateTime  @updatedAt
+  id                     Int       @id @default(autoincrement())
+  email                  String    @unique
+  password               String
+  fullname               String
+  gender                 Gender
+  profilePicture         String    @default("./.temp-file-storage/avatar-default.png") @map("profile_picture")
+  emailVerified          Boolean   @default(false) @map("email_verified")
+  otp                    String?   @db.VarChar(5)
+  otpExpiry              DateTime? @map("otp_expiry")
+  forgotPasswordVerified Boolean   @default(false) @map("forgot_password_verified")
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
   @@map("renters")
 }
