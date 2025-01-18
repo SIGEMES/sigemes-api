@@ -38,4 +38,14 @@ export class RenterUsecase {
 
         return renterData;
     }
+
+    public async getRenterData(renter: Renter): Promise<Renter> {
+        const renterData: Renter|null = await this.renterRepo.getUserByEmail(renter.email);
+
+        if (!renterData) {
+            throw new Error('User not found');
+        }
+
+        return renterData;
+    }
 }
