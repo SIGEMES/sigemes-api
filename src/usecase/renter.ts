@@ -31,6 +31,7 @@ export class RenterUsecase {
             id: renterData.id,
             email: renterData.email,
             fullname: renterData.fullname,
+            role: "renter",
             emailVerified: renterData.emailVerified,
         });
 

@@ -1,6 +1,6 @@
-import {Response, Request, NextFunction} from "express";
-import {ZodError} from "zod";
-import {ResponseError} from "../../domain/error/response-error";
+import { Response, Request, NextFunction } from "express";
+import { ZodError } from "zod";
+import { ResponseError } from "../../domain/error/response-error";
 import { BaseFailedResponse } from "../dto/response/base-failed";
 
 export const errorMiddleware = async (error: Error, req: Request, res: Response, next: NextFunction) => {
