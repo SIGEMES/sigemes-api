@@ -1,5 +1,5 @@
-import { WebServer } from "./config/web";
-import { prisma } from "./config/database";
+import { WebServer } from "./infrastructure/config/web";
+import { prisma } from "./infrastructure/config/database";
 import { RenterRepo } from "./infrastructure/repository/renter-repo";
 import { RenterRepoInterface } from "./domain/interface/renter-repo";
 import { RenterUsecase } from "./usecase/renter";

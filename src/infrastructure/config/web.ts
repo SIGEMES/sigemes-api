@@ -1,7 +1,7 @@
 import express from 'express';
-import { APIRouter } from '../presentation/router/api';
-import { RenterController } from '../presentation/controller/renter-controller';
-import { errorMiddleware } from '../presentation/middleware/error-middleware';
+import { APIRouter } from '../../presentation/router/api';
+import { RenterController } from '../../presentation/controller/renter-controller';
+import { errorMiddleware } from '../../presentation/middleware/error-middleware';
 
 export class WebServer {
     private app: express.Application;
