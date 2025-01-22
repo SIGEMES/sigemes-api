@@ -1,10 +1,12 @@
+export type Gender = 'male' | 'female';
+
 export class Renter {
     constructor (
         public id: number,
         public email: string,
         public password: string,
         public fullname: string,
-        public gender: string,
+        public gender: Gender,
         public profilePicture: string,
         public emailVerified: boolean,
         public forgotPasswordVerified: boolean,

@@ -27,4 +27,14 @@ export class RenterController {
             next(error);
         }
     }
+
+    async register(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const renter: Renter = await this.renterUsecase.register(req.body);
+            const renterResponse: RenterGetDataResponse = RenterGetDataResponse.fromEntity(renter);
+            res.status(201).json(new BaseSuccessResponse(true, "Register success", renterResponse));
+        } catch (error) {
+            next(error);
+        }
+    }
 }

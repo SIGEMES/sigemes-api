@@ -15,5 +15,19 @@ export class RenterRepo implements RenterRepoInterface {
         }
 
         return renter;
-    }   
+    };
+
+    async createUser(renter: Renter): Promise<Renter> {
+        const createdRenter: Renter = await this.prisma.renter.create({
+            data: {
+                email: renter.email,
+                password: renter.password,
+                fullname: renter.fullname,
+                gender: renter.gender
+            }
+        });
+
+        return createdRenter;
+    };
+
 }

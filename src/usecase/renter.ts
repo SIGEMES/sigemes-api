@@ -13,7 +13,7 @@ export class RenterUsecase {
     ) {}
 
     public async login(renter: Renter): Promise<Renter> {
-        const loginRequest = this.renterValidator.validate(renter, "login");
+        const loginRequest: Renter = this.renterValidator.validate(renter, "login");
 
         const renterData: Renter|null = await this.renterRepo.getUserByEmail(loginRequest.email);
 
@@ -48,5 +48,22 @@ export class RenterUsecase {
         }
 
         return renterData;
+    }
+
+    public async register(renter: Renter): Promise<Renter> {
+        const registerRequest: Renter = this.renterValidator.validate(renter, "register");
+
+        const renterData: Renter|null = await this.renterRepo.getUserByEmail(registerRequest.email);
+
+        if (renterData) {
+            throw new Error('Email already registered');
+        }
+
+        const hashedPassword: string = await this.bcryptService.hashPassword(registerRequest.password);
+        registerRequest.password = hashedPassword;
+
+        const newRenter: Renter = await this.renterRepo.createUser(registerRequest);
+
+        return newRenter;
     }
 }
