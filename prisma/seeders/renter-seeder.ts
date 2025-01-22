@@ -13,6 +13,7 @@ export async function seedRenters(): Promise<void> {
                 email: "alice@prisma.io",
                 password: hashedPassword,
                 emailVerified: true,
+                phoneNumber: "1234567890",
                 gender: "female",
             },
             {
@@ -20,6 +21,7 @@ export async function seedRenters(): Promise<void> {
                 email: "bob@prisma.io",
                 password: hashedPassword,
                 emailVerified: true,
+                phoneNumber: "1234567890",
                 gender: "male",
             },
             {
@@ -27,6 +29,7 @@ export async function seedRenters(): Promise<void> {
                 email: "charlie@prisma.io",
                 password: hashedPassword,
                 emailVerified: false,
+                phoneNumber: "1234567890",
                 gender: "male"
             },
         ],

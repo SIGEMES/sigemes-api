@@ -6,6 +6,7 @@ export class Renter {
         public email: string,
         public password: string,
         public fullname: string,
+        public phoneNumber: string,
         public gender: Gender,
         public profilePicture: string,
         public emailVerified: boolean,

@@ -9,6 +9,7 @@ export const RenterValidation: Record<string, ZodSchema<any>> = {
         email: z.string().email(),
         password: z.string().min(5),
         fullname: z.string().min(3),
+        phoneNumber: z.string().min(10),
         gender: z.string().max(5),
     }),
 };

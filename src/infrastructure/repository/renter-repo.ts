@@ -23,6 +23,7 @@ export class RenterRepo implements RenterRepoInterface {
                 email: renter.email,
                 password: renter.password,
                 fullname: renter.fullname,
+                phoneNumber: renter.phoneNumber,
                 gender: renter.gender
             }
         });

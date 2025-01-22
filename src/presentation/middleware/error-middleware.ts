@@ -5,7 +5,11 @@ import { BaseFailedResponse } from "../dto/response/base-failed";
 
 export const errorMiddleware = async (error: Error, req: Request, res: Response, next: NextFunction) => {
     if (error instanceof ZodError) {
-        const messages = error.issues.map(issue => issue.message).join(', ');
+        const messages = error.issues.map(issue => {
+            const path = issue.path.join('.');
+            return `${path}: ${issue.message}`;
+        }).join(', ');
+    
         res.status(400).json(new BaseFailedResponse(
             false,
             messages,

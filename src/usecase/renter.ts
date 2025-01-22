@@ -3,6 +3,7 @@ import { RenterRepoInterface } from '../domain/interface/renter-repo';
 import { JwtInterface } from '../domain/interface/jwt';
 import { BcryptInterface } from '../domain/interface/bcrypt';
 import { ValidatorInterface } from '../domain/interface/validator';
+import { ResponseError } from '../domain/error/response-error';
 
 export class RenterUsecase {
     constructor(
@@ -56,7 +57,7 @@ export class RenterUsecase {
         const renterData: Renter|null = await this.renterRepo.getUserByEmail(registerRequest.email);
 
         if (renterData) {
-            throw new Error('Email already registered');
+            throw new ResponseError('Email already registered', 400);
         }
 
         const hashedPassword: string = await this.bcryptService.hashPassword(registerRequest.password);

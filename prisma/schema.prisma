@@ -23,6 +23,7 @@ model Renter {
   email                  String    @unique
   password               String
   fullname               String
+  phoneNumber            String    @map("phone_number")
   gender                 Gender
   profilePicture         String    @default("./.temp-file-storage/avatar-default.png") @map("profile_picture")
   emailVerified          Boolean   @default(false) @map("email_verified")
