@@ -21,13 +21,17 @@ export class RenterUsecase {
         const renterData: Renter | null = await this.renterRepo.getUserByEmail(loginRequest.email);
 
         if (!renterData) {
-            throw new Error('User not found');
+            throw new ResponseError('User not found', 400);
         }
 
         const passwordMatch = await this.bcryptService.comparePassword(loginRequest.password, renterData.password);
 
         if (!passwordMatch) {
-            throw new Error('Invalid password');
+            throw new ResponseError('Invalid password', 400);
+        }
+
+        if (!renterData.emailVerified) {
+            throw new ResponseError('Email not verified', 400);
         }
 
         const token: string = this.jwtService.generateToken({
@@ -47,7 +51,7 @@ export class RenterUsecase {
         const renterData: Renter | null = await this.renterRepo.getUserByEmail(renter.email);
 
         if (!renterData) {
-            throw new Error('User not found');
+            throw new ResponseError('User not found', 200);
         }
 
         return renterData;
@@ -76,7 +80,7 @@ export class RenterUsecase {
         const renterData: Renter | null = await this.renterRepo.getUserByEmail(verifyEmailRequest.email);
 
         if (!renterData) {
-            throw new Error('User not found');
+            throw new ResponseError('User not found', 200);
         }
 
         const otp: string = Math.floor(10000 + Math.random() * 90000).toString();
