@@ -46,4 +46,13 @@ export class RenterController {
             next(error);
         }
     }
+
+    public async verifyEmailOTP(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            await this.renterUsecase.verifyEmailVerificationOTP(req.body);
+            res.status(200).json(new BaseSuccessResponse(true, "Verify email OTP success", null));
+        } catch (error) {
+            next(error);
+        }
+    }
 }

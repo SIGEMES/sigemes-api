@@ -18,7 +18,7 @@ export class RenterUsecase {
     public async login(renter: Renter): Promise<Renter> {
         const loginRequest: Renter = this.renterValidator.validate(renter, "login");
 
-        const renterData: Renter|null = await this.renterRepo.getUserByEmail(loginRequest.email);
+        const renterData: Renter | null = await this.renterRepo.getUserByEmail(loginRequest.email);
 
         if (!renterData) {
             throw new Error('User not found');
@@ -44,7 +44,7 @@ export class RenterUsecase {
     }
 
     public async getRenterData(renter: Renter): Promise<Renter> {
-        const renterData: Renter|null = await this.renterRepo.getUserByEmail(renter.email);
+        const renterData: Renter | null = await this.renterRepo.getUserByEmail(renter.email);
 
         if (!renterData) {
             throw new Error('User not found');
@@ -56,7 +56,7 @@ export class RenterUsecase {
     public async register(renter: Renter): Promise<Renter> {
         const registerRequest: Renter = this.renterValidator.validate(renter, "register");
 
-        const renterData: Renter|null = await this.renterRepo.getUserByEmail(registerRequest.email);
+        const renterData: Renter | null = await this.renterRepo.getUserByEmail(registerRequest.email);
 
         if (renterData) {
             throw new ResponseError('Email already registered', 400);
@@ -71,9 +71,9 @@ export class RenterUsecase {
     }
 
     public async sendEmailVerificationOTP(renter: Renter): Promise<void> {
-        const verifyEmailRequest: Renter = this.renterValidator.validate(renter, "verifyEmail");
+        const verifyEmailRequest: Renter = this.renterValidator.validate(renter, "sendEmailVerificationOTP");
 
-        const renterData: Renter|null = await this.renterRepo.getUserByEmail(verifyEmailRequest.email);
+        const renterData: Renter | null = await this.renterRepo.getUserByEmail(verifyEmailRequest.email);
 
         if (!renterData) {
             throw new Error('User not found');
@@ -85,5 +85,29 @@ export class RenterUsecase {
         await this.renterRepo.updateOTP(renterData.id, otp, otpExpiry);
 
         await this.mailerService.sendEmail(renterData.email, 'Verifikasi Email SIGEMES', otp, 'verifikasi email');
+    }
+
+    public async verifyEmailVerificationOTP(renter: Renter): Promise<void> {
+        const verifyEmailRequest: Renter = this.renterValidator.validate(renter, "verifyEmailVerificationOTP");
+
+        const renterData: Renter | null = await this.renterRepo.getUserOTPByEmail(verifyEmailRequest.email);
+
+        if (!renterData) {
+            throw new ResponseError('User not found', 400);
+        }
+
+        if (!renterData.otp || !renterData.otpExpiry) {
+            throw new ResponseError('OTP not found', 400);
+        }
+
+        if (renterData.otp !== verifyEmailRequest.otp) {
+            throw new ResponseError('Invalid OTP', 400);
+        }
+
+        if (renterData.otpExpiry < new Date()) {
+            throw new ResponseError('OTP expired', 400);
+        }
+
+        await this.renterRepo.updateEmailVerified(renterData.id);
     }
 }

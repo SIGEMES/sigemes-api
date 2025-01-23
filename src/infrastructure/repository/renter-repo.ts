@@ -10,12 +10,8 @@ export class RenterRepo implements RenterRepoInterface {
             where: { email }
         });
 
-        if (!renter) {
-            return renter;
-        }
-
         return renter;
-    };
+    }
 
     public async createUser(renter: Renter): Promise<Renter> {
         const createdRenter: Renter = await this.prisma.renter.create({
@@ -29,7 +25,7 @@ export class RenterRepo implements RenterRepoInterface {
         });
 
         return createdRenter;
-    };
+    }
 
     public async updateOTP(id: number, otp: string, otpExpiry: Date): Promise<void> {
         await this.prisma.renter.update({
@@ -39,5 +35,29 @@ export class RenterRepo implements RenterRepoInterface {
                 otpExpiry
             }
         });
-    };
+    }
+
+    public async getUserOTPByEmail(email: string): Promise<Renter|null> {
+        const renter: Renter | null = await this.prisma.renter.findUnique({
+            where: { email },
+            select: {
+                id: true,
+                otp: true,
+                otpExpiry: true
+            },
+        }) as Renter;
+        
+        return renter;
+    }
+
+    public async updateEmailVerified(id: number): Promise<void> {
+        await this.prisma.renter.update({
+            where: { id },
+            data: {
+                emailVerified: true,
+                otp: null,
+                otpExpiry: null
+            }
+        });
+    }
 }
