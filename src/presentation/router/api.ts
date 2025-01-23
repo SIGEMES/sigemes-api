@@ -16,6 +16,7 @@ export class APIRouter {
     private configRentersRoutes(): void {
         this.renterRouter.get("/login", this.renterController.login.bind(this.renterController));
         this.renterRouter.post("/register", this.renterController.register.bind(this.renterController));
+        this.renterRouter.post("/email/send-otp", this.renterController.sendEmailVerificationOTP.bind(this.renterController));
         this.renterRouter.use(jwtMiddleware, isRenterMiddleware);
         this.renterRouter.get("", this.renterController.getRenterData.bind(this.renterController));
     }

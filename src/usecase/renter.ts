@@ -4,13 +4,15 @@ import { JwtInterface } from '../domain/interface/jwt';
 import { BcryptInterface } from '../domain/interface/bcrypt';
 import { ValidatorInterface } from '../domain/interface/validator';
 import { ResponseError } from '../domain/error/response-error';
+import { MailerInterface } from '../domain/interface/mailer';
 
 export class RenterUsecase {
     constructor(
         private renterValidator: ValidatorInterface,
         private renterRepo: RenterRepoInterface,
         private jwtService: JwtInterface,
-        private bcryptService: BcryptInterface
+        private bcryptService: BcryptInterface,
+        private mailerService: MailerInterface,
     ) {}
 
     public async login(renter: Renter): Promise<Renter> {
@@ -66,5 +68,22 @@ export class RenterUsecase {
         const newRenter: Renter = await this.renterRepo.createUser(registerRequest);
 
         return newRenter;
+    }
+
+    public async sendEmailVerificationOTP(renter: Renter): Promise<void> {
+        const verifyEmailRequest: Renter = this.renterValidator.validate(renter, "verifyEmail");
+
+        const renterData: Renter|null = await this.renterRepo.getUserByEmail(verifyEmailRequest.email);
+
+        if (!renterData) {
+            throw new Error('User not found');
+        }
+
+        const otp: string = Math.floor(10000 + Math.random() * 90000).toString();
+        const otpExpiry: Date = new Date(Date.now() + 600000);
+
+        await this.renterRepo.updateOTP(renterData.id, otp, otpExpiry);
+
+        await this.mailerService.sendEmail(renterData.email, 'Verifikasi Email SIGEMES', otp, 'verifikasi email');
     }
 }

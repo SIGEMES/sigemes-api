@@ -12,4 +12,7 @@ export const RenterValidation: Record<string, ZodSchema<any>> = {
         phoneNumber: z.string().min(10),
         gender: z.string().max(5),
     }),
+    verifyEmail: z.object({
+        email: z.string().email(),
+    }),
 };

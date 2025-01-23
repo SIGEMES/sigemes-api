@@ -8,7 +8,7 @@ import { BaseSuccessResponse } from '../dto/response/base-success';
 export class RenterController {
     constructor(private renterUsecase: RenterUsecase) {}
 
-    async login(req: Request, res: Response, next: NextFunction): Promise<void> {
+    public async login(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const renter: Renter = await this.renterUsecase.login(req.body);
             const renterResponse: RenterLoginResponse = RenterLoginResponse.fromEntity(renter);
@@ -18,7 +18,7 @@ export class RenterController {
         }
     }
 
-    async getRenterData(req: Request, res: Response, next: NextFunction): Promise<void> {
+    public async getRenterData(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const renter: Renter = await this.renterUsecase.getRenterData(res.locals.user);
             const renterResponse: RenterGetDataResponse = RenterGetDataResponse.fromEntity(renter);
@@ -28,11 +28,20 @@ export class RenterController {
         }
     }
 
-    async register(req: Request, res: Response, next: NextFunction): Promise<void> {
+    public async register(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const renter: Renter = await this.renterUsecase.register(req.body);
             const renterResponse: RenterGetDataResponse = RenterGetDataResponse.fromEntity(renter);
             res.status(201).json(new BaseSuccessResponse(true, "Register success", renterResponse));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    public async sendEmailVerificationOTP(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            await this.renterUsecase.sendEmailVerificationOTP(req.body);
+            res.status(200).json(new BaseSuccessResponse(true, "Send verification email OTP success", null));
         } catch (error) {
             next(error);
         }

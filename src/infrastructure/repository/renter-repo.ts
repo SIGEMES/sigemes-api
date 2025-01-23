@@ -5,7 +5,7 @@ import { Renter } from '../../domain/entity/renter';
 export class RenterRepo implements RenterRepoInterface {
     constructor(private prisma: PrismaClient) { }
 
-    async getUserByEmail(email: string): Promise<Renter|null> {
+    public async getUserByEmail(email: string): Promise<Renter|null> {
         const renter:Renter|null = await this.prisma.renter.findUnique({
             where: { email }
         });
@@ -17,7 +17,7 @@ export class RenterRepo implements RenterRepoInterface {
         return renter;
     };
 
-    async createUser(renter: Renter): Promise<Renter> {
+    public async createUser(renter: Renter): Promise<Renter> {
         const createdRenter: Renter = await this.prisma.renter.create({
             data: {
                 email: renter.email,
@@ -31,4 +31,13 @@ export class RenterRepo implements RenterRepoInterface {
         return createdRenter;
     };
 
+    public async updateOTP(id: number, otp: string, otpExpiry: Date): Promise<void> {
+        await this.prisma.renter.update({
+            where: { id },
+            data: {
+                otp,
+                otpExpiry
+            }
+        });
+    };
 }
