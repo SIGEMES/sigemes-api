@@ -114,4 +114,28 @@ export class RenterUsecase {
 
         await this.renterRepo.updateEmailVerified(renterData.id);
     }
+
+    public async changePassword(renterLoginData: Renter, renterRequestData: Renter): Promise<void> {
+        const changePasswordRequest: Renter = this.renterValidator.validate(renterRequestData, "changePassword");
+
+        const renterData: Renter | null = await this.renterRepo.getUserByEmail(renterLoginData.email);
+
+        if (!renterData) {
+            throw new ResponseError('User not found', 400);
+        }
+
+        if (changePasswordRequest.password === changePasswordRequest.newPassword) {
+            throw new ResponseError('New password cannot be the same as old password', 400);
+        }
+
+        const passwordMatch = await this.bcryptService.comparePassword(changePasswordRequest.password, renterData.password);
+
+        if (!passwordMatch) {
+            throw new ResponseError('Invalid old password', 400);
+        }
+
+        const hashedPassword: string = await this.bcryptService.hashPassword(changePasswordRequest.newPassword);
+
+        await this.renterRepo.updatePassword(renterData.id, hashedPassword);
+    }
 }

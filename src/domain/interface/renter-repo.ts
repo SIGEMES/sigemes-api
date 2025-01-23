@@ -6,4 +6,5 @@ export interface RenterRepoInterface {
     updateOTP(id: number, otp: string, otpExpiry: Date): Promise<void>;
     getUserOTPByEmail(email: string): Promise<Renter|null>;
     updateEmailVerified(id: number): Promise<void>;
+    updatePassword(id: number, password: string): Promise<void>;
 }

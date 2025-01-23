@@ -8,7 +8,7 @@ export class RenterRepo implements RenterRepoInterface {
     public async getUserByEmail(email: string): Promise<Renter|null> {
         const renter:Renter|null = await this.prisma.renter.findUnique({
             where: { email }
-        });
+        }) as Renter;
 
         return renter;
     }
@@ -22,7 +22,7 @@ export class RenterRepo implements RenterRepoInterface {
                 phoneNumber: renter.phoneNumber,
                 gender: renter.gender
             }
-        });
+        }) as Renter;
 
         return createdRenter;
     }
@@ -57,6 +57,15 @@ export class RenterRepo implements RenterRepoInterface {
                 emailVerified: true,
                 otp: null,
                 otpExpiry: null
+            }
+        });
+    }
+
+    public async updatePassword(id: number, password: string): Promise<void> {
+        await this.prisma.renter.update({
+            where: { id },
+            data: {
+                password
             }
         });
     }

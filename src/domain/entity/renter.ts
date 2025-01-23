@@ -5,6 +5,7 @@ export class Renter {
         public id: number,
         public email: string,
         public password: string,
+        public newPassword: string,
         public fullname: string,
         public phoneNumber: string,
         public gender: Gender,

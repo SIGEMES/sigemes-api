@@ -19,4 +19,8 @@ export const RenterValidation: Record<string, ZodSchema<any>> = {
         email: z.string().email(),
         otp: z.string().min(5).max(5),
     }),
+    changePassword: z.object({
+        password: z.string().min(5),
+        newPassword: z.string().min(5),
+    }),
 };

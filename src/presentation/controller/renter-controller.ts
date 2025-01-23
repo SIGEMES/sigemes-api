@@ -55,4 +55,13 @@ export class RenterController {
             next(error);
         }
     }
+
+    public async changePassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            await this.renterUsecase.changePassword(res.locals.user, req.body);
+            res.status(200).json(new BaseSuccessResponse(true, "Update password success", null));
+        } catch (error) {
+            next(error);
+        }
+    }
 }

@@ -20,5 +20,6 @@ export class APIRouter {
         this.renterRouter.post("/email/verify-otp", this.renterController.verifyEmailOTP.bind(this.renterController));
         this.renterRouter.use(jwtMiddleware, isRenterMiddleware);
         this.renterRouter.get("", this.renterController.getRenterData.bind(this.renterController));
+        this.renterRouter.put("/change-password", this.renterController.changePassword.bind(this.renterController));
     }
 }
