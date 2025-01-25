@@ -8,4 +8,5 @@ export interface RenterRepoInterface {
     updateEmailVerified(id: number): Promise<void>;
     updateForgotPasswordVerified(id: number): Promise<void>;
     updatePassword(id: number, password: string): Promise<void>;
+    updatePasswordForgotPassword(id: number, password: string): Promise<void>;
 }

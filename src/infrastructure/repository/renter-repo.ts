@@ -80,4 +80,14 @@ export class RenterRepo implements RenterRepoInterface {
             }
         });
     }
+    
+    public async updatePasswordForgotPassword(id: number, password: string): Promise<void> {
+        await this.prisma.renter.update({
+            where: { id },
+            data: {
+                password,
+                forgotPasswordVerified: false
+            }
+        });
+    }
 }

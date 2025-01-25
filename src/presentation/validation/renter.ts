@@ -27,5 +27,10 @@ export class RenterValidation {
         old_password: z.string().min(5),
         new_password: z.string().min(5),
     });
+
+    public static changePasswordForgotPassword = z.object({
+        email: z.string().email(),
+        new_password: z.string().min(5),
+    });
     
 }

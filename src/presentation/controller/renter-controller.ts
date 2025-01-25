@@ -111,4 +111,19 @@ export class RenterController {
             next(error);
         }
     }
+
+
+    public async changePasswordForgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const validatedData: {
+                email: string,
+                new_password: string
+            } = RenterValidation.changePasswordForgotPassword.parse(req.body);
+
+            await this.renterUsecase.changePasswordForgotPassword(validatedData.email, validatedData.new_password);
+            res.status(200).json(new BaseSuccessResponse(true, "Update password success", null));
+        } catch (error) {
+            next(error);
+        }
+    }
 }

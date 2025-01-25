@@ -132,4 +132,20 @@ export class RenterUsecase {
 
         await this.renterRepo.updatePassword(renterData.id, hashedPassword);
     }
+
+    public async changePasswordForgotPassword(email: string, newPassword: string): Promise<void> {
+        const renterData: Renter | null = await this.renterRepo.getUserByEmail(email);
+
+        if (!renterData) {
+            throw new ResponseError('User not found', 400);
+        }
+
+        if (renterData.forgotPasswordVerified === false) {
+            throw new ResponseError('User not verified to reset password', 400);
+        }
+
+        const hashedPassword: string = await this.bcryptService.hashPassword(newPassword);
+
+        await this.renterRepo.updatePasswordForgotPassword(renterData.id, hashedPassword);
+    }
 }
