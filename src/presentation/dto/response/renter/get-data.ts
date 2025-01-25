@@ -1,4 +1,4 @@
-import { Renter } from '../../../domain/entity/renter';
+import { Renter } from '../../../../domain/entity/renter';
 
 export class RenterGetDataResponse {
     constructor (

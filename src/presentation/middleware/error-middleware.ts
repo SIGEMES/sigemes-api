@@ -1,7 +1,7 @@
 import { Response, Request, NextFunction } from "express";
 import { ZodError } from "zod";
 import { ResponseError } from "../../domain/error/response-error";
-import { BaseFailedResponse } from "../dto/response/base-failed";
+import { BaseFailedResponse } from "../dto/response/base/base-failed";
 
 export const errorMiddleware = async (error: Error, req: Request, res: Response, next: NextFunction) => {
     if (error instanceof ZodError) {
@@ -22,7 +22,7 @@ export const errorMiddleware = async (error: Error, req: Request, res: Response,
             error.message,
         ));
     } else {
-        // console.log(error);
+        console.log(error);
         res.status(500).json(new BaseFailedResponse(
             false,
             error.message,

@@ -1,4 +1,4 @@
-import { Renter } from '../../../domain/entity/renter';
+import { Renter } from '../../../../domain/entity/renter';
 
 export class RenterLoginResponse {
     constructor (
@@ -12,7 +12,7 @@ export class RenterLoginResponse {
         public token: string,
     ) {}
 
-    static fromEntity(renter: Renter): RenterLoginResponse {
+    static fromEntity(renter: Renter, token: string): RenterLoginResponse {
         return new RenterLoginResponse(
             renter.id,
             renter.email,
@@ -21,7 +21,7 @@ export class RenterLoginResponse {
             renter.gender,
             renter.profilePicture,
             renter.emailVerified,
-            renter.token as string,
+            token,
         );
     }
 }

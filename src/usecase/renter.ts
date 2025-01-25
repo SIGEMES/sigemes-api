@@ -2,29 +2,25 @@ import { Renter } from '../domain/entity/renter';
 import { RenterRepoInterface } from '../domain/interface/renter-repo';
 import { JwtInterface } from '../domain/interface/jwt';
 import { BcryptInterface } from '../domain/interface/bcrypt';
-import { ValidatorInterface } from '../domain/interface/validator';
 import { ResponseError } from '../domain/error/response-error';
 import { MailerInterface } from '../domain/interface/mailer';
 
 export class RenterUsecase {
     constructor(
-        private renterValidator: ValidatorInterface,
         private renterRepo: RenterRepoInterface,
         private jwtService: JwtInterface,
         private bcryptService: BcryptInterface,
         private mailerService: MailerInterface,
     ) {}
 
-    public async login(renter: Renter): Promise<Renter> {
-        const loginRequest: Renter = this.renterValidator.validate(renter, "login");
-
-        const renterData: Renter | null = await this.renterRepo.getUserByEmail(loginRequest.email);
+    public async login(email: string, password: string): Promise<{ renterData: Renter, token: string }> {
+        const renterData: Renter | null = await this.renterRepo.getUserByEmail(email);
 
         if (!renterData) {
             throw new ResponseError('User not found', 400);
         }
 
-        const passwordMatch = await this.bcryptService.comparePassword(loginRequest.password, renterData.password);
+        const passwordMatch = await this.bcryptService.comparePassword(password, renterData.password);
 
         if (!passwordMatch) {
             throw new ResponseError('Invalid password', 400);
@@ -42,13 +38,11 @@ export class RenterUsecase {
             emailVerified: renterData.emailVerified,
         });
 
-        renterData.token = token;
-
-        return renterData;
+        return { renterData, token };
     }
 
-    public async getRenterData(renter: Renter): Promise<Renter> {
-        const renterData: Renter | null = await this.renterRepo.getUserByEmail(renter.email);
+    public async getRenterDataByEmail(email: string): Promise<Renter> {
+        const renterData: Renter | null = await this.renterRepo.getUserByEmail(email);
 
         if (!renterData) {
             throw new ResponseError('User not found', 200);
@@ -58,26 +52,22 @@ export class RenterUsecase {
     }
 
     public async register(renter: Renter): Promise<Renter> {
-        const registerRequest: Renter = this.renterValidator.validate(renter, "register");
-
-        const renterData: Renter | null = await this.renterRepo.getUserByEmail(registerRequest.email);
+        const renterData: Renter | null = await this.renterRepo.getUserByEmail(renter.email);
 
         if (renterData) {
             throw new ResponseError('Email already registered', 400);
         }
 
-        const hashedPassword: string = await this.bcryptService.hashPassword(registerRequest.password);
-        registerRequest.password = hashedPassword;
+        const hashedPassword: string = await this.bcryptService.hashPassword(renter.password);
+        renter.password = hashedPassword;
 
-        const newRenter: Renter = await this.renterRepo.createUser(registerRequest);
+        const newRenter: Renter = await this.renterRepo.createUser(renter);
 
         return newRenter;
     }
 
-    public async sendEmailVerificationOTP(renter: Renter): Promise<void> {
-        const verifyEmailRequest: Renter = this.renterValidator.validate(renter, "sendEmailVerificationOTP");
-
-        const renterData: Renter | null = await this.renterRepo.getUserByEmail(verifyEmailRequest.email);
+    public async sendOTP(email: string, action: string): Promise<void> {
+        const renterData: Renter | null = await this.renterRepo.getUserByEmail(email);
 
         if (!renterData) {
             throw new ResponseError('User not found', 200);
@@ -91,10 +81,8 @@ export class RenterUsecase {
         await this.mailerService.sendEmail(renterData.email, 'Verifikasi Email SIGEMES', otp, 'verifikasi email');
     }
 
-    public async verifyEmailVerificationOTP(renter: Renter): Promise<void> {
-        const verifyEmailRequest: Renter = this.renterValidator.validate(renter, "verifyEmailVerificationOTP");
-
-        const renterData: Renter | null = await this.renterRepo.getUserOTPByEmail(verifyEmailRequest.email);
+    public async verifyOTP(email: string, otp:string, action: string): Promise<void> {
+        const renterData: Renter | null = await this.renterRepo.getUserOTPByEmail(email);
 
         if (!renterData) {
             throw new ResponseError('User not found', 400);
@@ -104,7 +92,7 @@ export class RenterUsecase {
             throw new ResponseError('OTP not found', 400);
         }
 
-        if (renterData.otp !== verifyEmailRequest.otp) {
+        if (renterData.otp !== otp) {
             throw new ResponseError('Invalid OTP', 400);
         }
 
@@ -112,29 +100,29 @@ export class RenterUsecase {
             throw new ResponseError('OTP expired', 400);
         }
 
-        await this.renterRepo.updateEmailVerified(renterData.id);
+        if (action === 'emailVerification') {
+            await this.renterRepo.updateEmailVerified(renterData.id);
+        }
     }
 
-    public async changePassword(renterLoginData: Renter, renterRequestData: Renter): Promise<void> {
-        const changePasswordRequest: Renter = this.renterValidator.validate(renterRequestData, "changePassword");
-
-        const renterData: Renter | null = await this.renterRepo.getUserByEmail(renterLoginData.email);
+    public async changePassword(email: string, oldPassword: string, newPassword: string): Promise<void> {
+        const renterData: Renter | null = await this.renterRepo.getUserByEmail(email);
 
         if (!renterData) {
             throw new ResponseError('User not found', 400);
         }
 
-        if (changePasswordRequest.password === changePasswordRequest.newPassword) {
+        if (oldPassword === newPassword) {
             throw new ResponseError('New password cannot be the same as old password', 400);
         }
 
-        const passwordMatch = await this.bcryptService.comparePassword(changePasswordRequest.password, renterData.password);
+        const passwordMatch = await this.bcryptService.comparePassword(oldPassword, renterData.password);
 
         if (!passwordMatch) {
             throw new ResponseError('Invalid old password', 400);
         }
 
-        const hashedPassword: string = await this.bcryptService.hashPassword(changePasswordRequest.newPassword);
+        const hashedPassword: string = await this.bcryptService.hashPassword(newPassword);
 
         await this.renterRepo.updatePassword(renterData.id, hashedPassword);
     }
