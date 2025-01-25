@@ -106,6 +106,8 @@ export class RenterUsecase {
 
         if (action === 'emailVerification') {
             await this.renterRepo.updateEmailVerified(renterData.id);
+        } else {
+            await this.renterRepo.updateForgotPasswordVerified(renterData.id);
         }
     }
 
