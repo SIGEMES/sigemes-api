@@ -87,4 +87,14 @@ export class RenterController {
             next(error);
         }
     }
+
+    public async sendForgotPasswordOTP(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const validatedData: { email:string } = RenterValidation.sendEmailOTP.parse(req.body);
+            await this.renterUsecase.sendOTP(validatedData.email, "forgotPassword");
+            res.status(200).json(new BaseSuccessResponse(true, "Send forgot password OTP success", null));
+        } catch (error) {
+            next(error);
+        }
+    }
 }

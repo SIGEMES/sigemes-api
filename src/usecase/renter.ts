@@ -77,8 +77,12 @@ export class RenterUsecase {
         const otpExpiry: Date = new Date(Date.now() + 600000);
 
         await this.renterRepo.updateOTP(renterData.id, otp, otpExpiry);
-
-        await this.mailerService.sendEmail(renterData.email, 'Verifikasi Email SIGEMES', otp, 'verifikasi email');
+        
+        if (action === 'emailVerification') {
+            await this.mailerService.sendEmail(renterData.email, 'Verifikasi Email SIGEMES', otp, 'verifikasi email');
+        } else {
+            await this.mailerService.sendEmail(renterData.email, 'Reset Password SIGEMES', otp, 'reset password');
+        }
     }
 
     public async verifyOTP(email: string, otp:string, action: string): Promise<void> {
