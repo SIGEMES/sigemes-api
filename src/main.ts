@@ -13,6 +13,7 @@ import { RenterRepoInterface } from "./domain/interface/renter-repo";
 import { MailerInterface } from "./domain/interface/mailer";
 import { ObjectStorageInterface } from "./domain/interface/object-storage";
 import { CloudStorageService } from "./infrastructure/object-storage/cloud-storage";
+import { APIRouter } from "./presentation/router/api";
 
 export async function main(): Promise<void> {
 
@@ -26,9 +27,13 @@ export async function main(): Promise<void> {
     const renterUsecase: RenterUsecase = new RenterUsecase(renterRepo, jwtService, bcryptService, mailerService, objectStorageService);
     const renterController: RenterController = new RenterController(renterUsecase);
 
+    const router: APIRouter = new APIRouter(
+        renterController
+    );
+
     const webServer: WebServer = new WebServer(
         8080,
-        renterController);
+        router);
     webServer.start();
 }
 

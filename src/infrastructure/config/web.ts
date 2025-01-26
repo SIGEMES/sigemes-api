@@ -10,13 +10,11 @@ export class WebServer {
 
     constructor(
         port: number,
-        renterController: RenterController
+        APIRouter: APIRouter
     ) {
         this.app = express();
         this.port = port;
-        this.APIRouter = new APIRouter(
-            renterController
-        );
+        this.APIRouter = APIRouter;
 
         this.app.use(express.json());
         this.app.use("/api/v1/renters", this.APIRouter.renterRouter);

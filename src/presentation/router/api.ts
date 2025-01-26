@@ -5,8 +5,8 @@ import { isRenterMiddleware } from '../middleware/is-renter-middleware';
 import multer from 'multer';
 
 export class APIRouter {
-    public renterRouter: express.Router;
     public multerUpload: multer.Multer;
+    public renterRouter: express.Router;
 
     constructor(
         private renterController: RenterController
