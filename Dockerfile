@@ -12,5 +12,5 @@ COPY --from=build /app/package*.json ./
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/src/infrastructure/mailer/view ./dist/infrastructure/mailer/view
 COPY --from=build /app/node_modules ./node_modules
-EXPOSE 3000
+EXPOSE 8080
 CMD ["npm", "run", "start-prod"]

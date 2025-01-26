@@ -27,7 +27,7 @@ export async function main(): Promise<void> {
     const renterController: RenterController = new RenterController(renterUsecase);
 
     const webServer: WebServer = new WebServer(
-        3000,
+        8080,
         renterController);
     webServer.start();
 }
