@@ -6,6 +6,8 @@ import { RenterGetDataResponse } from '../dto/response/renter/get-data';
 import { BaseSuccessResponse } from '../dto/response/base/base-success';
 import { RenterValidation } from '../validation/renter';
 import { RenterRegisterRequest } from '../dto/request/renter/register';
+import { RenterUpdateProfileRequest } from '../dto/request/renter/update-profile';
+import { File } from '../../domain/interface/file';
 
 export class RenterController {
     constructor(private renterUsecase: RenterUsecase) {}
@@ -122,6 +124,29 @@ export class RenterController {
 
             await this.renterUsecase.changePasswordForgotPassword(validatedData.email, validatedData.new_password);
             res.status(200).json(new BaseSuccessResponse(true, "Update password success", null));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    public async updateProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const validatedData: RenterUpdateProfileRequest = RenterValidation.updateProfile.parse(req.body);
+            const renterValidatedData: Renter = RenterUpdateProfileRequest.toEntity(validatedData);
+
+            let fileData: File | undefined;
+            if (req.file) {
+                fileData = {
+                    originalName: req.file.originalname,
+                    mimeType: req.file.mimetype,
+                    size: req.file.size,
+                    buffer: req.file.buffer,
+                };
+            }
+
+            const renter: Renter = await this.renterUsecase.updateProfile(res.locals.user.id, renterValidatedData, fileData);
+            const renterResponse: RenterGetDataResponse = RenterGetDataResponse.fromEntity(renter);
+            res.status(200).json(new BaseSuccessResponse(true, "Update profile success", renterResponse));
         } catch (error) {
             next(error);
         }

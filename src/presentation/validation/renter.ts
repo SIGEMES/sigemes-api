@@ -32,5 +32,11 @@ export class RenterValidation {
         email: z.string().email(),
         new_password: z.string().min(5),
     });
+
+    public static updateProfile = z.object({
+        fullname: z.string().min(3),
+        phone_number: z.string().min(10),
+        gender: z.enum(['male', 'female'],)}
+    );
     
 }

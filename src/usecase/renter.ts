@@ -4,6 +4,8 @@ import { JwtInterface } from '../domain/interface/jwt';
 import { BcryptInterface } from '../domain/interface/bcrypt';
 import { ResponseError } from '../domain/error/response-error';
 import { MailerInterface } from '../domain/interface/mailer';
+import { ObjectStorageInterface } from '../domain/interface/object-storage';
+import { File } from '../domain/interface/file';
 
 export class RenterUsecase {
     constructor(
@@ -11,6 +13,7 @@ export class RenterUsecase {
         private jwtService: JwtInterface,
         private bcryptService: BcryptInterface,
         private mailerService: MailerInterface,
+        private objectStorageService: ObjectStorageInterface
     ) {}
 
     public async login(email: string, password: string): Promise<{ renterData: Renter, token: string }> {
@@ -147,5 +150,32 @@ export class RenterUsecase {
         const hashedPassword: string = await this.bcryptService.hashPassword(newPassword);
 
         await this.renterRepo.updatePasswordForgotPassword(renterData.id, hashedPassword);
+    }
+
+    public async updateProfile(id: number, renter: Renter, file?: File): Promise<Renter> {
+        const renterData: Renter | null = await this.renterRepo.getUserById(id);
+
+        if (!renterData) {
+            throw new ResponseError('User not found', 400);
+        }
+
+        if (file) {
+            const oldProfilePicture: string = renterData.profilePicture.split('/').pop() as string;
+            const oldProfilePicturePath: string = `profile-pictures/${oldProfilePicture}`;
+
+            if (oldProfilePicture !== 'default-picture.png') {
+                await this.objectStorageService.deleteFile(oldProfilePicturePath);
+            }
+
+            const hashName: string = `${Date.now()}-${Math.random().toString(36).substring(7)}`;
+            file.originalName = hashName + file.originalName;
+
+            const imageUrl: string = await this.objectStorageService.uploadFile(file, 'profile-pictures');
+            renter.profilePicture = imageUrl;
+        }
+
+        const updatedRenter: Renter = await this.renterRepo.updateProfile(id, renter);
+
+        return updatedRenter;
     }
 }

@@ -25,7 +25,7 @@ model Renter {
   fullname               String
   phoneNumber            String    @map("phone_number")
   gender                 Gender
-  profilePicture         String    @default("./.temp-file-storage/avatar-default.png") @map("profile_picture")
+  profilePicture         String    @default("https://storage.googleapis.com/sigemes-storage/profile-pictures/default-picture.png") @map("profile_picture")
   emailVerified          Boolean   @default(false) @map("email_verified")
   otp                    String?   @db.VarChar(5)
   otpExpiry              DateTime? @map("otp_expiry")

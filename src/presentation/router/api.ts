@@ -2,13 +2,22 @@ import express from 'express';
 import { RenterController } from '../controller/renter-controller';
 import { jwtMiddleware } from '../middleware/jwt-middleware';
 import { isRenterMiddleware } from '../middleware/is-renter-middleware';
+import multer from 'multer';
 
 export class APIRouter {
     public renterRouter: express.Router;
+    public multerUpload: multer.Multer;
 
     constructor(
         private renterController: RenterController
     ) {
+        this.multerUpload = multer({
+            storage: multer.memoryStorage(),
+            limits: {
+                fileSize: 5 * 1024 * 1024,
+            },
+        });
+
         this.renterRouter = express.Router();
         this.configRentersRoutes();
     }
@@ -24,5 +33,6 @@ export class APIRouter {
         this.renterRouter.use(jwtMiddleware, isRenterMiddleware);
         this.renterRouter.get("", this.renterController.getRenterData.bind(this.renterController));
         this.renterRouter.put("/change-password", this.renterController.changePassword.bind(this.renterController));
+        this.renterRouter.put("/update-profile", this.multerUpload.single('profile_picture'), this.renterController.updateProfile.bind(this.renterController));
     }
 }

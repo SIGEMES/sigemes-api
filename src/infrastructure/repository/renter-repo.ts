@@ -5,6 +5,14 @@ import { Renter } from '../../domain/entity/renter';
 export class RenterRepo implements RenterRepoInterface {
     constructor(private prisma: PrismaClient) { }
 
+    public async getUserById(id: number): Promise<Renter|null> {
+        const renter: Renter|null = await this.prisma.renter.findUnique({
+            where: { id }
+        }) as Renter;
+
+        return renter;
+    }
+
     public async getUserByEmail(email: string): Promise<Renter|null> {
         const renter:Renter|null = await this.prisma.renter.findUnique({
             where: { email }
@@ -89,5 +97,19 @@ export class RenterRepo implements RenterRepoInterface {
                 forgotPasswordVerified: false
             }
         });
+    }
+
+    public async updateProfile(id: number, renter: Renter): Promise<Renter> {
+        const updatedRenter: Renter = await this.prisma.renter.update({
+            where: { id },
+            data: {
+                fullname: renter.fullname,
+                phoneNumber: renter.phoneNumber,
+                gender: renter.gender,
+                profilePicture: renter.profilePicture
+            }
+        });
+
+        return updatedRenter;
     }
 }
