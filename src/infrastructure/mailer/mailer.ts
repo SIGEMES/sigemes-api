@@ -16,7 +16,12 @@ export class MailerService implements MailerInterface {
     };
 
     public async sendEmail(to: string, subject: string, otp: string, action: string): Promise<void> {
-        let htmlContent: string = fs.readFileSync(path.resolve('./src/infrastructure/mailer/view/otp.html'), 'utf8');
+        let viewPath: string = path.resolve('./src/infrastructure/mailer/view/otp.html');
+        if (process.env.NODE_ENV === 'prod') {
+            viewPath = path.resolve('./dist/infrastructure/mailer/view/otp.html');
+        }
+
+        let htmlContent: string = fs.readFileSync(viewPath, 'utf8');
         htmlContent = htmlContent.replace('{{OTP}}', otp);
         htmlContent = htmlContent.replace('{{ACTION}}', action);
 
