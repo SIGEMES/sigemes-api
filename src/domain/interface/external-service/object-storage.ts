@@ -1,4 +1,4 @@
-import { File } from "./file";
+import { File } from "../library/file";
 
 export interface ObjectStorageInterface {
     uploadFile(file: File, path: string): Promise<string>;

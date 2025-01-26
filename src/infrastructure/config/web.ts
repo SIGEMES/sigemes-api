@@ -1,6 +1,6 @@
 import express from 'express';
 import { APIRouter } from '../../presentation/router/api';
-import { RenterController } from '../../presentation/controller/renter-controller';
+import { RenterController } from '../../presentation/controller/renter';
 import { errorMiddleware } from '../../presentation/middleware/error-middleware';
 
 export class WebServer {

@@ -1,15 +1,15 @@
 import { Renter } from '../domain/entity/renter';
-import { RenterRepoInterface } from '../domain/interface/renter-repo';
-import { JwtInterface } from '../domain/interface/jwt';
-import { BcryptInterface } from '../domain/interface/bcrypt';
+import { RenterRepositoryInterface } from '../domain/interface/repository/renter';
+import { JwtInterface } from '../domain/interface/library/jwt';
+import { BcryptInterface } from '../domain/interface/library/bcrypt';
 import { ResponseError } from '../domain/error/response-error';
-import { MailerInterface } from '../domain/interface/mailer';
-import { ObjectStorageInterface } from '../domain/interface/object-storage';
-import { File } from '../domain/interface/file';
+import { MailerInterface } from '../domain/interface/external-service/mailer';
+import { ObjectStorageInterface } from '../domain/interface/external-service/object-storage';
+import { File } from '../domain/interface/library/file';
 
 export class RenterUsecase {
     constructor(
-        private renterRepo: RenterRepoInterface,
+        private renterRepo: RenterRepositoryInterface,
         private jwtService: JwtInterface,
         private bcryptService: BcryptInterface,
         private mailerService: MailerInterface,

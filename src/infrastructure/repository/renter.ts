@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import { RenterRepoInterface } from '../../domain/interface/renter-repo';
+import { RenterRepositoryInterface } from '../../domain/interface/repository/renter';
 import { Renter } from '../../domain/entity/renter';
 
-export class RenterRepo implements RenterRepoInterface {
+export class RenterRepo implements RenterRepositoryInterface {
     constructor(private prisma: PrismaClient) { }
 
     public async getUserById(id: number): Promise<Renter|null> {

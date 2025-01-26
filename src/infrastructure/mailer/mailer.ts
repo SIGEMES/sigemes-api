@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import nodemailer from 'nodemailer';
-import { MailerInterface } from '../../domain/interface/mailer';
+import { MailerInterface } from '../../domain/interface/external-service/mailer';
 
 export class MailerService implements MailerInterface {
     private transporter: nodemailer.Transporter;

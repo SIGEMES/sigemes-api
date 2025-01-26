@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { BcryptInterface } from '../../domain/interface/bcrypt';
+import { BcryptInterface } from '../../domain/interface/library/bcrypt';
 
 export class BcryptService implements BcryptInterface {
     async hashPassword(password: string): Promise<string> {

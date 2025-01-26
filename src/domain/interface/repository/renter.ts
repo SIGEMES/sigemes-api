@@ -1,6 +1,6 @@
-import { Renter } from "../entity/renter";
+import { Renter } from "../../entity/renter";
 
-export interface RenterRepoInterface {
+export interface RenterRepositoryInterface {
     getUserById(id: number): Promise<Renter|null>;
     getUserByEmail(email: string): Promise<Renter|null>;
     createUser(renter: Renter): Promise<Renter>;

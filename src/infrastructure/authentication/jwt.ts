@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { JwtInterface } from '../../domain/interface/jwt';
+import { JwtInterface } from '../../domain/interface/library/jwt';
 
 export class JwtService implements JwtInterface {
     private jwtSecret: string = process.env.JWT_SECRET as string;

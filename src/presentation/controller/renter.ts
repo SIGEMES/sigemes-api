@@ -7,7 +7,7 @@ import { BaseSuccessResponse } from '../dto/response/base/base-success';
 import { RenterValidation } from '../validation/renter';
 import { RenterRegisterRequest } from '../dto/request/renter/register';
 import { RenterUpdateProfileRequest } from '../dto/request/renter/update-profile';
-import { File } from '../../domain/interface/file';
+import { File } from '../../domain/interface/library/file';
 
 export class RenterController {
     constructor(private renterUsecase: RenterUsecase) {}

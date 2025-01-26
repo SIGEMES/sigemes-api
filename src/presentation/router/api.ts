@@ -1,5 +1,5 @@
 import express from 'express';
-import { RenterController } from '../controller/renter-controller';
+import { RenterController } from '../controller/renter';
 import { jwtMiddleware } from '../middleware/jwt-middleware';
 import { isRenterMiddleware } from '../middleware/is-renter-middleware';
 import multer from 'multer';

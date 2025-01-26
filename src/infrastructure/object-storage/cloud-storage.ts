@@ -1,6 +1,6 @@
 import { Bucket, Storage } from "@google-cloud/storage";
-import { ObjectStorageInterface } from "../../domain/interface/object-storage";
-import { File } from "../../domain/interface/file";
+import { ObjectStorageInterface } from "../../domain/interface/external-service/object-storage";
+import { File } from "../../domain/interface/library/file";
 
 export class CloudStorageService implements ObjectStorageInterface{
     private storage: Storage;

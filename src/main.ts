@@ -1,17 +1,17 @@
 import { WebServer } from "./infrastructure/config/web";
 import { prisma } from "./infrastructure/config/database";
-import { RenterRepo } from "./infrastructure/repository/renter-repo";
+import { RenterRepo } from "./infrastructure/repository/renter";
 import { RenterUsecase } from "./usecase/renter";
-import { RenterController } from "./presentation/controller/renter-controller";
-import { JwtService } from "./infrastructure/authentication/jwt-service";
-import { BcryptService } from "./infrastructure/authentication/bcrypt-service";
+import { RenterController } from "./presentation/controller/renter";
+import { JwtService } from "./infrastructure/authentication/jwt";
+import { BcryptService } from "./infrastructure/authentication/bcrypt";
 import { MailerService } from "./infrastructure/mailer/mailer";
 
-import { JwtInterface } from "./domain/interface/jwt";
-import { BcryptInterface } from "./domain/interface/bcrypt";
-import { RenterRepoInterface } from "./domain/interface/renter-repo";
-import { MailerInterface } from "./domain/interface/mailer";
-import { ObjectStorageInterface } from "./domain/interface/object-storage";
+import { JwtInterface } from "./domain/interface/library/jwt";
+import { BcryptInterface } from "./domain/interface/library/bcrypt";
+import { RenterRepositoryInterface } from "./domain/interface/repository/renter";
+import { MailerInterface } from "./domain/interface/external-service/mailer";
+import { ObjectStorageInterface } from "./domain/interface/external-service/object-storage";
 import { CloudStorageService } from "./infrastructure/object-storage/cloud-storage";
 import { APIRouter } from "./presentation/router/api";
 
@@ -23,7 +23,7 @@ export async function main(): Promise<void> {
     const objectStorageService: ObjectStorageInterface = new CloudStorageService();
 
     // Renter Module
-    const renterRepo: RenterRepoInterface = new RenterRepo(prisma);
+    const renterRepo: RenterRepositoryInterface = new RenterRepo(prisma);
     const renterUsecase: RenterUsecase = new RenterUsecase(renterRepo, jwtService, bcryptService, mailerService, objectStorageService);
     const renterController: RenterController = new RenterController(renterUsecase);
 
