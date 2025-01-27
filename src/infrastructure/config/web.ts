@@ -1,7 +1,6 @@
 import express from 'express';
 import { APIRouter } from '../../presentation/router/api';
-import { RenterController } from '../../presentation/controller/renter';
-import { errorMiddleware } from '../../presentation/middleware/error-middleware';
+import { errorMiddleware } from '../../presentation/middleware/error';
 
 export class WebServer {
     private app: express.Application;
@@ -18,6 +17,7 @@ export class WebServer {
 
         this.app.use(express.json());
         this.app.use("/api/v1/renters", this.APIRouter.renterRouter);
+        this.app.use("/api/v1/admins", this.APIRouter.adminRouter);
         this.app.use(errorMiddleware);
     }
 
