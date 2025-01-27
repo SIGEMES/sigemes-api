@@ -26,4 +26,17 @@ export class AdminRepository implements AdminRepositoryInterface {
 
         return admin;
     }
+
+    public async createAdmin(admin: Admin): Promise<Admin> {
+        const newAdmin: Admin = await this.prisma.admin.create({
+            data: {
+                email: admin.email,
+                password: admin.password,
+                fullname: admin.fullname,
+                phoneNumber: admin.phoneNumber,
+            }
+        });
+
+        return newAdmin;
+    }
 }

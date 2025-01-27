@@ -5,6 +5,7 @@ import { isRenterMiddleware } from '../middleware/is-renter';
 import multer from 'multer';
 import { AdminController } from '../controller/admin';
 import { isAdminMiddleware } from '../middleware/is-admin';
+import { isSuperAdminMiddleware } from '../middleware/is-super-admin';
 
 export class APIRouter {
     public multerUpload: multer.Multer;
@@ -49,5 +50,7 @@ export class APIRouter {
         this.adminRouter.get("", this.adminController.getAllAdmin.bind(this.adminController));
         this.adminRouter.get("/profile", this.adminController.getCurrentAdmin.bind(this.adminController));
         this.adminRouter.get("/:id", this.adminController.getAdminById.bind(this.adminController));
+        this.adminRouter.use(isSuperAdminMiddleware);
+        this.adminRouter.post("", this.adminController.createAdmin.bind(this.adminController));
     }
 }

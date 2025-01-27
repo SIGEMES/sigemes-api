@@ -4,4 +4,5 @@ export interface AdminRepositoryInterface {
     getAllAdmin(): Promise<Admin[]>;
     getAdminById(id: number): Promise<Admin|null>;
     getAdminByEmail(email: string): Promise<Admin|null>;
+    createAdmin(admin: Admin): Promise<Admin>;
 }

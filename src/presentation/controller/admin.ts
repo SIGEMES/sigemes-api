@@ -5,6 +5,7 @@ import { AdminLoginResponse } from '../dto/response/admin/login';
 import { BaseSuccessResponse } from '../dto/response/base/base-success';
 import { AdminValidation } from '../validation/admin';
 import { AdminGetDataResponse } from '../dto/response/admin/get-data';
+import { CreateAdminRequest } from '../dto/request/admin/create';
 
 export class AdminController {
     constructor(private adminUsecase: AdminUsecase) {}
@@ -40,7 +41,6 @@ export class AdminController {
 
     public async getAdminById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            console.log("**********************");
             const admin: Admin = await this.adminUsecase.getAdminById(Number(req.params.id));
             const adminResponse: AdminGetDataResponse = AdminGetDataResponse.fromEntity(admin);
             res.status(200).json(new BaseSuccessResponse(true, "Get admin by id success", adminResponse));
@@ -51,10 +51,20 @@ export class AdminController {
 
     public async getCurrentAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            console.log("========================", res.locals.user)
             const admin: Admin = await this.adminUsecase.getAdminById(Number(res.locals.user.id));
             const adminResponse: AdminGetDataResponse = AdminGetDataResponse.fromEntity(admin);
             res.status(200).json(new BaseSuccessResponse(true, "Get current admin profile success", adminResponse));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    public async createAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const validatedData: CreateAdminRequest = AdminValidation.createAdmin.parse(req.body);
+            const admin: Admin = await this.adminUsecase.createAdmin(CreateAdminRequest.toEntity(validatedData));
+            const adminResponse: AdminGetDataResponse = AdminGetDataResponse.fromEntity(admin);
+            res.status(201).json(new BaseSuccessResponse(true, "Create admin success", adminResponse));
         } catch (error) {
             next(error);
         }

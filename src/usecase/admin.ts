@@ -57,4 +57,19 @@ export class AdminUsecase {
 
         return admin;
     }
+
+    public async createAdmin(admin: Admin): Promise<Admin> {
+        const adminData: Admin | null = await this.adminRepository.getAdminByEmail(admin.email);
+
+        if (adminData) {
+            throw new ResponseError('Email already used', 400);
+        }
+
+        const hashedPassword: string = await this.bcryptService.hashPassword(admin.password);
+        admin.password = hashedPassword;
+        
+        const newAdmin: Admin = await this.adminRepository.createAdmin(admin);
+
+        return newAdmin;
+    }
 }
