@@ -5,6 +5,12 @@ import { Admin } from '../../domain/entity/admin';
 export class AdminRepository implements AdminRepositoryInterface {
     constructor(private prisma: PrismaClient) { }
 
+    public async getAllAdmin(): Promise<Admin[]> {
+        const admins: Admin[] = await this.prisma.admin.findMany();
+
+        return admins;
+    }
+
     public async getAdminById(id: number): Promise<Admin|null> {
         const admin: Admin|null = await this.prisma.admin.findUnique({
             where: { id }

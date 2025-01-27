@@ -4,6 +4,7 @@ import { jwtMiddleware } from '../middleware/jwt';
 import { isRenterMiddleware } from '../middleware/is-renter';
 import multer from 'multer';
 import { AdminController } from '../controller/admin';
+import { isAdminMiddleware } from '../middleware/is-admin';
 
 export class APIRouter {
     public multerUpload: multer.Multer;
@@ -44,5 +45,9 @@ export class APIRouter {
 
     private configAdminRoutes(): void {
         this.adminRouter.post("/login", this.adminController.login.bind(this.adminController));
+        this.adminRouter.use(jwtMiddleware, isAdminMiddleware);
+        this.adminRouter.get("", this.adminController.getAllAdmin.bind(this.adminController));
+        this.adminRouter.get("/profile", this.adminController.getCurrentAdmin.bind(this.adminController));
+        this.adminRouter.get("/:id", this.adminController.getAdminById.bind(this.adminController));
     }
 }

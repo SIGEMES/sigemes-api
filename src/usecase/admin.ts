@@ -27,7 +27,7 @@ export class AdminUsecase {
         let role: string;
 
         if (adminData.isSuperAdmin === true) {
-            role = "superadmin";
+            role = "super_admin";
         } else {
             role = "admin";
         }
@@ -40,5 +40,21 @@ export class AdminUsecase {
         });
 
         return { adminData, token };
+    }
+
+    public async getAllAdmin(): Promise<Admin[]> {
+        const admins: Admin[] = await this.adminRepository.getAllAdmin();
+
+        return admins;
+    }
+
+    public async getAdminById(id: number): Promise<Admin> {
+        const admin: Admin | null = await this.adminRepository.getAdminById(id);
+
+        if (!admin) {
+            throw new ResponseError('Admin not found', 400);
+        }
+
+        return admin;
     }
 }
