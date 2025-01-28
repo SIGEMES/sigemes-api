@@ -35,3 +35,17 @@ model Renter {
 
   @@map("renters")
 }
+
+model Admin {
+  id             Int      @id @default(autoincrement())
+  email          String   @unique @db.VarChar(255)
+  password       String   @db.VarChar(255)
+  fullname       String   @db.VarChar(255)
+  phoneNumber    String   @map("telephone_number") @db.VarChar(15)
+  isSuperAdmin   Boolean  @default(false) @map("is_super_admin")
+  profilePicture String   @default("https://storage.googleapis.com/sigemes-storage/profile-pictures/default-picture.png") @map("profile_picture")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("admins")
+}

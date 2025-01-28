@@ -1,15 +1,20 @@
 import express from 'express';
 import { RenterController } from '../controller/renter';
-import { jwtMiddleware } from '../middleware/jwt-middleware';
-import { isRenterMiddleware } from '../middleware/is-renter-middleware';
+import { jwtMiddleware } from '../middleware/jwt';
+import { isRenterMiddleware } from '../middleware/is-renter';
 import multer from 'multer';
+import { AdminController } from '../controller/admin';
+import { isAdminMiddleware } from '../middleware/is-admin';
+import { isSuperAdminMiddleware } from '../middleware/is-super-admin';
 
 export class APIRouter {
     public multerUpload: multer.Multer;
     public renterRouter: express.Router;
+    public adminRouter: express.Router;
 
     constructor(
-        private renterController: RenterController
+        private renterController: RenterController,
+        private adminController: AdminController,
     ) {
         this.multerUpload = multer({
             storage: multer.memoryStorage(),
@@ -19,7 +24,10 @@ export class APIRouter {
         });
 
         this.renterRouter = express.Router();
+        this.adminRouter = express.Router();
+
         this.configRentersRoutes();
+        this.configAdminRoutes();
     }
 
     private configRentersRoutes(): void {
@@ -34,5 +42,16 @@ export class APIRouter {
         this.renterRouter.get("", this.renterController.getRenterData.bind(this.renterController));
         this.renterRouter.put("/change-password", this.renterController.changePassword.bind(this.renterController));
         this.renterRouter.put("/update-profile", this.multerUpload.single('profile_picture'), this.renterController.updateProfile.bind(this.renterController));
+    }
+
+    private configAdminRoutes(): void {
+        this.adminRouter.post("/login", this.adminController.login.bind(this.adminController));
+        this.adminRouter.use(jwtMiddleware, isAdminMiddleware);
+        this.adminRouter.get("", this.adminController.getAllAdmin.bind(this.adminController));
+        this.adminRouter.get("/:id", this.adminController.getAdminById.bind(this.adminController));
+        this.adminRouter.use(isSuperAdminMiddleware);
+        this.adminRouter.post("", this.adminController.createAdmin.bind(this.adminController));
+        this.adminRouter.put("/:id", this.multerUpload.single('profile_picture'), this.adminController.updateAdmin.bind(this.adminController));
+        this.adminRouter.delete("/:id", this.adminController.deleteAdmin.bind(this.adminController));
     }
 }

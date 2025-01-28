@@ -3,6 +3,11 @@ import { prisma } from "./infrastructure/config/database";
 import { RenterRepo } from "./infrastructure/repository/renter";
 import { RenterUsecase } from "./usecase/renter";
 import { RenterController } from "./presentation/controller/renter";
+
+import { AdminRepository } from "./infrastructure/repository/admin";
+import { AdminUsecase } from "./usecase/admin";
+import { AdminController } from "./presentation/controller/admin";
+
 import { JwtService } from "./infrastructure/authentication/jwt";
 import { BcryptService } from "./infrastructure/authentication/bcrypt";
 import { MailerService } from "./infrastructure/mailer/mailer";
@@ -10,6 +15,7 @@ import { MailerService } from "./infrastructure/mailer/mailer";
 import { JwtInterface } from "./domain/interface/library/jwt";
 import { BcryptInterface } from "./domain/interface/library/bcrypt";
 import { RenterRepositoryInterface } from "./domain/interface/repository/renter";
+import { AdminRepositoryInterface } from "./domain/interface/repository/admin";
 import { MailerInterface } from "./domain/interface/external-service/mailer";
 import { ObjectStorageInterface } from "./domain/interface/external-service/object-storage";
 import { CloudStorageService } from "./infrastructure/object-storage/cloud-storage";
@@ -27,8 +33,14 @@ export async function main(): Promise<void> {
     const renterUsecase: RenterUsecase = new RenterUsecase(renterRepo, jwtService, bcryptService, mailerService, objectStorageService);
     const renterController: RenterController = new RenterController(renterUsecase);
 
+    // Admin Module
+    const adminRepository: AdminRepositoryInterface = new AdminRepository(prisma);
+    const adminUsecase: AdminUsecase = new AdminUsecase(adminRepository, jwtService, bcryptService, objectStorageService);
+    const adminController: AdminController = new AdminController(adminUsecase);
+
     const router: APIRouter = new APIRouter(
-        renterController
+        renterController,
+        adminController,
     );
 
     const webServer: WebServer = new WebServer(
