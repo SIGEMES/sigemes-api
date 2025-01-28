@@ -2,10 +2,10 @@ import { PrismaClient } from '@prisma/client';
 import { RenterRepositoryInterface } from '../../domain/interface/repository/renter';
 import { Renter } from '../../domain/entity/renter';
 
-export class RenterRepo implements RenterRepositoryInterface {
+export class RenterRepository implements RenterRepositoryInterface {
     constructor(private prisma: PrismaClient) { }
 
-    public async getUserById(id: number): Promise<Renter|null> {
+    public async getRenterById(id: number): Promise<Renter|null> {
         const renter: Renter|null = await this.prisma.renter.findUnique({
             where: { id }
         }) as Renter;
@@ -13,7 +13,7 @@ export class RenterRepo implements RenterRepositoryInterface {
         return renter;
     }
 
-    public async getUserByEmail(email: string): Promise<Renter|null> {
+    public async getRenterByEmail(email: string): Promise<Renter|null> {
         const renter:Renter|null = await this.prisma.renter.findUnique({
             where: { email }
         }) as Renter;
@@ -21,8 +21,8 @@ export class RenterRepo implements RenterRepositoryInterface {
         return renter;
     }
 
-    public async createUser(renter: Renter): Promise<Renter> {
-        const createdRenter: Renter = await this.prisma.renter.create({
+    public async createRenter(renter: Renter): Promise<Renter> {
+        const newRenter: Renter = await this.prisma.renter.create({
             data: {
                 email: renter.email,
                 password: renter.password,
@@ -32,7 +32,7 @@ export class RenterRepo implements RenterRepositoryInterface {
             }
         }) as Renter;
 
-        return createdRenter;
+        return newRenter;
     }
 
     public async updateOTP(id: number, otp: string, otpExpiry: Date): Promise<void> {
@@ -45,7 +45,7 @@ export class RenterRepo implements RenterRepositoryInterface {
         });
     }
 
-    public async getUserOTPByEmail(email: string): Promise<Renter|null> {
+    public async getRenterOTPByEmail(email: string): Promise<Renter|null> {
         const renter: Renter | null = await this.prisma.renter.findUnique({
             where: { email },
             select: {

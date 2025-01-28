@@ -9,7 +9,7 @@ import { File } from '../domain/interface/library/file';
 
 export class RenterUsecase {
     constructor(
-        private renterRepo: RenterRepositoryInterface,
+        private renterRepository: RenterRepositoryInterface,
         private jwtService: JwtInterface,
         private bcryptService: BcryptInterface,
         private mailerService: MailerInterface,
@@ -17,10 +17,10 @@ export class RenterUsecase {
     ) {}
 
     public async login(email: string, password: string): Promise<{ renterData: Renter, token: string }> {
-        const renterData: Renter | null = await this.renterRepo.getUserByEmail(email);
+        const renterData: Renter | null = await this.renterRepository.getRenterByEmail(email);
 
         if (!renterData) {
-            throw new ResponseError('User not found', 400);
+            throw new ResponseError('Renter not found', 400);
         }
 
         const passwordMatch = await this.bcryptService.comparePassword(password, renterData.password);
@@ -45,17 +45,17 @@ export class RenterUsecase {
     }
 
     public async getRenterDataByEmail(email: string): Promise<Renter> {
-        const renterData: Renter | null = await this.renterRepo.getUserByEmail(email);
+        const renterData: Renter | null = await this.renterRepository.getRenterByEmail(email);
 
         if (!renterData) {
-            throw new ResponseError('User not found', 200);
+            throw new ResponseError('Renter not found', 200);
         }
 
         return renterData;
     }
 
     public async register(renter: Renter): Promise<Renter> {
-        const renterData: Renter | null = await this.renterRepo.getUserByEmail(renter.email);
+        const renterData: Renter | null = await this.renterRepository.getRenterByEmail(renter.email);
 
         if (renterData) {
             throw new ResponseError('Email already registered', 400);
@@ -64,22 +64,22 @@ export class RenterUsecase {
         const hashedPassword: string = await this.bcryptService.hashPassword(renter.password);
         renter.password = hashedPassword;
 
-        const newRenter: Renter = await this.renterRepo.createUser(renter);
+        const newRenter: Renter = await this.renterRepository.createRenter(renter);
 
         return newRenter;
     }
 
     public async sendOTP(email: string, action: string): Promise<void> {
-        const renterData: Renter | null = await this.renterRepo.getUserByEmail(email);
+        const renterData: Renter | null = await this.renterRepository.getRenterByEmail(email);
 
         if (!renterData) {
-            throw new ResponseError('User not found', 200);
+            throw new ResponseError('Renter not found', 200);
         }
 
         const otp: string = Math.floor(10000 + Math.random() * 90000).toString();
         const otpExpiry: Date = new Date(Date.now() + 600000);
 
-        await this.renterRepo.updateOTP(renterData.id, otp, otpExpiry);
+        await this.renterRepository.updateOTP(renterData.id, otp, otpExpiry);
         
         if (action === 'emailVerification') {
             await this.mailerService.sendEmail(renterData.email, 'Verifikasi Email SIGEMES', otp, 'verifikasi email');
@@ -89,10 +89,10 @@ export class RenterUsecase {
     }
 
     public async verifyOTP(email: string, otp:string, action: string): Promise<void> {
-        const renterData: Renter | null = await this.renterRepo.getUserOTPByEmail(email);
+        const renterData: Renter | null = await this.renterRepository.getRenterOTPByEmail(email);
 
         if (!renterData) {
-            throw new ResponseError('User not found', 400);
+            throw new ResponseError('Renter not found', 400);
         }
 
         if (!renterData.otp || !renterData.otpExpiry) {
@@ -108,17 +108,17 @@ export class RenterUsecase {
         }
 
         if (action === 'emailVerification') {
-            await this.renterRepo.updateEmailVerified(renterData.id);
+            await this.renterRepository.updateEmailVerified(renterData.id);
         } else {
-            await this.renterRepo.updateForgotPasswordVerified(renterData.id);
+            await this.renterRepository.updateForgotPasswordVerified(renterData.id);
         }
     }
 
     public async changePassword(email: string, oldPassword: string, newPassword: string): Promise<void> {
-        const renterData: Renter | null = await this.renterRepo.getUserByEmail(email);
+        const renterData: Renter | null = await this.renterRepository.getRenterByEmail(email);
 
         if (!renterData) {
-            throw new ResponseError('User not found', 400);
+            throw new ResponseError('Renter not found', 400);
         }
 
         if (oldPassword === newPassword) {
@@ -133,33 +133,35 @@ export class RenterUsecase {
 
         const hashedPassword: string = await this.bcryptService.hashPassword(newPassword);
 
-        await this.renterRepo.updatePassword(renterData.id, hashedPassword);
+        await this.renterRepository.updatePassword(renterData.id, hashedPassword);
     }
 
     public async changePasswordForgotPassword(email: string, newPassword: string): Promise<void> {
-        const renterData: Renter | null = await this.renterRepo.getUserByEmail(email);
+        const renterData: Renter | null = await this.renterRepository.getRenterByEmail(email);
 
         if (!renterData) {
-            throw new ResponseError('User not found', 400);
+            throw new ResponseError('Renter not found', 400);
         }
 
         if (renterData.forgotPasswordVerified === false) {
-            throw new ResponseError('User not verified to reset password', 400);
+            throw new ResponseError('Renter not verified to reset password', 400);
         }
 
         const hashedPassword: string = await this.bcryptService.hashPassword(newPassword);
 
-        await this.renterRepo.updatePasswordForgotPassword(renterData.id, hashedPassword);
+        await this.renterRepository.updatePasswordForgotPassword(renterData.id, hashedPassword);
     }
 
-    public async updateProfile(id: number, renter: Renter, file?: File): Promise<Renter> {
-        const renterData: Renter | null = await this.renterRepo.getUserById(id);
+    public async updateProfile(id: number, renter: Renter, profilePicture?: File): Promise<Renter> {
+        const renterData: Renter | null = await this.renterRepository.getRenterById(id);
 
         if (!renterData) {
-            throw new ResponseError('User not found', 400);
+            throw new ResponseError('Renter not found', 400);
         }
 
-        if (file) {
+        renter.profilePicture = renterData.profilePicture;
+
+        if (profilePicture) {
             const oldProfilePicture: string = renterData.profilePicture.split('/').pop() as string;
             const oldProfilePicturePath: string = `profile-pictures/${oldProfilePicture}`;
 
@@ -168,13 +170,13 @@ export class RenterUsecase {
             }
 
             const hashName: string = `${Date.now()}-${Math.random().toString(36).substring(7)}`;
-            file.originalName = hashName + file.originalName;
+            profilePicture.originalName = hashName + profilePicture.originalName;
 
-            const imageUrl: string = await this.objectStorageService.uploadFile(file, 'profile-pictures');
+            const imageUrl: string = await this.objectStorageService.uploadFile(profilePicture, 'profile-pictures');
             renter.profilePicture = imageUrl;
         }
 
-        const updatedRenter: Renter = await this.renterRepo.updateProfile(id, renter);
+        const updatedRenter: Renter = await this.renterRepository.updateProfile(id, renter);
 
         return updatedRenter;
     }
