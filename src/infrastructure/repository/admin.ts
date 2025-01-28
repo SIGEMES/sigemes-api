@@ -39,4 +39,33 @@ export class AdminRepository implements AdminRepositoryInterface {
 
         return newAdmin;
     }
+
+    public async updateAdmin(admin: Admin): Promise<Admin> {
+        const updatedAdmin: Admin = await this.prisma.admin.update({
+            where: { id: admin.id },
+            data: {
+                email: admin.email,
+                password: admin.password,
+                fullname: admin.fullname,
+                phoneNumber: admin.phoneNumber,
+                profilePicture: admin.profilePicture,
+            }
+        });
+
+        return updatedAdmin;
+    }
+
+    public async updateAdminWithoutPassword(admin: Admin): Promise<Admin> {
+        const updatedAdmin: Admin = await this.prisma.admin.update({
+            where: { id: admin.id },
+            data: {
+                email: admin.email,
+                fullname: admin.fullname,
+                phoneNumber: admin.phoneNumber,
+                profilePicture: admin.profilePicture,
+            }
+        });
+
+        return updatedAdmin;
+    }
 }

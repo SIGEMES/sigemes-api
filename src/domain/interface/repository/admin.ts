@@ -5,4 +5,6 @@ export interface AdminRepositoryInterface {
     getAdminById(id: number): Promise<Admin|null>;
     getAdminByEmail(email: string): Promise<Admin|null>;
     createAdmin(admin: Admin): Promise<Admin>;
+    updateAdmin(admin: Admin): Promise<Admin>;
+    updateAdminWithoutPassword(admin: Admin): Promise<Admin>;
 }

@@ -35,7 +35,7 @@ export async function main(): Promise<void> {
 
     // Admin Module
     const adminRepository: AdminRepositoryInterface = new AdminRepository(prisma);
-    const adminUsecase: AdminUsecase = new AdminUsecase(adminRepository, jwtService, bcryptService);
+    const adminUsecase: AdminUsecase = new AdminUsecase(adminRepository, jwtService, bcryptService, objectStorageService);
     const adminController: AdminController = new AdminController(adminUsecase);
 
     const router: APIRouter = new APIRouter(

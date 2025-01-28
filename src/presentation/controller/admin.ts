@@ -6,6 +6,8 @@ import { BaseSuccessResponse } from '../dto/response/base/base-success';
 import { AdminValidation } from '../validation/admin';
 import { AdminGetDataResponse } from '../dto/response/admin/get-data';
 import { CreateAdminRequest } from '../dto/request/admin/create';
+import { UpdateAdminRequest } from '../dto/request/admin/update';
+import { File } from '../../domain/interface/library/file';
 
 export class AdminController {
     constructor(private adminUsecase: AdminUsecase) {}
@@ -65,6 +67,36 @@ export class AdminController {
             const admin: Admin = await this.adminUsecase.createAdmin(CreateAdminRequest.toEntity(validatedData));
             const adminResponse: AdminGetDataResponse = AdminGetDataResponse.fromEntity(admin);
             res.status(201).json(new BaseSuccessResponse(true, "Create admin success", adminResponse));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    public async updateAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            let validatedData: UpdateAdminRequest;
+            let fileData: File | undefined;
+
+            req.body.id = Number(req.params.id);
+
+            if (req.body.password) {
+                validatedData = AdminValidation.updateAdmin.parse(req.body);
+            } else {
+                validatedData = AdminValidation.updateAdminWithoutPassword.parse(req.body);
+            }
+            
+            if (req.file) {
+                fileData = {
+                    originalName: req.file.originalname,
+                    mimeType: req.file.mimetype,
+                    size: req.file.size,
+                    buffer: req.file.buffer,
+                };
+            }
+            
+            const admin: Admin = await this.adminUsecase.updateAdmin(UpdateAdminRequest.toEntity(validatedData), fileData);
+            const adminResponse: AdminGetDataResponse = AdminGetDataResponse.fromEntity(admin);
+            res.status(200).json(new BaseSuccessResponse(true, "Update admin success", adminResponse));
         } catch (error) {
             next(error);
         }
