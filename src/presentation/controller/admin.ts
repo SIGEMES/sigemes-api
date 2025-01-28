@@ -101,4 +101,14 @@ export class AdminController {
             next(error);
         }
     }
+
+    public async deleteAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { id } = AdminValidation.id.parse({ id: Number(req.params.id) });
+            await this.adminUsecase.deleteAdmin(id);
+            res.status(200).json(new BaseSuccessResponse(true, "Delete admin success", null));
+        } catch (error) {
+            next(error);
+        }
+    }
 }

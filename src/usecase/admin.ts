@@ -111,4 +111,16 @@ export class AdminUsecase {
         
         return updatedAdmin;
     }
+
+    public async deleteAdmin(id: number): Promise<Admin> {
+        const admin: Admin | null = await this.adminRepository.getAdminById(id);
+
+        if (!admin) {
+            throw new ResponseError('Admin not found', 400);
+        }
+
+        const deletedAdmin: Admin = await this.adminRepository.deleteAdmin(id);
+
+        return deletedAdmin;
+    }
 }

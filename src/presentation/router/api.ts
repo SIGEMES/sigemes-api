@@ -53,5 +53,6 @@ export class APIRouter {
         this.adminRouter.use(isSuperAdminMiddleware);
         this.adminRouter.post("", this.adminController.createAdmin.bind(this.adminController));
         this.adminRouter.put("/:id", this.multerUpload.single('profile_picture'), this.adminController.updateAdmin.bind(this.adminController));
+        this.adminRouter.delete("/:id", this.adminController.deleteAdmin.bind(this.adminController));
     }
 }

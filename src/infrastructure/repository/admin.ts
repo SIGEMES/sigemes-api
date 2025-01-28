@@ -68,4 +68,12 @@ export class AdminRepository implements AdminRepositoryInterface {
 
         return updatedAdmin;
     }
+
+    public async deleteAdmin(id: number): Promise<Admin> {
+        const deletedAdmin: Admin = await this.prisma.admin.delete({
+            where: { id }
+        });
+
+        return deletedAdmin;
+    }
 }

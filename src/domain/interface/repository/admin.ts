@@ -7,4 +7,5 @@ export interface AdminRepositoryInterface {
     createAdmin(admin: Admin): Promise<Admin>;
     updateAdmin(admin: Admin): Promise<Admin>;
     updateAdminWithoutPassword(admin: Admin): Promise<Admin>;
+    deleteAdmin(id: number): Promise<Admin>;
 }
