@@ -43,19 +43,10 @@ export class AdminController {
 
     public async getAdminById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const admin: Admin = await this.adminUsecase.getAdminById(Number(req.params.id));
+            const { id } = AdminValidation.id.parse({ id: Number(req.params.id) });
+            const admin: Admin = await this.adminUsecase.getAdminById(id);
             const adminResponse: AdminGetDataResponse = AdminGetDataResponse.fromEntity(admin);
             res.status(200).json(new BaseSuccessResponse(true, "Get admin by id success", adminResponse));
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    public async getCurrentAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-            const admin: Admin = await this.adminUsecase.getAdminById(Number(res.locals.user.id));
-            const adminResponse: AdminGetDataResponse = AdminGetDataResponse.fromEntity(admin);
-            res.status(200).json(new BaseSuccessResponse(true, "Get current admin profile success", adminResponse));
         } catch (error) {
             next(error);
         }

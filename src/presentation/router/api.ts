@@ -48,7 +48,6 @@ export class APIRouter {
         this.adminRouter.post("/login", this.adminController.login.bind(this.adminController));
         this.adminRouter.use(jwtMiddleware, isAdminMiddleware);
         this.adminRouter.get("", this.adminController.getAllAdmin.bind(this.adminController));
-        this.adminRouter.get("/profile", this.adminController.getCurrentAdmin.bind(this.adminController));
         this.adminRouter.get("/:id", this.adminController.getAdminById.bind(this.adminController));
         this.adminRouter.use(isSuperAdminMiddleware);
         this.adminRouter.post("", this.adminController.createAdmin.bind(this.adminController));
