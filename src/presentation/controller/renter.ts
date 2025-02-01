@@ -31,9 +31,10 @@ export class RenterController {
         }
     }
 
-    public async getRenterData(req: Request, res: Response, next: NextFunction): Promise<void> {
+    public async getRenterById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const renter: Renter = await this.renterUsecase.getRenterDataByEmail(res.locals.user.email);
+            const { id } = RenterValidation.id.parse({ id: Number(req.params.id) });
+            const renter: Renter = await this.renterUsecase.getRenterById(id);
             const renterResponse: RenterGetDataResponse = RenterGetDataResponse.fromEntity(renter);
             res.status(200).json(new BaseSuccessResponse(true, "Get renter data success", renterResponse));
         } catch (error) {
@@ -78,12 +79,14 @@ export class RenterController {
 
     public async changePassword(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            const { id } = RenterValidation.id.parse({ id: Number(req.params.id) });
+
             const validatedData: {
                 old_password: string,
                 new_password: string
             } = RenterValidation.changePassword.parse(req.body);
 
-            await this.renterUsecase.changePassword(res.locals.user.email, validatedData.old_password, validatedData.new_password);
+            await this.renterUsecase.changePassword(id, res.locals.user.id, validatedData.old_password, validatedData.new_password);
             res.status(200).json(new BaseSuccessResponse(true, "Update password success", null));
         } catch (error) {
             next(error);
@@ -131,6 +134,7 @@ export class RenterController {
 
     public async updateProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            const { id } = RenterValidation.id.parse({ id: Number(req.params.id) });
             const validatedData: RenterUpdateProfileRequest = RenterValidation.updateProfile.parse(req.body);
             const renterValidatedData: Renter = RenterUpdateProfileRequest.toEntity(validatedData);
 
@@ -144,7 +148,7 @@ export class RenterController {
                 };
             }
 
-            const renter: Renter = await this.renterUsecase.updateProfile(res.locals.user.id, renterValidatedData, fileData);
+            const renter: Renter = await this.renterUsecase.updateProfile(id, res.locals.user.id, renterValidatedData, fileData);
             const renterResponse: RenterGetDataResponse = RenterGetDataResponse.fromEntity(renter);
             res.status(200).json(new BaseSuccessResponse(true, "Update profile success", renterResponse));
         } catch (error) {

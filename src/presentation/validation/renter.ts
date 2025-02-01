@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
 export class RenterValidation {
+    public static id = z.object({
+        id: z.number(),
+    });
+
     public static login = z.object({
         email: z.string().email(),
         password: z.string().min(5),

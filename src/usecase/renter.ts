@@ -44,8 +44,8 @@ export class RenterUsecase {
         return { renterData, token };
     }
 
-    public async getRenterDataByEmail(email: string): Promise<Renter> {
-        const renterData: Renter | null = await this.renterRepository.getRenterByEmail(email);
+    public async getRenterById(id: number): Promise<Renter> {
+        const renterData: Renter | null = await this.renterRepository.getRenterById(id);
 
         if (!renterData) {
             throw new ResponseError('Renter not found', 200);
@@ -114,8 +114,12 @@ export class RenterUsecase {
         }
     }
 
-    public async changePassword(email: string, oldPassword: string, newPassword: string): Promise<void> {
-        const renterData: Renter | null = await this.renterRepository.getRenterByEmail(email);
+    public async changePassword(idParam: number, idToken: number, oldPassword: string, newPassword: string): Promise<void> {
+        if (idParam !== idToken) {
+            throw new ResponseError('Unauthorized', 401);
+        }
+
+        const renterData: Renter | null = await this.renterRepository.getRenterById(idToken);
 
         if (!renterData) {
             throw new ResponseError('Renter not found', 400);
@@ -152,8 +156,12 @@ export class RenterUsecase {
         await this.renterRepository.updatePasswordForgotPassword(renterData.id, hashedPassword);
     }
 
-    public async updateProfile(id: number, renter: Renter, profilePicture?: File): Promise<Renter> {
-        const renterData: Renter | null = await this.renterRepository.getRenterById(id);
+    public async updateProfile(idParam: number, idToken: number, renter: Renter, profilePicture?: File): Promise<Renter> {
+        if (idParam !== idToken) {
+            throw new ResponseError('Unauthorized', 401);
+        }
+
+        const renterData: Renter | null = await this.renterRepository.getRenterById(idToken);
 
         if (!renterData) {
             throw new ResponseError('Renter not found', 400);
@@ -176,7 +184,7 @@ export class RenterUsecase {
             renter.profilePicture = imageUrl;
         }
 
-        const updatedRenter: Renter = await this.renterRepository.updateProfile(id, renter);
+        const updatedRenter: Renter = await this.renterRepository.updateProfile(idToken, renter);
 
         return updatedRenter;
     }
