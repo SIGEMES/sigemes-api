@@ -14,8 +14,8 @@ datasource db {
 }
 
 enum Gender {
-  male
-  female
+  perempuan
+  laki_laki
 }
 
 model Renter {

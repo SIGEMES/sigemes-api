@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { Gender, PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 
 const prisma: PrismaClient = new PrismaClient()
@@ -14,7 +14,7 @@ export async function seedRenters(): Promise<void> {
                 password: hashedPassword,
                 emailVerified: true,
                 phoneNumber: "1234567890",
-                gender: "female",
+                gender: Gender.perempuan,
             },
             {
                 fullname: "Bob Smith",
@@ -22,7 +22,7 @@ export async function seedRenters(): Promise<void> {
                 password: hashedPassword,
                 emailVerified: true,
                 phoneNumber: "1234567890",
-                gender: "male",
+                gender: Gender.laki_laki,
             },
             {
                 fullname: "Charlie Brown",
@@ -30,7 +30,7 @@ export async function seedRenters(): Promise<void> {
                 password: hashedPassword,
                 emailVerified: false,
                 phoneNumber: "1234567890",
-                gender: "male"
+                gender: Gender.laki_laki,
             },
         ],
     });

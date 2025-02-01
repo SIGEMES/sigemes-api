@@ -1,6 +1,6 @@
 import { WebServer } from "./infrastructure/config/web";
 import { prisma } from "./infrastructure/config/database";
-import { RenterRepo } from "./infrastructure/repository/renter";
+import { RenterRepository } from "./infrastructure/repository/renter";
 import { RenterUsecase } from "./usecase/renter";
 import { RenterController } from "./presentation/controller/renter";
 
@@ -29,8 +29,8 @@ export async function main(): Promise<void> {
     const objectStorageService: ObjectStorageInterface = new CloudStorageService();
 
     // Renter Module
-    const renterRepo: RenterRepositoryInterface = new RenterRepo(prisma);
-    const renterUsecase: RenterUsecase = new RenterUsecase(renterRepo, jwtService, bcryptService, mailerService, objectStorageService);
+    const renterRepository: RenterRepositoryInterface = new RenterRepository(prisma);
+    const renterUsecase: RenterUsecase = new RenterUsecase(renterRepository, jwtService, bcryptService, mailerService, objectStorageService);
     const renterController: RenterController = new RenterController(renterUsecase);
 
     // Admin Module

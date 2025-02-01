@@ -1,11 +1,11 @@
 import { Renter } from "../../entity/renter";
 
 export interface RenterRepositoryInterface {
-    getUserById(id: number): Promise<Renter|null>;
-    getUserByEmail(email: string): Promise<Renter|null>;
-    createUser(renter: Renter): Promise<Renter>;
+    getRenterById(id: number): Promise<Renter|null>;
+    getRenterByEmail(email: string): Promise<Renter|null>;
+    createRenter(renter: Renter): Promise<Renter>;
     updateOTP(id: number, otp: string, otpExpiry: Date): Promise<void>;
-    getUserOTPByEmail(email: string): Promise<Renter|null>;
+    getRenterOTPByEmail(email: string): Promise<Renter|null>;
     updateEmailVerified(id: number): Promise<void>;
     updateForgotPasswordVerified(id: number): Promise<void>;
     updatePassword(id: number, password: string): Promise<void>;

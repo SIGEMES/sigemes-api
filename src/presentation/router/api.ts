@@ -38,10 +38,11 @@ export class APIRouter {
         this.renterRouter.post("/forgot-password/send-otp", this.renterController.sendForgotPasswordOTP.bind(this.renterController));
         this.renterRouter.post("/forgot-password/verify-otp", this.renterController.verifyForgotPasswordOTP.bind(this.renterController));
         this.renterRouter.put("/forgot-password/change-password", this.renterController.changePasswordForgotPassword.bind(this.renterController));
-        this.renterRouter.use(jwtMiddleware, isRenterMiddleware);
-        this.renterRouter.get("", this.renterController.getRenterData.bind(this.renterController));
-        this.renterRouter.put("/change-password", this.renterController.changePassword.bind(this.renterController));
-        this.renterRouter.put("/update-profile", this.multerUpload.single('profile_picture'), this.renterController.updateProfile.bind(this.renterController));
+        this.renterRouter.use(jwtMiddleware);
+        this.renterRouter.get("/:id", this.renterController.getRenterById.bind(this.renterController));
+        this.renterRouter.use(isRenterMiddleware);
+        this.renterRouter.put("/:id", this.multerUpload.single('profile_picture'), this.renterController.updateProfile.bind(this.renterController));
+        this.renterRouter.put("/:id/password", this.renterController.changePassword.bind(this.renterController));
     }
 
     private configAdminRoutes(): void {
