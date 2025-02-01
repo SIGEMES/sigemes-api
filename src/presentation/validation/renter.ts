@@ -11,7 +11,7 @@ export class RenterValidation {
         password: z.string().min(5),
         fullname: z.string().min(3),
         phone_number: z.string().min(10),
-        gender: z.enum(['male', 'female']),
+        gender: z.enum(['perempuan', 'laki_laki']),
     });
 
     public static sendEmailOTP = z.object({
@@ -36,7 +36,7 @@ export class RenterValidation {
     public static updateProfile = z.object({
         fullname: z.string().min(3),
         phone_number: z.string().min(10),
-        gender: z.enum(['male', 'female'],)}
+        gender: z.enum(['perempuan', 'laki_laki'],)}
     );
     
 }

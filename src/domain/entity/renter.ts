@@ -1,4 +1,4 @@
-export type Gender = 'male' | 'female';
+export type Gender = 'perempuan' | 'laki_laki';
 
 export class Renter {
     constructor (
@@ -7,7 +7,7 @@ export class Renter {
         public password: string = '',
         public fullname: string = '',
         public phoneNumber: string = '',
-        public gender: Gender = 'male',
+        public gender: Gender = 'laki_laki',
         public profilePicture: string = '',
         public emailVerified: boolean = false,
         public forgotPasswordVerified: boolean = false,
