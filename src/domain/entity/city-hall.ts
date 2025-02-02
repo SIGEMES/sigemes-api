@@ -16,7 +16,7 @@ export class CityHall {
         public status: CityHallStatus = 'tersedia',
         public contactPerson: string = '',
 
-        public media: CityHallMedia[] = [],
-        public pricing: CityHallPricing[] = [],
+        public cityHallMedia: CityHallMedia[] = [],
+        public cityHallPricing: CityHallPricing[] = [],
     ) {}
 }
