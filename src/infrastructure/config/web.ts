@@ -18,6 +18,7 @@ export class WebServer {
         this.app.use(express.json());
         this.app.use("/api/v1/renters", this.APIRouter.renterRouter);
         this.app.use("/api/v1/admins", this.APIRouter.adminRouter);
+        this.app.use("/api/v1/city-halls", this.APIRouter.cityHallRouter);
         this.app.use(errorMiddleware);
     }
 

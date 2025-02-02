@@ -12,7 +12,7 @@ export async function seedCityHalls(): Promise<void> {
                 areaM2: 1000,
                 peopleCapacity: 1000,
                 address: "Jl. Adam Malik No. 1",
-                latitude: 1.378624,
+                latitude: 1.3786243456,
                 longitude: 99.272306,
                 status: "tersedia",
                 contactPerson: "081234567890",
