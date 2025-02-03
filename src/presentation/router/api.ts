@@ -64,5 +64,6 @@ export class APIRouter {
     private configCityHallRoutes(): void {
         this.cityHallRouter.use(jwtMiddleware);
         this.cityHallRouter.get("", this.cityHallController.getAllCityHalls.bind(this.cityHallController));
+        this.cityHallRouter.get("/:id", this.cityHallController.getCityHallById.bind(this.cityHallController));
     }
 }

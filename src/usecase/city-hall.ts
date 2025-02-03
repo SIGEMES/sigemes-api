@@ -12,4 +12,14 @@ export class CityHallUsecase {
 
         return cityHalls;
     }
+
+    public async getCityHallById(id: number): Promise<CityHall> {
+        const cityHall: CityHall|null = await this.cityHallRepository.getCityHallById(id);
+
+        if (!cityHall) {
+            throw new ResponseError("City hall not found", 404);
+        }
+
+        return cityHall;
+    }
 }
