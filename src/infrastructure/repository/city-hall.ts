@@ -33,4 +33,59 @@ export class CityHallRepository implements CityHallRepositoryInterface {
 
         return cityHall;
     }
+
+    public async createCityHall(cityHall: CityHall): Promise<CityHall> {
+        const createdCityHall: CityHall = await this.prisma.cityHall.create(
+            {
+                data: {
+                    name: cityHall.name,
+                    description: cityHall.description,
+                    areaM2: cityHall.areaM2,
+                    peopleCapacity: cityHall.peopleCapacity,
+                    address: cityHall.address,
+                    latitude: cityHall.latitude,
+                    longitude: cityHall.longitude,
+                    contactPerson: cityHall.contactPerson,
+                    cityHallMedia: {
+                        create: cityHall.cityHallMedia.map(media => ({
+                            url: media.url,
+                        }))
+                    },
+                    cityHallPricing: {
+                        create: cityHall.cityHallPricing.map(pricing => ({
+                            activityType: pricing.activityType,
+                            facilities: pricing.facilities,
+                            pricePerDay: pricing.pricePerDay,
+                        }))
+                    },
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    description: true,
+                    areaM2: true,
+                    peopleCapacity: true,
+                    address: true,
+                    latitude: true,
+                    longitude: true,
+                    contactPerson: true,
+                    cityHallMedia: {
+                        select: {
+                            url: true,
+                        }
+                    },
+                    cityHallPricing: {
+                        select: {
+                            id: true,
+                            activityType: true,
+                            facilities: true,
+                            pricePerDay: true,
+                        }
+                    }
+                },        
+            }
+        ) as CityHall;
+
+        return createdCityHall;
+    }
 }

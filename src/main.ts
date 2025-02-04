@@ -45,7 +45,7 @@ export async function main(): Promise<void> {
 
     // City Hall Module
     const cityHallRepository: CityHallRepositoryInterface = new CityHallRepository(prisma);
-    const cityHallUsecase: CityHallUsecase = new CityHallUsecase(cityHallRepository);
+    const cityHallUsecase: CityHallUsecase = new CityHallUsecase(cityHallRepository, objectStorageService);
     const cityHallController: CityHallController = new CityHallController(cityHallUsecase);
 
     const router: APIRouter = new APIRouter(

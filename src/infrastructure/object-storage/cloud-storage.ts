@@ -1,4 +1,4 @@
-import { Bucket, Storage } from "@google-cloud/storage";
+import { Bucket, Storage, TransferManager } from "@google-cloud/storage";
 import { ObjectStorageInterface } from "../../domain/interface/external-service/object-storage";
 import { File } from "../../domain/interface/library/file";
 
@@ -45,6 +45,17 @@ export class CloudStorageService implements ObjectStorageInterface{
         });
 
         return `https://storage.googleapis.com/${this.bucketName}/${destinationPath}/${file.originalName}`;
+    }
+
+    public async uploadMultipleFiles(files: File[], destinationPath: string): Promise<string[]> {
+        const urls: string[] = [];
+
+        for (const file of files) {
+            const url = await this.uploadFile(file, destinationPath);
+            urls.push(url);
+        }
+
+        return urls;
     }
 
     public async deleteFile(path: string): Promise<void> {
