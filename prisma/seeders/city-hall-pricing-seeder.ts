@@ -9,19 +9,19 @@ export async function seedCityHallPricing(): Promise<void> {
             {
                 cityHallId: 1,
                 activityType: "Komersial",
-                facilities: "- Gedung \n- Area Parkir \n- Toilet \n- Ruang Rapat",
+                facilities: "Gedung; Area Parkir; Toilet; Ruang Rapat",
                 pricePerDay: 1800000,
             },
             {
                 cityHallId: 1,
                 activityType: "Sosial",
-                facilities: "- Gedung \n- Area Parkir \n- Toilet \n- Ruang Rapat",
+                facilities: "Gedung; Area Parkir; Toilet; Ruang Rapat",
                 pricePerDay: 750000,
             },
             {
                 cityHallId: 1,
                 activityType: "Instansi Pemerintah",
-                facilities: "- Gedung \n- Area Parkir \n- Toilet \n- Ruang Rapat \n- Kursi \n- Panggung \n- Podium \n- Sound System",
+                facilities: "Gedung; Area Parkir; Toilet; Ruang Rapat; Kursi; Panggung; Podium; Sound System",
                 pricePerDay: 1000000,
             },
         ],
