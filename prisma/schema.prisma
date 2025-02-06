@@ -88,6 +88,7 @@ model CityHallPricing {
   activityType String   @map("activity_type") @db.VarChar(255)
   facilities   String   @db.Text
   pricePerDay  Float    @map("price_per_day") @db.DoublePrecision
+  isActive     Boolean  @default(true) @map("is_active")
 
   @@map("city_hall_pricing")
 }

@@ -8,11 +8,11 @@ export async function seedCityHallMedia(): Promise<void> {
         data: [
             {
                 cityHallId: 1,
-                url: "https://storage.googleapis.com/sigemes-storage/city-hall-media/adam-malik-depan.jpg",
+                url: "https://storage.googleapis.com/sigemes-storage/city-hall-media/adam-malik-depan.jpeg",
             },
             {
                 cityHallId: 1,
-                url: "https://storage.googleapis.com/sigemes-storage/city-hall-media/adam-malik-dalam.jpg",
+                url: "https://storage.googleapis.com/sigemes-storage/city-hall-media/adam-malik-dalam.jpeg",
             },
         ],
     });

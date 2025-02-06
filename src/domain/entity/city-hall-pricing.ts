@@ -5,5 +5,6 @@ export class CityHallPricing {
         public activityType: string = '',
         public facilities: string = '',
         public pricePerDay: number = 0,
+        public isActive: boolean = true,
     ) {}
 }

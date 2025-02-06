@@ -6,6 +6,7 @@ export class GetCityHallPricingResponse {
         public activity_type: string,
         public facilities: string,
         public price_per_day: number,
+        public is_active: boolean,
     ) {}
 
     public static fromEntity(cityHallPricing: CityHallPricing): GetCityHallPricingResponse {
@@ -14,6 +15,7 @@ export class GetCityHallPricingResponse {
             cityHallPricing.activityType,
             cityHallPricing.facilities,
             cityHallPricing.pricePerDay,
+            cityHallPricing.isActive,
         );
     }
 }
