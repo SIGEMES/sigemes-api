@@ -4,13 +4,13 @@ import { CityHallPricing } from '../../entity/city-hall-pricing';
 
 export interface CityHallRepositoryInterface {
     getAllCityHalls(): Promise<CityHall[]>;
-    getCityHallById(id: number): Promise<CityHall|null>;
-    getCityHallMediaById(id: number): Promise<CityHallMedia|null>;
-    createCityHall(cityHall: CityHall): Promise<CityHall>;
-    createCityHallMedia(cityHallMedia: CityHallMedia[]): Promise<CityHallMedia[]>;
-    createCityHallPricing(cityHallPricing: CityHallPricing[]): Promise<CityHallPricing[]>;
-    updateCityHallOnly(id: number, cityHall: CityHall): Promise<CityHall>;
-    updateCityHallPricing(cityHallPricing: CityHallPricing): Promise<CityHallPricing>;
-    deleteCityHallPricing(id: number): Promise<CityHallPricing>;
-    deleteCityHallMedia(id: number): Promise<CityHallMedia>;
+    getCityHallById(id: number, transaction?: any): Promise<CityHall|null>;
+    getCityHallMediaById(id: number, transaction?: any): Promise<CityHallMedia|null>;
+    createCityHall(cityHall: CityHall, transaction?: any): Promise<CityHall>;
+    createCityHallMedia(cityHallMedia: CityHallMedia[], transaction?: any): Promise<CityHallMedia[]>;
+    createCityHallPricing(cityHallPricing: CityHallPricing[], transaction?: any): Promise<CityHallPricing[]>;
+    updateCityHallOnly(id: number, cityHall: CityHall, transaction?: any): Promise<CityHall>;
+    updateCityHallPricing(cityHallPricing: CityHallPricing, transaction?: any): Promise<CityHallPricing>;
+    deleteCityHallPricing(id: number, transaction?: any): Promise<CityHallPricing>;
+    deleteCityHallMedia(id: number, transaction?: any): Promise<CityHallMedia>;
 }

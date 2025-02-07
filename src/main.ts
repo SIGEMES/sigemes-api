@@ -15,6 +15,7 @@ import { CityHallController } from "./presentation/controller/city-hall";
 import { JwtService } from "./infrastructure/authentication/jwt";
 import { BcryptService } from "./infrastructure/authentication/bcrypt";
 import { MailerService } from "./infrastructure/mailer/mailer";
+import { DbTransaction } from "./infrastructure/repository/db-transaction";
 
 import { JwtInterface } from "./domain/interface/library/jwt";
 import { BcryptInterface } from "./domain/interface/library/bcrypt";
@@ -24,6 +25,7 @@ import { CityHallRepositoryInterface } from "./domain/interface/repository/city-
 import { MailerInterface } from "./domain/interface/external-service/mailer";
 import { ObjectStorageInterface } from "./domain/interface/external-service/object-storage";
 import { CloudStorageService } from "./infrastructure/object-storage/cloud-storage";
+import { DbTransactionInterface } from "./domain/interface/repository/db-transaction";
 import { APIRouter } from "./presentation/router/api";
 
 export async function main(): Promise<void> {
@@ -32,6 +34,7 @@ export async function main(): Promise<void> {
     const bcryptService: BcryptInterface = new BcryptService();
     const mailerService: MailerInterface = new MailerService();
     const objectStorageService: ObjectStorageInterface = new CloudStorageService();
+    const dbTransaction: DbTransactionInterface = new DbTransaction(prisma);
 
     // Renter Module
     const renterRepository: RenterRepositoryInterface = new RenterRepository(prisma);
@@ -45,7 +48,7 @@ export async function main(): Promise<void> {
 
     // City Hall Module
     const cityHallRepository: CityHallRepositoryInterface = new CityHallRepository(prisma);
-    const cityHallUsecase: CityHallUsecase = new CityHallUsecase(cityHallRepository, objectStorageService);
+    const cityHallUsecase: CityHallUsecase = new CityHallUsecase(cityHallRepository, objectStorageService, dbTransaction);
     const cityHallController: CityHallController = new CityHallController(cityHallUsecase);
 
     const router: APIRouter = new APIRouter(

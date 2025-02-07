@@ -7,8 +7,9 @@ import { CityHallMedia } from '../../domain/entity/city-hall-media';
 export class CityHallRepository implements CityHallRepositoryInterface {
     constructor(private prisma: PrismaClient) { }
 
-    public async getAllCityHalls(): Promise<CityHall[]> {
-        const cityHalls: CityHall[] = await this.prisma.cityHall.findMany(
+    public async getAllCityHalls(transaction?: any): Promise<CityHall[]> {
+        const prisma = transaction || this.prisma;
+        const cityHalls: CityHall[] = await prisma.cityHall.findMany(
             {
                 include: {
                     cityHallMedia: true,
@@ -20,8 +21,9 @@ export class CityHallRepository implements CityHallRepositoryInterface {
         return cityHalls;
     }
 
-    public async getCityHallById(id: number): Promise<CityHall|null> {
-        const cityHall: CityHall|null = await this.prisma.cityHall.findUnique(
+    public async getCityHallById(id: number, transaction?: any): Promise<CityHall|null> {
+        const prisma = transaction || this.prisma;
+        const cityHall: CityHall|null = await prisma.cityHall.findUnique(
             {
                 where: {
                     id: id
@@ -36,8 +38,9 @@ export class CityHallRepository implements CityHallRepositoryInterface {
         return cityHall;
     }
 
-    public async getCityHallMediaById(id: number): Promise<CityHallMedia|null> {
-        const cityHallMedia: CityHallMedia|null = await this.prisma.cityHallMedia.findUnique(
+    public async getCityHallMediaById(id: number, transaction?: any): Promise<CityHallMedia|null> {
+        const prisma = transaction || this.prisma;
+        const cityHallMedia: CityHallMedia|null = await prisma.cityHallMedia.findUnique(
             {
                 where: {
                     id: id
@@ -48,8 +51,9 @@ export class CityHallRepository implements CityHallRepositoryInterface {
         return cityHallMedia;
     }
 
-    public async createCityHall(cityHall: CityHall): Promise<CityHall> {
-        const createdCityHall: CityHall = await this.prisma.cityHall.create(
+    public async createCityHall(cityHall: CityHall, transaction?: any): Promise<CityHall> {
+        const prisma = transaction || this.prisma;
+        const createdCityHall: CityHall = await prisma.cityHall.create(
             {
                 data: {
                     name: cityHall.name,
@@ -104,9 +108,10 @@ export class CityHallRepository implements CityHallRepositoryInterface {
         return createdCityHall;
     }
 
-    public async createCityHallMedia(cityHallMedia: CityHallMedia[]): Promise<CityHallMedia[]> {
+    public async createCityHallMedia(cityHallMedia: CityHallMedia[], transaction?: any): Promise<CityHallMedia[]> {
 
-        const createdCityHallMedia: CityHallMedia[] = await this.prisma.cityHallMedia.createManyAndReturn(
+        const prisma = transaction || this.prisma;
+        const createdCityHallMedia: CityHallMedia[] = await prisma.cityHallMedia.createManyAndReturn(
             {
                 data: cityHallMedia.map(media => ({
                     cityHallId: media.cityHallId,
@@ -122,8 +127,9 @@ export class CityHallRepository implements CityHallRepositoryInterface {
         return createdCityHallMedia;
     }
 
-    public async createCityHallPricing(cityHallPricing: CityHallPricing[]): Promise<CityHallPricing[]> {
-        const createdCityHallPricing: CityHallPricing[] = await this.prisma.cityHallPricing.createManyAndReturn(
+    public async createCityHallPricing(cityHallPricing: CityHallPricing[], transaction?: any): Promise<CityHallPricing[]> {
+        const prisma = transaction || this.prisma;
+        const createdCityHallPricing: CityHallPricing[] = await prisma.cityHallPricing.createManyAndReturn(
             {
                 data: cityHallPricing.map(pricing => ({
                     cityHallId: pricing.cityHallId,
@@ -143,8 +149,9 @@ export class CityHallRepository implements CityHallRepositoryInterface {
         return createdCityHallPricing;
     }
 
-    public async updateCityHallOnly(id: number, cityHall: CityHall): Promise<CityHall> {
-        const updatedCityHall: CityHall = await this.prisma.cityHall.update(
+    public async updateCityHallOnly(id: number, cityHall: CityHall, transaction?: any): Promise<CityHall> {
+        const prisma = transaction || this.prisma;
+        const updatedCityHall: CityHall = await prisma.cityHall.update(
             {
                 where: {
                     id: id
@@ -176,8 +183,9 @@ export class CityHallRepository implements CityHallRepositoryInterface {
         return updatedCityHall;
     }
 
-    public async updateCityHallPricing(cityHallPricing: CityHallPricing): Promise<CityHallPricing> {
-        const updatedCityHallPricing: CityHallPricing = await this.prisma.cityHallPricing.update(
+    public async updateCityHallPricing(cityHallPricing: CityHallPricing, transaction?: any): Promise<CityHallPricing> {
+        const prisma = transaction || this.prisma;
+        const updatedCityHallPricing: CityHallPricing = await prisma.cityHallPricing.update(
             {
                 where: {
                     id: cityHallPricing.id
@@ -199,8 +207,9 @@ export class CityHallRepository implements CityHallRepositoryInterface {
         return updatedCityHallPricing;
     }
 
-    public async deleteCityHallPricing(id: number): Promise<CityHallPricing> {
-        const deletedCityHallPricing: CityHallPricing = await this.prisma.cityHallPricing.delete(
+    public async deleteCityHallPricing(id: number, transaction?: any): Promise<CityHallPricing> {
+        const prisma = transaction || this.prisma;
+        const deletedCityHallPricing: CityHallPricing = await prisma.cityHallPricing.delete(
             {
                 where: {
                     id: id
@@ -217,8 +226,9 @@ export class CityHallRepository implements CityHallRepositoryInterface {
         return deletedCityHallPricing;
     }
 
-    public async deleteCityHallMedia(id: number): Promise<CityHallMedia> {
-        const deletedCityHallMedia: CityHallMedia = await this.prisma.cityHallMedia.delete(
+    public async deleteCityHallMedia(id: number, transaction?: any): Promise<CityHallMedia> {
+        const prisma = transaction || this.prisma;
+        const deletedCityHallMedia: CityHallMedia = await prisma.cityHallMedia.delete(
             {
                 where: {
                     id: id
