@@ -242,4 +242,17 @@ export class CityHallRepository implements CityHallRepositoryInterface {
 
         return deletedCityHallMedia;
     }
+
+    public async deleteCityHall(id: number, transaction?: any): Promise<CityHall> {
+        const prisma = transaction || this.prisma;
+        const deletedCityHall: CityHall = await prisma.cityHall.delete(
+            {
+                where: {
+                    id: id
+                },
+            }
+        ) as CityHall;
+
+        return deletedCityHall;
+    }
 }

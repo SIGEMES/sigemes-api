@@ -11,6 +11,7 @@ export interface CityHallRepositoryInterface {
     createCityHallPricing(cityHallPricing: CityHallPricing[], transaction?: any): Promise<CityHallPricing[]>;
     updateCityHallOnly(id: number, cityHall: CityHall, transaction?: any): Promise<CityHall>;
     updateCityHallPricing(cityHallPricing: CityHallPricing, transaction?: any): Promise<CityHallPricing>;
+    deleteCityHall(id: number, transaction?: any): Promise<CityHall>;
     deleteCityHallPricing(id: number, transaction?: any): Promise<CityHallPricing>;
     deleteCityHallMedia(id: number, transaction?: any): Promise<CityHallMedia>;
 }

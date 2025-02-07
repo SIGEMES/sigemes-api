@@ -74,7 +74,7 @@ model CityHall {
 
 model CityHallMedia {
   id         Int      @id @default(autoincrement())
-  cityHall   CityHall @relation(fields: [cityHallId], references: [id])
+  cityHall   CityHall @relation(fields: [cityHallId], references: [id], onDelete: Cascade)
   cityHallId Int      @map("city_hall_id")
   url        String   @db.VarChar(255)
 
@@ -83,7 +83,7 @@ model CityHallMedia {
 
 model CityHallPricing {
   id           Int      @id @default(autoincrement())
-  cityHall     CityHall @relation(fields: [cityHallId], references: [id])
+  cityHall     CityHall @relation(fields: [cityHallId], references: [id], onDelete: Cascade)
   cityHallId   Int      @map("city_hall_id")
   activityType String   @map("activity_type") @db.VarChar(255)
   facilities   String   @db.Text

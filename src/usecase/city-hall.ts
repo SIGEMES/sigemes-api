@@ -158,4 +158,24 @@ export class CityHallUsecase {
             return updatedCityHall;
         });
     }
+
+    public async deleteCityHall(id: number): Promise<CityHall> {
+        const cityHall: CityHall|null = await this.cityHallRepository.getCityHallById(id);
+
+        if (!cityHall) {
+            throw new ResponseError("City hall not found", 404);
+        }
+
+        const deletedCityHall: CityHall = await this.cityHallRepository.deleteCityHall(id);
+        
+        if(cityHall.cityHallMedia.length > 0) {
+            for (const media of cityHall.cityHallMedia) {
+                const imageName: string = media.url.split('/').pop() as string;
+                const imagePath: string = `city-hall-media/${imageName}`;
+                await this.objectStorageService.deleteFile(imagePath);
+            }
+        }
+
+        return deletedCityHall;
+    }
 }

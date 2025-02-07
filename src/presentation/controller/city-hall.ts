@@ -129,4 +129,14 @@ export class CityHallController {
             next(error);
         }
     }
+
+    public async deleteCityHall(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { id } = CityHallValidation.id.parse({ id: Number(req.params.id)});
+            await this.cityHallUsecase.deleteCityHall(id);
+            res.status(200).json(new BaseSuccessResponse(true, "Delete city hall success", null));
+        } catch (error) {
+            next(error);
+        }
+    }
 }
