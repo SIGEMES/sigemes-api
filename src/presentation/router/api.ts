@@ -6,15 +6,18 @@ import multer from 'multer';
 import { AdminController } from '../controller/admin';
 import { isAdminMiddleware } from '../middleware/is-admin';
 import { isSuperAdminMiddleware } from '../middleware/is-super-admin';
+import { CityHallController } from '../controller/city-hall';
 
 export class APIRouter {
     public multerUpload: multer.Multer;
     public renterRouter: express.Router;
     public adminRouter: express.Router;
+    public cityHallRouter: express.Router;
 
     constructor(
         private renterController: RenterController,
         private adminController: AdminController,
+        private cityHallController: CityHallController
     ) {
         this.multerUpload = multer({
             storage: multer.memoryStorage(),
@@ -25,9 +28,11 @@ export class APIRouter {
 
         this.renterRouter = express.Router();
         this.adminRouter = express.Router();
+        this.cityHallRouter = express.Router();
 
         this.configRentersRoutes();
         this.configAdminRoutes();
+        this.configCityHallRoutes();
     }
 
     private configRentersRoutes(): void {
@@ -54,5 +59,15 @@ export class APIRouter {
         this.adminRouter.post("", this.adminController.createAdmin.bind(this.adminController));
         this.adminRouter.put("/:id", this.multerUpload.single('profile_picture'), this.adminController.updateAdmin.bind(this.adminController));
         this.adminRouter.delete("/:id", this.adminController.deleteAdmin.bind(this.adminController));
+    }
+
+    private configCityHallRoutes(): void {
+        this.cityHallRouter.use(jwtMiddleware);
+        this.cityHallRouter.get("", this.cityHallController.getAllCityHalls.bind(this.cityHallController));
+        this.cityHallRouter.get("/:id", this.cityHallController.getCityHallById.bind(this.cityHallController));
+        this.cityHallRouter.use(isAdminMiddleware);
+        this.cityHallRouter.post("", this.multerUpload.array('city_hall_images'), this.cityHallController.createCityHall.bind(this.cityHallController));
+        this.cityHallRouter.put("/:id", this.multerUpload.array('city_hall_images'), this.cityHallController.updateCityHall.bind(this.cityHallController));
+        this.cityHallRouter.delete("/:id", this.cityHallController.deleteCityHall.bind(this.cityHallController));
     }
 }

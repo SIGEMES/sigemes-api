@@ -49,3 +49,46 @@ model Admin {
 
   @@map("admins")
 }
+
+enum CityHallStatus {
+  tersedia
+  tidak_tersedia
+}
+
+model CityHall {
+  id              Int               @id @default(autoincrement())
+  name            String            @db.VarChar(255)
+  description     String            @db.Text
+  areaM2          Float             @map("area_m2") @db.DoublePrecision
+  peopleCapacity  Int               @map("people_capacity") @db.Integer
+  address         String            @db.VarChar(255)
+  latitude        Float             @db.DoublePrecision
+  longitude       Float             @db.DoublePrecision
+  status          CityHallStatus    @default(tersedia) @map("city_hall_status")
+  contactPerson   String            @map("contact_person") @db.VarChar(15)
+  cityHallMedia   CityHallMedia[]
+  cityHallPricing CityHallPricing[]
+
+  @@map("city_halls")
+}
+
+model CityHallMedia {
+  id         Int      @id @default(autoincrement())
+  cityHall   CityHall @relation(fields: [cityHallId], references: [id], onDelete: Cascade)
+  cityHallId Int      @map("city_hall_id")
+  url        String   @db.VarChar(255)
+
+  @@map("city_hall_media")
+}
+
+model CityHallPricing {
+  id           Int      @id @default(autoincrement())
+  cityHall     CityHall @relation(fields: [cityHallId], references: [id], onDelete: Cascade)
+  cityHallId   Int      @map("city_hall_id")
+  activityType String   @map("activity_type") @db.VarChar(255)
+  facilities   String   @db.Text
+  pricePerDay  Float    @map("price_per_day") @db.DoublePrecision
+  isActive     Boolean  @default(true) @map("is_active")
+
+  @@map("city_hall_pricing")
+}
