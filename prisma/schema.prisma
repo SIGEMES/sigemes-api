@@ -50,7 +50,7 @@ model Admin {
   @@map("admins")
 }
 
-enum CityHallStatus {
+enum Status {
   tersedia
   tidak_tersedia
 }
@@ -64,7 +64,7 @@ model CityHall {
   address         String            @db.VarChar(255)
   latitude        Float             @db.DoublePrecision
   longitude       Float             @db.DoublePrecision
-  status          CityHallStatus    @default(tersedia) @map("city_hall_status")
+  status          Status            @default(tersedia) @map("city_hall_status")
   contactPerson   String            @map("contact_person") @db.VarChar(15)
   cityHallMedia   CityHallMedia[]
   cityHallPricing CityHallPricing[]
@@ -91,4 +91,71 @@ model CityHallPricing {
   isActive     Boolean  @default(true) @map("is_active")
 
   @@map("city_hall_pricing")
+}
+
+model Guesthouse {
+  id              Int               @id @default(autoincrement())
+  name            String            @db.VarChar(255)
+  description     String            @db.Text
+  facilities      String            @db.Text
+  areaM2          Float             @map("area_m2") @db.DoublePrecision
+  address         String            @db.VarChar(255)
+  latitude        Float             @db.DoublePrecision
+  longitude       Float             @db.DoublePrecision
+  contactPerson   String            @map("contact_person") @db.VarChar(15)
+  guesthouseMedia GuesthouseMedia[]
+  guesthouseRoom  GuesthouseRoom[]
+
+  @@map("guesthouses")
+}
+
+model GuesthouseMedia {
+  id           Int        @id @default(autoincrement())
+  guesthouse   Guesthouse @relation(fields: [guesthouseId], references: [id], onDelete: Cascade)
+  guesthouseId Int        @map("guesthouse_id")
+  url          String     @db.VarChar(255)
+
+  @@map("guesthouse_media")
+}
+
+enum RoomType {
+  vip
+  standard
+}
+
+model GuesthouseRoom {
+  id                    Int                     @id @default(autoincrement())
+  guesthouse            Guesthouse              @relation(fields: [guesthouseId], references: [id], onDelete: Cascade)
+  guesthouseId          Int                     @map("guesthouse_id")
+  name                  String                  @db.VarChar(255)
+  type                  RoomType                @default(standard)
+  facilities            String                  @db.Text
+  availableSlot         Int                     @map("available_slot") @db.Integer
+  totalSlot             Int                     @map("total_slot") @db.Integer
+  areaM2                Float                   @map("area_m2") @db.DoublePrecision
+  status                Status                  @default(tersedia)
+  guesthouseRoomMedia   GuesthouseRoomMedia[]
+  guesthouseRoomPricing GuesthouseRoomPricing[]
+
+  @@map("guesthouse_rooms")
+}
+
+model GuesthouseRoomMedia {
+  id               Int            @id @default(autoincrement())
+  guesthouseRoom   GuesthouseRoom @relation(fields: [guesthouseRoomId], references: [id], onDelete: Cascade)
+  guesthouseRoomId Int            @map("guesthouse_room_id")
+  url              String         @db.VarChar(255)
+
+  @@map("guesthouse_room_media")
+}
+
+model GuesthouseRoomPricing {
+  id               Int            @id @default(autoincrement())
+  guesthouseRoom   GuesthouseRoom @relation(fields: [guesthouseRoomId], references: [id], onDelete: Cascade)
+  guesthouseRoomId Int            @map("guesthouse_room_id")
+  retributionType  String         @map("retribution_type") @db.VarChar(255)
+  pricePerDay      Float          @map("price_per_day") @db.DoublePrecision
+  isActive         Boolean        @default(true) @map("is_active")
+
+  @@map("guesthouse_room_pricing")
 }
