@@ -80,5 +80,7 @@ export class APIRouter {
         this.guesthouseRouter.use(jwtMiddleware);
         this.guesthouseRouter.get("", this.guesthouseController.getAllGuesthouses.bind(this.guesthouseController));
         this.guesthouseRouter.get("/:id", this.guesthouseController.getGuesthouseById.bind(this.guesthouseController));
+        this.guesthouseRouter.use(isAdminMiddleware);
+        this.guesthouseRouter.post("", this.multerUpload.array('guesthouse_images'), this.guesthouseController.createGuesthouse.bind(this.guesthouseController));
     }
 }

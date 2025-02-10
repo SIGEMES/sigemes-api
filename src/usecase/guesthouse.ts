@@ -28,4 +28,25 @@ export class GuesthouseUsecase {
 
         return guesthouse;
     }
+
+    public async createGuesthouse(guesthouse: Guesthouse, guesthouseMedia: File[]): Promise<Guesthouse> {
+        // hash filename
+        guesthouseMedia = guesthouseMedia.map(file => ({
+            ...file,
+            originalName: `${Date.now()}-${Math.random().toString(36).substring(7)}-${file.originalName}`,
+        }));
+
+        const guesthouseMediaURL: string[] = await this.objectStorageService.uploadMultipleFiles(guesthouseMedia, "guesthouse-media");
+
+        // map guesthouseMediaURL to guesthouseMedia attribute
+        guesthouse.guesthouseMedia = guesthouseMediaURL.map((url, index) => ({
+            id: index,
+            guesthouseId: guesthouse.id,
+            url,
+        }));
+
+        const newGuesthouse: Guesthouse = await this.guesthouseRepository.createGuesthouse(guesthouse);
+
+        return newGuesthouse;
+    }
 }
