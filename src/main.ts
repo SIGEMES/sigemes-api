@@ -12,6 +12,10 @@ import { CityHallRepository } from "./infrastructure/repository/city-hall";
 import { CityHallUsecase } from "./usecase/city-hall";
 import { CityHallController } from "./presentation/controller/city-hall";
 
+import { GuesthouseRepository } from "./infrastructure/repository/guesthouse";
+import { GuesthouseUsecase } from "./usecase/guesthouse";
+import { GuesthouseController } from "./presentation/controller/guesthouse";
+
 import { JwtService } from "./infrastructure/authentication/jwt";
 import { BcryptService } from "./infrastructure/authentication/bcrypt";
 import { MailerService } from "./infrastructure/mailer/mailer";
@@ -22,6 +26,7 @@ import { BcryptInterface } from "./domain/interface/library/bcrypt";
 import { RenterRepositoryInterface } from "./domain/interface/repository/renter";
 import { AdminRepositoryInterface } from "./domain/interface/repository/admin";
 import { CityHallRepositoryInterface } from "./domain/interface/repository/city-hall";
+import { GuesthouseRepositoryInterface } from "./domain/interface/repository/guesthouse";
 import { MailerInterface } from "./domain/interface/external-service/mailer";
 import { ObjectStorageInterface } from "./domain/interface/external-service/object-storage";
 import { CloudStorageService } from "./infrastructure/object-storage/cloud-storage";
@@ -51,10 +56,16 @@ export async function main(): Promise<void> {
     const cityHallUsecase: CityHallUsecase = new CityHallUsecase(cityHallRepository, objectStorageService, dbTransaction);
     const cityHallController: CityHallController = new CityHallController(cityHallUsecase);
 
+    // Guesthouse Module
+    const guesthouseRepository: GuesthouseRepositoryInterface = new GuesthouseRepository(prisma);
+    const guesthouseUsecase: GuesthouseUsecase = new GuesthouseUsecase(guesthouseRepository, objectStorageService, dbTransaction);
+    const guesthouseController: GuesthouseController = new GuesthouseController(guesthouseUsecase);
+
     const router: APIRouter = new APIRouter(
         renterController,
         adminController,
         cityHallController,
+        guesthouseController
     );
 
     const webServer: WebServer = new WebServer(
