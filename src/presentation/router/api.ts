@@ -7,17 +7,20 @@ import { AdminController } from '../controller/admin';
 import { isAdminMiddleware } from '../middleware/is-admin';
 import { isSuperAdminMiddleware } from '../middleware/is-super-admin';
 import { CityHallController } from '../controller/city-hall';
+import { GuesthouseController } from '../controller/guesthouse';
 
 export class APIRouter {
     public multerUpload: multer.Multer;
     public renterRouter: express.Router;
     public adminRouter: express.Router;
     public cityHallRouter: express.Router;
+    public guesthouseRouter: express.Router;
 
     constructor(
         private renterController: RenterController,
         private adminController: AdminController,
-        private cityHallController: CityHallController
+        private cityHallController: CityHallController,
+        private guesthouseController: GuesthouseController,
     ) {
         this.multerUpload = multer({
             storage: multer.memoryStorage(),
@@ -29,10 +32,12 @@ export class APIRouter {
         this.renterRouter = express.Router();
         this.adminRouter = express.Router();
         this.cityHallRouter = express.Router();
+        this.guesthouseRouter = express.Router();
 
         this.configRentersRoutes();
         this.configAdminRoutes();
         this.configCityHallRoutes();
+        this.configGuesthouseRoutes();
     }
 
     private configRentersRoutes(): void {
@@ -69,5 +74,15 @@ export class APIRouter {
         this.cityHallRouter.post("", this.multerUpload.array('city_hall_images'), this.cityHallController.createCityHall.bind(this.cityHallController));
         this.cityHallRouter.put("/:id", this.multerUpload.array('city_hall_images'), this.cityHallController.updateCityHall.bind(this.cityHallController));
         this.cityHallRouter.delete("/:id", this.cityHallController.deleteCityHall.bind(this.cityHallController));
+    }
+
+    private configGuesthouseRoutes(): void {
+        this.guesthouseRouter.use(jwtMiddleware);
+        this.guesthouseRouter.get("", this.guesthouseController.getAllGuesthouses.bind(this.guesthouseController));
+        this.guesthouseRouter.get("/:id", this.guesthouseController.getGuesthouseById.bind(this.guesthouseController));
+        this.guesthouseRouter.use(isAdminMiddleware);
+        this.guesthouseRouter.post("", this.multerUpload.array('guesthouse_media'), this.guesthouseController.createGuesthouse.bind(this.guesthouseController));
+        this.guesthouseRouter.put("/:id", this.multerUpload.array('guesthouse_media'), this.guesthouseController.updateGuesthouse.bind(this.guesthouseController));
+        this.guesthouseRouter.delete("/:id", this.guesthouseController.deleteGuesthouse.bind(this.guesthouseController));
     }
 }
