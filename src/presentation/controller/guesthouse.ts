@@ -115,4 +115,14 @@ export class GuesthouseController {
             next(error);
         }
     }
+
+    public async deleteGuesthouse(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { id } = GuesthouseValidation.id.parse({ id: Number(req.params.id)});
+            await this.guesthouseUsecase.deleteGuesthouse(id);
+            res.status(200).json(new BaseSuccessResponse(true, "Delete guesthouse success"));
+        } catch (error) {
+            next(error);
+        }
+    }
 }

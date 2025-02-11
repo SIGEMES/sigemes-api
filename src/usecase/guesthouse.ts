@@ -117,4 +117,22 @@ export class GuesthouseUsecase {
         });
     }
 
+    public async deleteGuesthouse(id: number): Promise<void> {
+        const guesthouse: Guesthouse|null = await this.guesthouseRepository.getGuesthouseById(id);
+
+        if (!guesthouse) {
+            throw new ResponseError("Guesthouse not found", 404);
+        }
+
+        if (guesthouse.guesthouseMedia.length > 0) {
+            for (const media of guesthouse.guesthouseMedia) {
+                const mediaName: string = media.url.split("/").pop() as string;
+                const mediaPath: string = `guesthouse-media/${mediaName}`;
+                await this.objectStorageService.deleteFile(mediaPath);
+                await this.guesthouseRepository.deleteGuesthouseMedia(media.id);
+            }
+        }
+
+        await this.guesthouseRepository.deleteGuesthouse(id);
+    }
 }

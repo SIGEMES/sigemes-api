@@ -110,11 +110,22 @@ export class GuesthouseRepository implements GuesthouseRepositoryInterface {
         return updatedGuesthouse;
     }
 
-    
+    public async deleteGuesthouse(id: number): Promise<void> {
+        await this.prisma.guesthouse.delete({
+            where: {
+                id: id,
+            },
+            include: {
+                guesthouseMedia: true,
+            }
+        });
+
+    }
+
     public async deleteGuesthouseMedia(id: number, transaction?: any): Promise<void> {
         const prisma = transaction || this.prisma;
         
-        await prisma.guesthouseMedia.deleteMany({
+        await prisma.guesthouseMedia.delete({
             where: {
                 id: id,
             },
