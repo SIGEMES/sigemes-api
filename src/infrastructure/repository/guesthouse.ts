@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { GuesthouseRepositoryInterface } from "../../domain/interface/repository/guesthouse";
 import { Guesthouse } from "../../domain/entity/guesthouse";
+import { GuesthouseMedia } from "../../domain/entity/guesthouse-media";
 
 export class GuesthouseRepository implements GuesthouseRepositoryInterface {
     constructor(private prisma: PrismaClient) { }
@@ -30,8 +31,20 @@ export class GuesthouseRepository implements GuesthouseRepositoryInterface {
         return guesthouse;
     }
 
-    public async createGuesthouse(guesthouse: Guesthouse): Promise<Guesthouse> {
-        const createdGuesthouse: Guesthouse = await this.prisma.guesthouse.create({
+    public async getGuesthouseMediaById(id: number): Promise<GuesthouseMedia|null> {
+        const guesthouseMedia: GuesthouseMedia|null = await this.prisma.guesthouseMedia.findUnique({
+            where: {
+                id: id
+            }
+        });
+
+        return guesthouseMedia;
+    }
+
+    public async createGuesthouse(guesthouse: Guesthouse, transaction?: any): Promise<Guesthouse> {
+        const prisma = transaction || this.prisma;
+
+        const createdGuesthouse: Guesthouse = await prisma.guesthouse.create({
             data: {
                 name: guesthouse.name,
                 description: guesthouse.description,
@@ -54,4 +67,58 @@ export class GuesthouseRepository implements GuesthouseRepositoryInterface {
 
         return createdGuesthouse;
     }
+
+    public async createGuesthouseMedia(guesthouseMedia: GuesthouseMedia[], transaction?: any): Promise<GuesthouseMedia[]> {
+        const prisma = transaction || this.prisma;
+        
+        const createdGuesthouseMedia: GuesthouseMedia[] = await prisma.guesthouseMedia.createManyAndReturn({
+            data: guesthouseMedia.map(media => ({
+                guesthouseId: media.guesthouseId,
+                url: media.url,
+            })),
+            select: {
+                id: true,
+                url: true,
+            },
+        }) as GuesthouseMedia[];
+
+        return createdGuesthouseMedia;
+    }
+
+    public async updateGuesthouseOnly(id: number, guesthouse: Guesthouse, transaction?: any): Promise<Guesthouse> {
+        const prisma = transaction || this.prisma;
+        
+        const updatedGuesthouse: Guesthouse = await prisma.guesthouse.update({
+            where: {
+                id: id,
+            },
+            data: {
+                name: guesthouse.name,
+                description: guesthouse.description,
+                facilities: guesthouse.facilities,
+                areaM2: guesthouse.areaM2,
+                address: guesthouse.address,
+                latitude: guesthouse.latitude,
+                longitude: guesthouse.longitude,
+                contactPerson: guesthouse.contactPerson,
+            },
+            include: {
+                guesthouseMedia: true,
+            }
+        });
+
+        return updatedGuesthouse;
+    }
+
+    
+    public async deleteGuesthouseMedia(id: number, transaction?: any): Promise<void> {
+        const prisma = transaction || this.prisma;
+        
+        await prisma.guesthouseMedia.deleteMany({
+            where: {
+                id: id,
+            },
+        });
+    }
+
 }

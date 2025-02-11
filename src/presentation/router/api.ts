@@ -81,6 +81,7 @@ export class APIRouter {
         this.guesthouseRouter.get("", this.guesthouseController.getAllGuesthouses.bind(this.guesthouseController));
         this.guesthouseRouter.get("/:id", this.guesthouseController.getGuesthouseById.bind(this.guesthouseController));
         this.guesthouseRouter.use(isAdminMiddleware);
-        this.guesthouseRouter.post("", this.multerUpload.array('guesthouse_images'), this.guesthouseController.createGuesthouse.bind(this.guesthouseController));
+        this.guesthouseRouter.post("", this.multerUpload.array('guesthouse_media'), this.guesthouseController.createGuesthouse.bind(this.guesthouseController));
+        this.guesthouseRouter.put("/:id", this.multerUpload.array('guesthouse_media'), this.guesthouseController.updateGuesthouse.bind(this.guesthouseController));
     }
 }
