@@ -8,6 +8,7 @@ import { isAdminMiddleware } from '../middleware/is-admin';
 import { isSuperAdminMiddleware } from '../middleware/is-super-admin';
 import { CityHallController } from '../controller/city-hall';
 import { GuesthouseController } from '../controller/guesthouse';
+import { GuesthouseRoomController } from '../controller/guesthouse-room';
 
 export class APIRouter {
     public multerUpload: multer.Multer;
@@ -15,12 +16,14 @@ export class APIRouter {
     public adminRouter: express.Router;
     public cityHallRouter: express.Router;
     public guesthouseRouter: express.Router;
+    public guesthouseRoomRouter: express.Router;
 
     constructor(
         private renterController: RenterController,
         private adminController: AdminController,
         private cityHallController: CityHallController,
         private guesthouseController: GuesthouseController,
+        private guesthouseRoomController: GuesthouseRoomController
     ) {
         this.multerUpload = multer({
             storage: multer.memoryStorage(),
@@ -32,11 +35,13 @@ export class APIRouter {
         this.renterRouter = express.Router();
         this.adminRouter = express.Router();
         this.cityHallRouter = express.Router();
+        this.guesthouseRoomRouter = express.Router();
         this.guesthouseRouter = express.Router();
 
         this.configRentersRoutes();
         this.configAdminRoutes();
         this.configCityHallRoutes();
+        this.configGuesthouseRoomRoutes();
         this.configGuesthouseRoutes();
     }
 
@@ -76,6 +81,12 @@ export class APIRouter {
         this.cityHallRouter.delete("/:id", this.cityHallController.deleteCityHall.bind(this.cityHallController));
     }
 
+    private configGuesthouseRoomRoutes(): void {
+        this.guesthouseRoomRouter.use(jwtMiddleware);
+        this.guesthouseRoomRouter.get("/:guesthouse_id/rooms", this.guesthouseRoomController.getAllGuesthouseRooms.bind(this.guesthouseRoomController));
+        this.guesthouseRoomRouter.get("/:guesthouse_id/rooms/:room_id", this.guesthouseRoomController.getGuesthouseRoomById.bind(this.guesthouseRoomController));
+    }
+
     private configGuesthouseRoutes(): void {
         this.guesthouseRouter.use(jwtMiddleware);
         this.guesthouseRouter.get("", this.guesthouseController.getAllGuesthouses.bind(this.guesthouseController));
@@ -85,4 +96,6 @@ export class APIRouter {
         this.guesthouseRouter.put("/:id", this.multerUpload.array('guesthouse_media'), this.guesthouseController.updateGuesthouse.bind(this.guesthouseController));
         this.guesthouseRouter.delete("/:id", this.guesthouseController.deleteGuesthouse.bind(this.guesthouseController));
     }
+    
+    
 }
