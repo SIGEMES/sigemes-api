@@ -31,4 +31,25 @@ export class GuesthouseRoomUsecase {
         return guesthouseRoom;
     }
 
+    public async createGuesthouseRoom(room: GuesthouseRoom, roomMedia: File[]): Promise<GuesthouseRoom> {
+        // hash filename
+        roomMedia = roomMedia.map(file => ({
+            ...file,
+            originalName: `${Date.now()}-${Math.random().toString(36).substring(7)}-${file.originalName}`,
+        }));
+
+        const roomMediaURL: string[] = await this.objectStorageService.uploadMultipleFiles(roomMedia, "guesthouse-media");
+
+        // map roomMediaURL to roomMedia attribute
+        room.guesthouseRoomMedia = roomMediaURL.map((url, index) => ({
+            id: index,
+            guesthouseRoomId: room.id,
+            url,
+        }));
+
+        const newRoom: GuesthouseRoom = await this.guesthouseRoomRepository.createGuesthouseRoom(room);
+
+        return newRoom;
+    }
+    
 }

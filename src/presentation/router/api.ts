@@ -85,6 +85,8 @@ export class APIRouter {
         this.guesthouseRoomRouter.use(jwtMiddleware);
         this.guesthouseRoomRouter.get("/:guesthouse_id/rooms", this.guesthouseRoomController.getAllGuesthouseRooms.bind(this.guesthouseRoomController));
         this.guesthouseRoomRouter.get("/:guesthouse_id/rooms/:room_id", this.guesthouseRoomController.getGuesthouseRoomById.bind(this.guesthouseRoomController));
+        this.guesthouseRoomRouter.use(isAdminMiddleware);
+        this.guesthouseRoomRouter.post("/:guesthouse_id/rooms", this.multerUpload.array('room_media'), this.guesthouseRoomController.createGuesthouseRoom.bind(this.guesthouseRoomController));
     }
 
     private configGuesthouseRoutes(): void {

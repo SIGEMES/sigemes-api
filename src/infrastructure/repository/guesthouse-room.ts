@@ -38,4 +38,60 @@ export class GuesthouseRoomRepository implements GuesthouseRoomRepositoryInterfa
 
         return guesthouseRoom;
     }
+
+    public async createGuesthouseRoom(room: GuesthouseRoom): Promise<GuesthouseRoom> {
+        const createdRoom: GuesthouseRoom = await this.prisma.guesthouseRoom.create(
+            {
+                data: {
+                    guesthouseId: room.guesthouseId,
+                    name: room.name,
+                    type: room.type,
+                    facilities: room.facilities,
+                    availableSlot: room.availableSlot,
+                    totalSlot: room.totalSlot,
+                    areaM2: room.areaM2,
+                    status: room.status,
+                    guesthouseRoomMedia: {
+                        create: room.guesthouseRoomMedia.map(media => ({
+                            url: media.url
+                        }))
+                    },
+                    guesthouseRoomPricing: {
+                        create: room.guesthouseRoomPricing.map(pricing => ({
+                            retributionType: pricing.retributionType,
+                            pricePerDay: pricing.pricePerDay,
+                            isActive: pricing.isActive
+                        }))
+                    }
+                },
+                select: {
+                    id: true,
+                    guesthouseId: true,
+                    name: true,
+                    type: true,
+                    facilities: true,
+                    availableSlot: true,
+                    totalSlot: true,
+                    areaM2: true,
+                    status: true,
+                    guesthouseRoomMedia: {
+                        select: {
+                            id: true,
+                            url: true
+                        }
+                    },
+                    guesthouseRoomPricing: {
+                        select: {
+                            id: true,
+                            retributionType: true,
+                            pricePerDay: true,
+                            isActive: true
+                        }
+                    },
+                },
+            }
+        ) as GuesthouseRoom;
+
+        return createdRoom;
+    }
 }

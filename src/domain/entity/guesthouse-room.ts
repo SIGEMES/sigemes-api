@@ -9,7 +9,7 @@ export class GuesthouseRoom {
         public id: number = 0,
         public guesthouseId: number = 0,
         public name: string = '',
-        public type: string = '',
+        public type: RoomType = 'standard',
         public facilities: string = '',
         public availableSlot: number = 0,
         public totalSlot: number = 0,
