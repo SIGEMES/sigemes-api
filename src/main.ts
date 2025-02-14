@@ -16,6 +16,10 @@ import { GuesthouseRepository } from "./infrastructure/repository/guesthouse";
 import { GuesthouseUsecase } from "./usecase/guesthouse";
 import { GuesthouseController } from "./presentation/controller/guesthouse";
 
+import { GuesthouseRoomRepository } from "./infrastructure/repository/guesthouse-room";
+import { GuesthouseRoomUsecase } from "./usecase/guesthouse-room";
+import { GuesthouseRoomController } from "./presentation/controller/guesthouse-room";
+
 import { JwtService } from "./infrastructure/authentication/jwt";
 import { BcryptService } from "./infrastructure/authentication/bcrypt";
 import { MailerService } from "./infrastructure/mailer/mailer";
@@ -27,6 +31,7 @@ import { RenterRepositoryInterface } from "./domain/interface/repository/renter"
 import { AdminRepositoryInterface } from "./domain/interface/repository/admin";
 import { CityHallRepositoryInterface } from "./domain/interface/repository/city-hall";
 import { GuesthouseRepositoryInterface } from "./domain/interface/repository/guesthouse";
+import { GuesthouseRoomRepositoryInterface } from "./domain/interface/repository/guesthouse-room";
 import { MailerInterface } from "./domain/interface/external-service/mailer";
 import { ObjectStorageInterface } from "./domain/interface/external-service/object-storage";
 import { CloudStorageService } from "./infrastructure/object-storage/cloud-storage";
@@ -56,6 +61,11 @@ export async function main(): Promise<void> {
     const cityHallUsecase: CityHallUsecase = new CityHallUsecase(cityHallRepository, objectStorageService, dbTransaction);
     const cityHallController: CityHallController = new CityHallController(cityHallUsecase);
 
+    // Guesthouse Room Module
+    const guesthouseRoomRepository: GuesthouseRoomRepositoryInterface = new GuesthouseRoomRepository(prisma);
+    const guesthouseRoomUsecase: GuesthouseRoomUsecase = new GuesthouseRoomUsecase(guesthouseRoomRepository, objectStorageService, dbTransaction);
+    const guesthouseRoomController: GuesthouseRoomController = new GuesthouseRoomController(guesthouseRoomUsecase);
+
     // Guesthouse Module
     const guesthouseRepository: GuesthouseRepositoryInterface = new GuesthouseRepository(prisma);
     const guesthouseUsecase: GuesthouseUsecase = new GuesthouseUsecase(guesthouseRepository, objectStorageService, dbTransaction);
@@ -65,7 +75,8 @@ export async function main(): Promise<void> {
         renterController,
         adminController,
         cityHallController,
-        guesthouseController
+        guesthouseController,
+        guesthouseRoomController,
     );
 
     const webServer: WebServer = new WebServer(
