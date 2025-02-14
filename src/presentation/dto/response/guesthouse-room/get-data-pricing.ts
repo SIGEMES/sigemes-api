@@ -3,6 +3,7 @@ import { GuesthouseRoomPricing } from "../../../../domain/entity/guesthouse-room
 export class GetGuesthouseRoomPricingResponse {
     constructor(
         public id: number,
+        public retribution_type: string,
         public price_per_day: number,
         public is_active: boolean,
     ) {}
@@ -10,6 +11,7 @@ export class GetGuesthouseRoomPricingResponse {
     public static fromEntity(guesthouseRoomPricing: GuesthouseRoomPricing): GetGuesthouseRoomPricingResponse {
         return new GetGuesthouseRoomPricingResponse(
             guesthouseRoomPricing.id,
+            guesthouseRoomPricing.retributionType,
             guesthouseRoomPricing.pricePerDay,
             guesthouseRoomPricing.isActive,
         );

@@ -7,6 +7,7 @@ import { GetGuesthouseRoomDataResponse } from "../dto/response/guesthouse-room/g
 import { GuesthouseRoomValidation } from "../validation/guesthouse-room";
 import { File } from "../../domain/interface/library/file";
 import { CreateGuesthouseRoomRequest } from "../dto/request/guesthouse-room/create";
+import { GuesthouseRoomMediaRequest } from "../dto/request/guesthouse-room/media";
 
 export class GuesthouseRoomController {
     constructor(private guesthouseRoomUsecase: GuesthouseRoomUsecase) {}
@@ -67,6 +68,58 @@ export class GuesthouseRoomController {
             const createdGuesthouseRoom: GuesthouseRoom = await this.guesthouseRoomUsecase.createGuesthouseRoom(guesthouseRoomEntity, guesthouseRoomMedia);
             const guesthouseRoomResponse: GetGuesthouseRoomDataResponse = GetGuesthouseRoomDataResponse.fromEntity(createdGuesthouseRoom);
             res.status(201).json(new BaseSuccessResponse(true, "Create guesthouse room success", guesthouseRoomResponse));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    public async updateGuesthouseRoom(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            let roomMedia: File[] = [];
+            let deletedMediaObject: GuesthouseRoomMediaRequest[] = [];
+            if (typeof req.body.available_slot === 'string') {
+                req.body.available_slot = parseFloat(req.body.available_slot);
+            }
+            if (typeof req.body.total_slot === 'string') {
+                req.body.total_slot = parseFloat(req.body.total_slot);
+            }
+            if (typeof req.body.area_m2 === 'string') {
+                req.body.area_m2 = parseFloat(req.body.area_m2);
+            }
+            if (typeof req.body.room_pricing === 'string') {
+                req.body.room_pricing = JSON.parse(req.body.room_pricing);
+            }
+            if (typeof req.body.deleted_media_object === 'string') {
+                req.body.deleted_media_object = JSON.parse(req.body.deleted_media_object);
+            }
+
+            const { id } = GuesthouseRoomValidation.id.parse({ id: Number(req.params.room_id) });
+            const guesthouseRoom: CreateGuesthouseRoomRequest = GuesthouseRoomValidation.createGuesthouseRoom.parse(req.body);
+            const guesthouseRoomEntity: GuesthouseRoom = CreateGuesthouseRoomRequest.toEntity(guesthouseRoom);
+            guesthouseRoomEntity.id = id;
+
+            if (req.files && Array.isArray(req.files)) {
+                roomMedia = req.files.map(file => ({
+                    fieldname: file.fieldname,
+                    originalName: file.originalname,
+                    mimeType: file.mimetype,
+                    buffer: file.buffer,
+                    size: file.size
+                }));
+            }
+
+            if (req.body.deleted_media_object) {
+                deletedMediaObject = GuesthouseRoomValidation.deletedMedia.parse(req.body.deleted_media_object);
+            }
+            const deletedMediaEntity: GuesthouseRoomMedia[] = deletedMediaObject.map((media) => ({
+                id: media.id,
+                guesthouseRoomId: id,
+                url: media.url,
+            }));
+
+            const updatedGuesthouseRoom: GuesthouseRoom = await this.guesthouseRoomUsecase.updateGuesthouseRoom(guesthouseRoomEntity, roomMedia, deletedMediaEntity);
+            const guesthouseRoomResponse: GetGuesthouseRoomDataResponse = GetGuesthouseRoomDataResponse.fromEntity(updatedGuesthouseRoom);
+            res.status(200).json(new BaseSuccessResponse(true, "Update guesthouse room success", guesthouseRoomResponse));
         } catch (error) {
             next(error);
         }
