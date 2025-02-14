@@ -88,6 +88,7 @@ export class APIRouter {
         this.guesthouseRoomRouter.use(isAdminMiddleware);
         this.guesthouseRoomRouter.post("/:guesthouse_id/rooms", this.multerUpload.array('room_media'), this.guesthouseRoomController.createGuesthouseRoom.bind(this.guesthouseRoomController));
         this.guesthouseRoomRouter.put("/:guesthouse_id/rooms/:room_id", this.multerUpload.array('room_media'), this.guesthouseRoomController.updateGuesthouseRoom.bind(this.guesthouseRoomController));
+        this.guesthouseRoomRouter.delete("/:guesthouse_id/rooms/:room_id", this.guesthouseRoomController.deleteGuesthouseRoom.bind(this.guesthouseRoomController));
     }
 
     private configGuesthouseRoutes(): void {

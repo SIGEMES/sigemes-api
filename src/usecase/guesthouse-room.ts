@@ -166,4 +166,23 @@ export class GuesthouseRoomUsecase {
             return updatedRoom;
         });
     }
+
+    public async deleteGuesthouseRoom(id: number): Promise<void> {
+        const room: GuesthouseRoom|null = await this.guesthouseRoomRepository.getGuesthouseRoomById(id);
+
+        if (!room) {
+            throw new ResponseError("Guesthouse room not found", 404);
+        }
+
+        await this.guesthouseRoomRepository.deleteGuesthouseRoomById(id);
+
+        if (room.guesthouseRoomMedia.length > 0) {
+            for (const media of room.guesthouseRoomMedia) {
+                const mediaName: string = media.url.split("/").pop() as string;
+                const mediaPath: string = `guesthouse-media/${mediaName}`;
+                await this.objectStorageService.deleteFile(mediaPath);
+                await this.guesthouseRoomRepository.deleteGuesthouseRoomMediaById(media.id);
+            }
+        }
+    }
 }

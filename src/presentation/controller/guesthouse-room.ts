@@ -124,4 +124,14 @@ export class GuesthouseRoomController {
             next(error);
         }
     }
+
+    public async deleteGuesthouseRoom(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { id } = GuesthouseRoomValidation.id.parse({ id: Number(req.params.room_id) });
+            await this.guesthouseRoomUsecase.deleteGuesthouseRoom(id);
+            res.status(200).json(new BaseSuccessResponse(true, "Delete guesthouse room success"));
+        } catch (error) {
+            next(error);
+        }
+    }
 }
