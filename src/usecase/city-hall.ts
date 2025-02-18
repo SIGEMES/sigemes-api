@@ -51,7 +51,7 @@ export class CityHallUsecase {
         return newCityHall;
     }
 
-    public async updateCityHall(id: number, cityHall: CityHall, cityHallMediaReq: File[], deletedObjectImages: CityHallMedia[]): Promise<CityHall> {
+    public async updateCityHall(id: number, cityHall: CityHall, cityHallMediaReq: File[], deletedObjectMedia: CityHallMedia[]): Promise<CityHall> {
         // Using transaction to ensure data consistency
         return await this.dbTransaction.run(async (tx) => {
             const oldCityHallData: CityHall|null = await this.cityHallRepository.getCityHallById(id);
@@ -63,43 +63,55 @@ export class CityHallUsecase {
             const updatedCityHall: CityHall = await this.cityHallRepository.updateCityHallOnly(id, cityHall, tx);
     
             const oldCityHallPricingCount: number = oldCityHallData.cityHallPricing.length;
-            let updatedCityHallPricingCount: number = 0
+            let notNewCityHallPricingCount: number = 0
             let newCityHallPricingData: CityHallPricing[] = [];
-            let deletedCityHallPricingId: number[] = [];
+            let notDeletedCityHallPricingId: number[] = [];
             let finalCityHallPricing: CityHallPricing[] = [];
             for (const cityHallPricing of cityHall.cityHallPricing) {
-                let i: number = updatedCityHallPricingCount;
-                let found: boolean = false;
                 if (cityHallPricing.id === 0) {
+                    cityHallPricing.cityHallId = id;
                     newCityHallPricingData.push(cityHallPricing);
                 } else {
+                    let i: number = notNewCityHallPricingCount;
                     while (i < oldCityHallPricingCount) {
+                        let isUpdated: boolean = false;
+                        notNewCityHallPricingCount++;
                         if (cityHallPricing.id === oldCityHallData.cityHallPricing[i].id) {
-                            await this.cityHallRepository.updateCityHallPricing(cityHallPricing, tx);
+                            if (cityHallPricing.activityType !== oldCityHallData.cityHallPricing[i].activityType) {
+                                isUpdated = true;
+                            }
+                            if (cityHallPricing.facilities !== oldCityHallData.cityHallPricing[i].facilities) {
+                                isUpdated = true;
+                            }
+                            if (cityHallPricing.pricePerDay !== oldCityHallData.cityHallPricing[i].pricePerDay) {
+                                isUpdated = true;
+                            }
+                            if (cityHallPricing.isActive !== oldCityHallData.cityHallPricing[i].isActive) {
+                                isUpdated = true;
+                            }
+
+                            if (isUpdated) {
+                                await this.cityHallRepository.updateCityHallPricing(cityHallPricing, tx);
+                            }
                             finalCityHallPricing.push(cityHallPricing);
-                            updatedCityHallPricingCount++;
-                            found = true;
+                            notDeletedCityHallPricingId.push(cityHallPricing.id);
                             break;
                         }
                         i++;
-                    }
-    
-                    if (!found) {
-                        deletedCityHallPricingId.push(cityHallPricing.id);
                     }
                 }
             }
     
             let newCityHallPricingFinal: CityHallPricing[] = [];
-            if (updatedCityHallPricingCount !== 0) {
+            if (newCityHallPricingData.length > 0) {
                 newCityHallPricingFinal = await this.cityHallRepository.createCityHallPricing(newCityHallPricingData, tx);
             }
     
             finalCityHallPricing = finalCityHallPricing.concat(newCityHallPricingFinal);
     
-            if (deletedCityHallPricingId.length !== 0) {
-                for (const id of deletedCityHallPricingId) {
-                    await this.cityHallRepository.deleteCityHallPricing(id, tx);
+            for (const pricing of oldCityHallData.cityHallPricing) {
+                if (!notDeletedCityHallPricingId.includes(pricing.id)) {
+                    await this.cityHallRepository.deleteCityHallPricing(pricing.id, tx);
                 }
             }
 
@@ -123,29 +135,29 @@ export class CityHallUsecase {
                 newCityHallMedia = await this.cityHallRepository.createCityHallMedia(cityHallMedia, tx);
             }
     
-            let deletedImageId: number[] = [];
-            if (deletedObjectImages.length > 0) {
-                for (const image of deletedObjectImages) {
-                    const cityHallImage: CityHallMedia|null = await this.cityHallRepository.getCityHallMediaById(image.id, tx);
-                    if (!cityHallImage) {
-                        throw new ResponseError("City hall image not found", 404);
+            let deletedMediaId: number[] = [];
+            if (deletedObjectMedia.length > 0) {
+                for (const media of deletedObjectMedia) {
+                    const cityHallMedia: CityHallMedia|null = await this.cityHallRepository.getCityHallMediaById(media.id, tx);
+                    if (!cityHallMedia) {
+                        throw new ResponseError("City hall media not found", 404);
                     }
     
-                    if(cityHallImage.url !== image.url) {
-                        throw new ResponseError("City hall image not found", 404);
+                    if(cityHallMedia.url !== media.url) {
+                        throw new ResponseError("City hall media not found", 404);
                     }
     
-                    const imageName: string = image.url.split('/').pop() as string;
-                    const imagePath: string = `city-hall-media/${imageName}`;
-                    await this.objectStorageService.deleteFile(imagePath);
-                    await this.cityHallRepository.deleteCityHallMedia(image.id, tx);
-                    deletedImageId.push(image.id);
+                    const mediaName: string = media.url.split('/').pop() as string;
+                    const mediaPath: string = `city-hall-media/${mediaName}`;
+                    await this.objectStorageService.deleteFile(mediaPath);
+                    await this.cityHallRepository.deleteCityHallMedia(media.id, tx);
+                    deletedMediaId.push(media.id);
                 }
             }
     
             let finalCityHallMedia: CityHallMedia[] = [];
             for (const media of oldCityHallData.cityHallMedia) {
-                if (!deletedImageId.includes(media.id)) {
+                if (!deletedMediaId.includes(media.id)) {
                     finalCityHallMedia.push(media);
                 }
             }
@@ -170,9 +182,9 @@ export class CityHallUsecase {
         
         if(cityHall.cityHallMedia.length > 0) {
             for (const media of cityHall.cityHallMedia) {
-                const imageName: string = media.url.split('/').pop() as string;
-                const imagePath: string = `city-hall-media/${imageName}`;
-                await this.objectStorageService.deleteFile(imagePath);
+                const mediaName: string = media.url.split('/').pop() as string;
+                const mediaPath: string = `city-hall-media/${mediaName}`;
+                await this.objectStorageService.deleteFile(mediaPath);
             }
         }
 

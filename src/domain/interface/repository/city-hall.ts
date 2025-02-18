@@ -1,4 +1,4 @@
-import { CityHallMedia } from '@prisma/client';
+import { CityHallMedia } from '../../entity/city-hall-media';
 import { CityHall } from '../../entity/city-hall';
 import { CityHallPricing } from '../../entity/city-hall-pricing';
 
