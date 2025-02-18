@@ -11,10 +11,21 @@ export class CityHallRepository implements CityHallRepositoryInterface {
         const prisma = transaction || this.prisma;
         const cityHalls: CityHall[] = await prisma.cityHall.findMany(
             {
+                orderBy: {
+                    id: 'asc',
+                },
                 include: {
-                    cityHallMedia: true,
-                    cityHallPricing: true,
-                }
+                    cityHallMedia: {
+                        orderBy: {
+                            id: 'asc',
+                        }
+                    },
+                    cityHallPricing: {
+                        orderBy: {
+                            id: 'asc',
+                        }
+                    },
+                },
             }
         );
 
@@ -29,8 +40,16 @@ export class CityHallRepository implements CityHallRepositoryInterface {
                     id: id
                 },
                 include: {
-                    cityHallMedia: true,
-                    cityHallPricing: true,
+                    cityHallMedia: {
+                        orderBy: {
+                            id: 'asc',
+                        }
+                    },
+                    cityHallPricing: {
+                        orderBy: {
+                            id: 'asc',
+                        }
+                    },
                 }
             }
         );
@@ -99,6 +118,7 @@ export class CityHallRepository implements CityHallRepositoryInterface {
                             activityType: true,
                             facilities: true,
                             pricePerDay: true,
+                            isActive: true,
                         }
                     }
                 },        
@@ -142,6 +162,7 @@ export class CityHallRepository implements CityHallRepositoryInterface {
                     activityType: true,
                     facilities: true,
                     pricePerDay: true,
+                    isActive: true,
                 },
             }
         ) as CityHallPricing[];

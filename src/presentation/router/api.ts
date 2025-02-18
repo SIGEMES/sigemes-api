@@ -73,8 +73,8 @@ export class APIRouter {
         this.cityHallRouter.get("", this.cityHallController.getAllCityHalls.bind(this.cityHallController));
         this.cityHallRouter.get("/:id", this.cityHallController.getCityHallById.bind(this.cityHallController));
         this.cityHallRouter.use(isAdminMiddleware);
-        this.cityHallRouter.post("", this.multerUpload.array('city_hall_images'), this.cityHallController.createCityHall.bind(this.cityHallController));
-        this.cityHallRouter.put("/:id", this.multerUpload.array('city_hall_images'), this.cityHallController.updateCityHall.bind(this.cityHallController));
+        this.cityHallRouter.post("", this.multerUpload.array('city_hall_media'), this.cityHallController.createCityHall.bind(this.cityHallController));
+        this.cityHallRouter.put("/:id", this.multerUpload.array('city_hall_media'), this.cityHallController.updateCityHall.bind(this.cityHallController));
         this.cityHallRouter.delete("/:id", this.cityHallController.deleteCityHall.bind(this.cityHallController));
     }
 
