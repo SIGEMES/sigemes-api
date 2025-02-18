@@ -14,8 +14,16 @@ export class GuesthouseRoomRepository implements GuesthouseRoomRepositoryInterfa
                     guesthouseId: guesthouseId
                 },
                 include: {
-                    guesthouseRoomMedia: true,
-                    guesthouseRoomPricing: true,
+                    guesthouseRoomMedia: {
+                        orderBy: {
+                            id: 'asc'
+                        },
+                    },
+                    guesthouseRoomPricing: {
+                        orderBy: {
+                            id: 'asc'
+                        },
+                    }
                 }
             }
         );
@@ -30,8 +38,16 @@ export class GuesthouseRoomRepository implements GuesthouseRoomRepositoryInterfa
                     id: id
                 },
                 include: {
-                    guesthouseRoomMedia: true,
-                    guesthouseRoomPricing: true,
+                    guesthouseRoomMedia: {
+                        orderBy: {
+                            id: 'asc'
+                        },
+                    },
+                    guesthouseRoomPricing: {
+                        orderBy: {
+                            id: 'asc'
+                        },
+                    }
                 }
             }
         );
@@ -110,7 +126,7 @@ export class GuesthouseRoomRepository implements GuesthouseRoomRepositoryInterfa
     public async createGuesthouseRoomMedia(roomMedia: GuesthouseRoomMedia[], transaction?: any): Promise<GuesthouseRoomMedia[]> {
         const prisma = transaction || this.prisma;
 
-        const createdRoomMedia: GuesthouseRoomMedia[] = await prisma.guesthouseRoomMedia.createMany(
+        const createdRoomMedia: GuesthouseRoomMedia[] = await prisma.guesthouseRoomMedia.createManyAndReturn(
             {
                 data: roomMedia.map(media => ({
                     guesthouseRoomId: media.guesthouseRoomId,

@@ -8,6 +8,7 @@ import { GuesthouseRoomValidation } from "../validation/guesthouse-room";
 import { File } from "../../domain/interface/library/file";
 import { CreateGuesthouseRoomRequest } from "../dto/request/guesthouse-room/create";
 import { GuesthouseRoomMediaRequest } from "../dto/request/guesthouse-room/media";
+import { UpdateGuesthouseRoomRequest } from "../dto/request/guesthouse-room/update";
 
 export class GuesthouseRoomController {
     constructor(private guesthouseRoomUsecase: GuesthouseRoomUsecase) {}
@@ -94,8 +95,8 @@ export class GuesthouseRoomController {
             }
 
             const { id } = GuesthouseRoomValidation.id.parse({ id: Number(req.params.room_id) });
-            const guesthouseRoom: CreateGuesthouseRoomRequest = GuesthouseRoomValidation.createGuesthouseRoom.parse(req.body);
-            const guesthouseRoomEntity: GuesthouseRoom = CreateGuesthouseRoomRequest.toEntity(guesthouseRoom);
+            const guesthouseRoom: UpdateGuesthouseRoomRequest = GuesthouseRoomValidation.updateGuesthouseRoom.parse(req.body);
+            const guesthouseRoomEntity: GuesthouseRoom = UpdateGuesthouseRoomRequest.toEntity(guesthouseRoom);
             guesthouseRoomEntity.id = id;
 
             if (req.files && Array.isArray(req.files)) {

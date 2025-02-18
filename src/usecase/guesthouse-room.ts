@@ -129,6 +129,8 @@ export class GuesthouseRoomUsecase {
                     guesthouseRoomId: room.id,
                     url,
                 }));
+
+                newRoomMedia = await this.guesthouseRoomRepository.createGuesthouseRoomMedia(newRoomMedia, tx);
             }
 
             let deletedRoomMediaId: number[] = [];
