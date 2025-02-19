@@ -20,10 +20,10 @@ enum Gender {
 
 model Renter {
   id                     Int       @id @default(autoincrement())
-  email                  String    @unique
-  password               String
-  fullname               String
-  phoneNumber            String    @map("phone_number")
+  email                  String    @unique @db.VarChar(320)
+  password               String    @db.VarChar(255)
+  fullname               String    @db.VarChar(100)
+  phoneNumber            String    @map("phone_number") @db.VarChar(15)
   gender                 Gender
   profilePicture         String    @default("https://storage.googleapis.com/sigemes-storage/profile-pictures/default-picture.png") @map("profile_picture")
   emailVerified          Boolean   @default(false) @map("email_verified")
@@ -38,9 +38,9 @@ model Renter {
 
 model Admin {
   id             Int      @id @default(autoincrement())
-  email          String   @unique @db.VarChar(255)
+  email          String   @unique @db.VarChar(320)
   password       String   @db.VarChar(255)
-  fullname       String   @db.VarChar(255)
+  fullname       String   @db.VarChar(100)
   phoneNumber    String   @map("telephone_number") @db.VarChar(15)
   isSuperAdmin   Boolean  @default(false) @map("is_super_admin")
   profilePicture String   @default("https://storage.googleapis.com/sigemes-storage/profile-pictures/default-picture.png") @map("profile_picture")
@@ -57,7 +57,7 @@ enum Status {
 
 model CityHall {
   id              Int               @id @default(autoincrement())
-  name            String            @db.VarChar(255)
+  name            String            @db.VarChar(100)
   description     String            @db.Text
   areaM2          Float             @map("area_m2") @db.DoublePrecision
   peopleCapacity  Int               @map("people_capacity") @db.Integer
@@ -76,7 +76,7 @@ model CityHallMedia {
   id         Int      @id @default(autoincrement())
   cityHall   CityHall @relation(fields: [cityHallId], references: [id], onDelete: Cascade)
   cityHallId Int      @map("city_hall_id")
-  url        String   @db.VarChar(255)
+  url        String
 
   @@map("city_hall_media")
 }
@@ -85,7 +85,7 @@ model CityHallPricing {
   id           Int      @id @default(autoincrement())
   cityHall     CityHall @relation(fields: [cityHallId], references: [id], onDelete: Cascade)
   cityHallId   Int      @map("city_hall_id")
-  activityType String   @map("activity_type") @db.VarChar(255)
+  activityType String   @map("activity_type") @db.VarChar(50)
   facilities   String   @db.Text
   pricePerDay  Float    @map("price_per_day") @db.DoublePrecision
   isActive     Boolean  @default(true) @map("is_active")
@@ -95,7 +95,7 @@ model CityHallPricing {
 
 model Guesthouse {
   id              Int               @id @default(autoincrement())
-  name            String            @db.VarChar(255)
+  name            String            @db.VarChar(100)
   description     String            @db.Text
   facilities      String            @db.Text
   areaM2          Float             @map("area_m2") @db.DoublePrecision
@@ -113,7 +113,7 @@ model GuesthouseMedia {
   id           Int        @id @default(autoincrement())
   guesthouse   Guesthouse @relation(fields: [guesthouseId], references: [id], onDelete: Cascade)
   guesthouseId Int        @map("guesthouse_id")
-  url          String     @db.VarChar(255)
+  url          String
 
   @@map("guesthouse_media")
 }
@@ -127,7 +127,7 @@ model GuesthouseRoom {
   id                    Int                     @id @default(autoincrement())
   guesthouse            Guesthouse              @relation(fields: [guesthouseId], references: [id], onDelete: Cascade)
   guesthouseId          Int                     @map("guesthouse_id")
-  name                  String                  @db.VarChar(255)
+  name                  String                  @db.VarChar(50)
   type                  RoomType                @default(standard)
   facilities            String                  @db.Text
   availableSlot         Int                     @map("available_slot") @db.Integer
@@ -144,7 +144,7 @@ model GuesthouseRoomMedia {
   id               Int            @id @default(autoincrement())
   guesthouseRoom   GuesthouseRoom @relation(fields: [guesthouseRoomId], references: [id], onDelete: Cascade)
   guesthouseRoomId Int            @map("guesthouse_room_id")
-  url              String         @db.VarChar(255)
+  url              String
 
   @@map("guesthouse_room_media")
 }
@@ -153,7 +153,7 @@ model GuesthouseRoomPricing {
   id               Int            @id @default(autoincrement())
   guesthouseRoom   GuesthouseRoom @relation(fields: [guesthouseRoomId], references: [id], onDelete: Cascade)
   guesthouseRoomId Int            @map("guesthouse_room_id")
-  retributionType  String         @map("retribution_type") @db.VarChar(255)
+  retributionType  String         @map("retribution_type") @db.VarChar(100)
   pricePerDay      Float          @map("price_per_day") @db.DoublePrecision
   isActive         Boolean        @default(true) @map("is_active")
 

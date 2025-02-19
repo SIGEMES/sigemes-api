@@ -7,11 +7,11 @@ export async function seedGuesthouseMedia(): Promise<void> {
         data: [
             {
                 guesthouseId: 1,
-                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/mess-padangsidempuan-dalam.png",
+                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/mess-padangsidimpuan1.jpg",
             },
             {
                 guesthouseId: 1,
-                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/mess-padangsidempuan-luar.png",
+                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/mess-padangsidimpuan2.png",
             },
         ],
     });

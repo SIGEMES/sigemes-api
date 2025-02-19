@@ -6,14 +6,14 @@ export async function seedGuesthouses(): Promise<void> {
     await prisma.guesthouse.createMany({
         data: [
             {
-                name: "Mess Kota Padangsidempuan",
-                description: "Mess Kota Padangsidempuan merupakan mess yang dapat disewa untuk para pejabat, pegawai negeri, maupun masyarakat umum yang membutuhkan tempat tinggal sementara.",
+                name: "Mess Pemko Padangsidimpuan",
+                description: "Mess Pemko PadangSidimpuan adalah fasilitas penginapan yang dikelola oleh Pemerintah Kota Padangsidimpuan,Sumatera Utara.Mess ini biasanya digunakan untuk keperluan resmi,seperti akomodasi bagi tamu pemerintah,pegawai negeri yang sedang melakukan perjalanan dinas,atau keperluan lainnya yang terkait dengan kegiatan pemerintahan.",
                 facilities: "Ruang lobby; TV; Sofa; WiFi; Kamar mandi umum; Parkir",
-                areaM2: 1000,
-                address: "Jl. Adam Malik No. 1",
-                latitude: 1.3666500703089492,
-                longitude: 99.27607939682193,
-                contactPerson: "081234567890",
+                areaM2: 969.255,
+                address: "Jl. Teladan No.45a, Teladan Bar., Kec. Medan Kota, Kota Medan, Sumatera Utara 20214",
+                latitude: 3.565151175062011,
+                longitude: 98.69103587869016,
+                contactPerson: "081269402020",
             },
         ],
     });
