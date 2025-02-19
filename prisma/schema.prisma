@@ -19,19 +19,20 @@ enum Gender {
 }
 
 model Renter {
-  id                     Int       @id @default(autoincrement())
-  email                  String    @unique @db.VarChar(320)
-  password               String    @db.VarChar(255)
-  fullname               String    @db.VarChar(100)
-  phoneNumber            String    @map("phone_number") @db.VarChar(15)
+  id                     Int        @id @default(autoincrement())
+  email                  String     @unique @db.VarChar(320)
+  password               String     @db.VarChar(255)
+  fullname               String     @db.VarChar(100)
+  phoneNumber            String     @map("phone_number") @db.VarChar(15)
   gender                 Gender
-  profilePicture         String    @default("https://storage.googleapis.com/sigemes-storage/profile-pictures/default-picture.png") @map("profile_picture")
-  emailVerified          Boolean   @default(false) @map("email_verified")
-  otp                    String?   @db.VarChar(5)
-  otpExpiry              DateTime? @map("otp_expiry")
-  forgotPasswordVerified Boolean   @default(false) @map("forgot_password_verified")
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
+  profilePicture         String     @default("https://storage.googleapis.com/sigemes-storage/profile-pictures/default-picture.png") @map("profile_picture")
+  emailVerified          Boolean    @default(false) @map("email_verified")
+  otp                    String?    @db.VarChar(5)
+  otpExpiry              DateTime?  @map("otp_expiry")
+  forgotPasswordVerified Boolean    @default(false) @map("forgot_password_verified")
+  createdAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
+  rentPlan               RentPlan[]
 
   @@map("renters")
 }
@@ -82,13 +83,14 @@ model CityHallMedia {
 }
 
 model CityHallPricing {
-  id           Int      @id @default(autoincrement())
-  cityHall     CityHall @relation(fields: [cityHallId], references: [id], onDelete: Cascade)
-  cityHallId   Int      @map("city_hall_id")
-  activityType String   @map("activity_type") @db.VarChar(50)
-  facilities   String   @db.Text
-  pricePerDay  Float    @map("price_per_day") @db.DoublePrecision
-  isActive     Boolean  @default(true) @map("is_active")
+  id           Int        @id @default(autoincrement())
+  cityHall     CityHall   @relation(fields: [cityHallId], references: [id], onDelete: Cascade)
+  cityHallId   Int        @map("city_hall_id")
+  activityType String     @map("activity_type") @db.VarChar(50)
+  facilities   String     @db.Text
+  pricePerDay  Float      @map("price_per_day") @db.DoublePrecision
+  isActive     Boolean    @default(true) @map("is_active")
+  RentPlan     RentPlan[]
 
   @@map("city_hall_pricing")
 }
@@ -156,6 +158,25 @@ model GuesthouseRoomPricing {
   retributionType  String         @map("retribution_type") @db.VarChar(100)
   pricePerDay      Float          @map("price_per_day") @db.DoublePrecision
   isActive         Boolean        @default(true) @map("is_active")
+  RentPlan         RentPlan[]
 
   @@map("guesthouse_room_pricing")
+}
+
+model RentPlan {
+  id                Int                    @id @default(autoincrement())
+  renterId          Int                    @map("renter_id")
+  roomPricingId     Int?                   @map("room_pricing_id")
+  cityHallPricingid Int?                   @map("city_hall_pricing_id")
+  slot              Int                    @default(1)
+  startDate         DateTime               @map("start_date")
+  endDate           DateTime               @map("end_date")
+  renterGender      Gender                 @map("renter_gender")
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  renter            Renter                 @relation(fields: [renterId], references: [id])
+  roomPricing       GuesthouseRoomPricing? @relation(fields: [roomPricingId], references: [id])
+  cityHallPricing   CityHallPricing?       @relation(fields: [cityHallPricingid], references: [id])
+
+  @@map("rent_plans")
 }
