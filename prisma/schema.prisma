@@ -164,19 +164,19 @@ model GuesthouseRoomPricing {
 }
 
 model RentPlan {
-  id                Int                    @id @default(autoincrement())
-  renterId          Int                    @map("renter_id")
-  roomPricingId     Int?                   @map("room_pricing_id")
-  cityHallPricingid Int?                   @map("city_hall_pricing_id")
-  slot              Int                    @default(1)
-  startDate         DateTime               @map("start_date")
-  endDate           DateTime               @map("end_date")
-  renterGender      Gender                 @map("renter_gender")
-  createdAt         DateTime               @default(now())
-  updatedAt         DateTime               @updatedAt
-  renter            Renter                 @relation(fields: [renterId], references: [id])
-  roomPricing       GuesthouseRoomPricing? @relation(fields: [roomPricingId], references: [id])
-  cityHallPricing   CityHallPricing?       @relation(fields: [cityHallPricingid], references: [id])
+  id                      Int                    @id @default(autoincrement())
+  renterId                Int                    @map("renter_id")
+  guesthouseRoomPricingId Int?                   @map("guesthouse_room_pricing_id")
+  cityHallPricingId       Int?                   @map("city_hall_pricing_id")
+  slot                    Int                    @default(1)
+  startDate               DateTime               @map("start_date")
+  endDate                 DateTime               @map("end_date")
+  renterGender            Gender                 @map("renter_gender")
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime               @updatedAt
+  renter                  Renter                 @relation(fields: [renterId], references: [id])
+  guesthouseRoomPricing   GuesthouseRoomPricing? @relation(fields: [guesthouseRoomPricingId], references: [id])
+  cityHallPricing         CityHallPricing?       @relation(fields: [cityHallPricingId], references: [id])
 
   @@map("rent_plans")
 }

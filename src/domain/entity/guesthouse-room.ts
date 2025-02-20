@@ -1,5 +1,6 @@
 import { GuesthouseRoomPricing } from "./guesthouse-room-pricing";
 import { GuesthouseRoomMedia } from "./guesthouse-room-media";
+import { Guesthouse } from "./guesthouse";
 
 export type RoomType = "vip" | "standard";
 export type Status = "tersedia" | "tidak_tersedia";
@@ -18,5 +19,6 @@ export class GuesthouseRoom {
     
         public guesthouseRoomPricing: GuesthouseRoomPricing[] = [],
         public guesthouseRoomMedia: GuesthouseRoomMedia[] = [],
+        public guesthouse: Guesthouse = new Guesthouse(),
     ) {}
 }

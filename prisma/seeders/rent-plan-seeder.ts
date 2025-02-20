@@ -7,7 +7,7 @@ export async function seedRentPlans(): Promise<void> {
         data: [
             {
                 renterId: 2,
-                roomPricingId: 1,
+                guesthouseRoomPricingId: 1,
                 slot: 1,
                 startDate: new Date('2025-02-25'),
                 endDate: new Date('2025-02-27'),
@@ -15,7 +15,7 @@ export async function seedRentPlans(): Promise<void> {
             },
             {
                 renterId: 2,
-                roomPricingId: 10,
+                guesthouseRoomPricingId: 10,
                 slot: 2,
                 startDate: new Date('2025-02-25'),
                 endDate: new Date('2025-02-27'),
@@ -23,7 +23,7 @@ export async function seedRentPlans(): Promise<void> {
             },
             {
                 renterId: 1,
-                roomPricingId: 6,
+                guesthouseRoomPricingId: 6,
                 slot: 1,
                 startDate: new Date('2025-02-28'),
                 endDate: new Date('2025-03-01'),
@@ -31,7 +31,7 @@ export async function seedRentPlans(): Promise<void> {
             },
             {
                 renterId: 1,
-                cityHallPricingid: 1,
+                cityHallPricingId: 1,
                 slot: 1,
                 startDate: new Date('2025-02-25'),
                 endDate: new Date('2025-02-27'),

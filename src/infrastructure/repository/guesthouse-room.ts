@@ -26,7 +26,7 @@ export class GuesthouseRoomRepository implements GuesthouseRoomRepositoryInterfa
                     }
                 }
             }
-        );
+        ) as GuesthouseRoom[];
 
         return guesthouseRooms;
     }
@@ -50,7 +50,7 @@ export class GuesthouseRoomRepository implements GuesthouseRoomRepositoryInterfa
                     }
                 }
             }
-        );
+        ) as GuesthouseRoom;
 
         return guesthouseRoom;
     }
