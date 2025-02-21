@@ -6,6 +6,7 @@ export interface GuesthouseRoomRepositoryInterface {
     getAllRoomsByGuesthouseId(guesthouseId: number): Promise<GuesthouseRoom[]>;
     getGuesthouseRoomById(id: number): Promise<GuesthouseRoom|null>;
     getGuesthouseRoomMediaById(id: number): Promise<GuesthouseRoomMedia|null>;
+    getGuesthouseRoomPricingById(id: number): Promise<GuesthouseRoomPricing|null>;
     createGuesthouseRoom(room: GuesthouseRoom): Promise<GuesthouseRoom>;
     createGuesthouseRoomMedia(roomMedia: GuesthouseRoomMedia[], transaction?: any): Promise<GuesthouseRoomMedia[]>;
     createGuesthouseRoomPricing(roomPricing: GuesthouseRoomPricing[], transaction?: any): Promise<GuesthouseRoomPricing[]>;

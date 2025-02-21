@@ -67,6 +67,21 @@ export class GuesthouseRoomRepository implements GuesthouseRoomRepositoryInterfa
         return guesthouseRoomMedia;
     }
 
+    public async getGuesthouseRoomPricingById(id: number): Promise<GuesthouseRoomPricing|null> {
+        const guesthouseRoomPricing: GuesthouseRoomPricing|null = await this.prisma.guesthouseRoomPricing.findUnique(
+            {
+                where: {
+                    id: id
+                },
+                include: {
+                    guesthouseRoom: true
+                },
+            },
+        ) as GuesthouseRoomPricing;
+
+        return guesthouseRoomPricing;
+    }
+
     public async createGuesthouseRoom(room: GuesthouseRoom): Promise<GuesthouseRoom> {
         const createdRoom: GuesthouseRoom = await this.prisma.guesthouseRoom.create(
             {

@@ -102,5 +102,6 @@ export class APIRouter {
     private configRentPlanRoutes(): void {
         this.rentPlanRouter.use(jwtMiddleware);
         this.rentPlanRouter.get("", this.rentPlanController.getAllRenterRentPlans.bind(this.rentPlanController));
+        this.rentPlanRouter.post("", this.rentPlanController.createRentPlan.bind(this.rentPlanController));
     }
 }

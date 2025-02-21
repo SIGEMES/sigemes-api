@@ -78,7 +78,7 @@ export async function main(): Promise<void> {
 
     // Rent Plan Module
     const rentPlanRepository: RentPlanRepositoryInterface = new RentPlanRepository(prisma);
-    const rentPlanUsecase: RentPlanUsecase = new RentPlanUsecase(rentPlanRepository, dbTransaction);
+    const rentPlanUsecase: RentPlanUsecase = new RentPlanUsecase(rentPlanRepository, guesthouseRoomRepository, cityHallRepository, dbTransaction);
     const rentPlanController: RentPlanController = new RentPlanController(rentPlanUsecase);
 
     const router: APIRouter = new APIRouter(
