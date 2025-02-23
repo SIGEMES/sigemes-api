@@ -103,5 +103,7 @@ export class APIRouter {
         this.rentPlanRouter.use(jwtMiddleware);
         this.rentPlanRouter.get("", this.rentPlanController.getAllRenterRentPlans.bind(this.rentPlanController));
         this.rentPlanRouter.post("", this.rentPlanController.createRentPlan.bind(this.rentPlanController));
+        this.rentPlanRouter.put("/:id", this.rentPlanController.updateRentPlan.bind(this.rentPlanController));
+        this.rentPlanRouter.delete("/:id", this.rentPlanController.deleteRentPlan.bind(this.rentPlanController));
     }
 }

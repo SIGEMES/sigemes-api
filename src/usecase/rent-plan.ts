@@ -22,8 +22,10 @@ export class RentPlanUsecase {
 
     public async createRentPlan(rentPlan: RentPlan): Promise<RentPlan> {
         let createdRentPlan: RentPlan;
-
-        if (rentPlan.guesthouseRoomPricingId) {
+        
+        if (rentPlan.guesthouseRoomPricingId && rentPlan.cityHallPricingId) {
+            throw new ResponseError("Please choose one of guesthouse room pricing or city hall pricing", 400);
+        } else if (rentPlan.guesthouseRoomPricingId) {
             const guesthouseRoomPricing = await this.guesthouseRoomRepository.getGuesthouseRoomPricingById(rentPlan.guesthouseRoomPricingId);
             if (!guesthouseRoomPricing) {
                 throw new ResponseError("Guesthouse room pricing not found", 404);
@@ -67,5 +69,78 @@ export class RentPlanUsecase {
         }
 
         return createdRentPlan;
+    }
+
+    public async updateRentPlan(rentPlan: RentPlan): Promise<RentPlan> {
+        const oldRentPlan = await this.rentPlanRepository.getRentPlanById(rentPlan.id);
+        if (!oldRentPlan) {
+            throw new ResponseError("Rent plan not found", 404);
+        }
+
+        if (rentPlan.renterId !== oldRentPlan.renterId) {
+            throw new ResponseError("Unauthorized", 401);
+        }
+
+        let updatedRentPlan: RentPlan;
+        if (rentPlan.guesthouseRoomPricingId && rentPlan.cityHallPricingId) {
+            throw new ResponseError("Please choose one of guesthouse room pricing or city hall pricing", 400);
+        } else if (rentPlan.guesthouseRoomPricingId) {
+            const guesthouseRoomPricing = await this.guesthouseRoomRepository.getGuesthouseRoomPricingById(rentPlan.guesthouseRoomPricingId);
+            if (!guesthouseRoomPricing) {
+                throw new ResponseError("Guesthouse room pricing not found", 404);
+            }
+
+            if (guesthouseRoomPricing.isActive === false) {
+                throw new ResponseError("Guesthouse room pricing is not available", 400);
+            }
+
+            if (guesthouseRoomPricing.guesthouseRoom.availableSlot <= rentPlan.slot) {
+                throw new ResponseError("Guesthouse room available slot is not enough", 400);
+            }
+
+            updatedRentPlan = await this.rentPlanRepository.updateRentPlan(rentPlan);
+
+        } else if (rentPlan.cityHallPricingId) {
+            const oneWeekFromNow = new Date();
+            oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
+
+            if (rentPlan.startDate > rentPlan.endDate) {
+                throw new ResponseError("Start date must be less than end date", 400);
+            }
+
+            if (rentPlan.startDate < oneWeekFromNow) {
+                throw new ResponseError("Start date must be at least 1 week from now", 400);
+            }
+
+            const cityHallPricing = await this.cityHallRepository.getCityHallPricingById(rentPlan.cityHallPricingId);
+            if (!cityHallPricing) {
+                throw new ResponseError("City hall pricing not found", 404);
+            }
+
+            if (cityHallPricing.isActive === false) {
+                throw new ResponseError("City hall pricing is not available", 400);
+            }
+
+            updatedRentPlan = await this.rentPlanRepository.updateRentPlan(rentPlan);
+            
+        } else {
+            throw new ResponseError("Please choose one of guesthouse room pricing or city hall pricing", 400);
+        }
+
+        return updatedRentPlan;
+    }
+
+    public async deleteRentPlan(rentPlanId: number, renterId: number): Promise<void> {
+        const rentPlan = await this.rentPlanRepository.getRentPlanById(rentPlanId);
+
+        if (!rentPlan) {
+            throw new ResponseError("Rent plan not found", 404);
+        }
+
+        if (rentPlan.renterId !== renterId) {
+            throw new ResponseError("Unauthorized", 401);
+        }
+
+        await this.rentPlanRepository.deleteRentPlan(rentPlanId);
     }
 }

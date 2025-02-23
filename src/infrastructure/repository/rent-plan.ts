@@ -41,7 +41,7 @@ export class RentPlanRepository implements RentPlanRepositoryInterface {
         return rentPlans;
     }
 
-    async getRentPlanById(rentPlanId: number): Promise<RentPlan> {
+    public async getRentPlanById(rentPlanId: number): Promise<RentPlan> {
         const rentPlan: RentPlan = await this.prisma.rentPlan.findUnique({
             where: {
                 id: rentPlanId,
@@ -77,7 +77,7 @@ export class RentPlanRepository implements RentPlanRepositoryInterface {
         return rentPlan;
     }
 
-    async createRentPlan(rentPlan: RentPlan): Promise<RentPlan> {
+    public async createRentPlan(rentPlan: RentPlan): Promise<RentPlan> {
         const newRentPlan: RentPlan = await this.prisma.rentPlan.create({
             data: {
                 renterId: rentPlan.renterId,
@@ -117,5 +117,57 @@ export class RentPlanRepository implements RentPlanRepositoryInterface {
         }) as RentPlan;
 
         return newRentPlan;
+    }
+
+    public async updateRentPlan(rentPlan: RentPlan): Promise<RentPlan> {
+        const updatedRentPlan: RentPlan = await this.prisma.rentPlan.update({
+            where: {
+                id: rentPlan.id,
+            },
+            data: {
+                guesthouseRoomPricingId: rentPlan.guesthouseRoomPricingId,
+                cityHallPricingId: rentPlan.cityHallPricingId,
+                slot: rentPlan.slot,
+                startDate: rentPlan.startDate,
+                endDate: rentPlan.endDate,
+                renterGender: rentPlan.renterGender,
+            },
+            include: {
+                renter: true,
+                guesthouseRoomPricing: {
+                    include: {
+                        guesthouseRoom: {
+                            include: {
+                                guesthouseRoomMedia: true,
+                                guesthouse: {
+                                    include: {
+                                        guesthouseMedia: true,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                cityHallPricing: {
+                    include: {
+                        cityHall: {
+                            include: {
+                                cityHallMedia: true,
+                            },
+                        },
+                    },
+                },
+            },
+        }) as RentPlan;
+
+        return updatedRentPlan;
+    }
+
+    public async deleteRentPlan(rentPlanId: number): Promise<void> {
+        await this.prisma.rentPlan.delete({
+            where: {
+                id: rentPlanId,
+            },
+        });
     }
 }
