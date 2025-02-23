@@ -20,6 +20,10 @@ import { GuesthouseRoomRepository } from "./infrastructure/repository/guesthouse
 import { GuesthouseRoomUsecase } from "./usecase/guesthouse-room";
 import { GuesthouseRoomController } from "./presentation/controller/guesthouse-room";
 
+import { RentPlanRepository } from "./infrastructure/repository/rent-plan";
+import { RentPlanUsecase } from "./usecase/rent-plan";
+import { RentPlanController } from "./presentation/controller/rent-plan";
+
 import { JwtService } from "./infrastructure/authentication/jwt";
 import { BcryptService } from "./infrastructure/authentication/bcrypt";
 import { MailerService } from "./infrastructure/mailer/mailer";
@@ -32,6 +36,7 @@ import { AdminRepositoryInterface } from "./domain/interface/repository/admin";
 import { CityHallRepositoryInterface } from "./domain/interface/repository/city-hall";
 import { GuesthouseRepositoryInterface } from "./domain/interface/repository/guesthouse";
 import { GuesthouseRoomRepositoryInterface } from "./domain/interface/repository/guesthouse-room";
+import { RentPlanRepositoryInterface } from "./domain/interface/repository/rent-plan";
 import { MailerInterface } from "./domain/interface/external-service/mailer";
 import { ObjectStorageInterface } from "./domain/interface/external-service/object-storage";
 import { CloudStorageService } from "./infrastructure/object-storage/cloud-storage";
@@ -71,12 +76,18 @@ export async function main(): Promise<void> {
     const guesthouseUsecase: GuesthouseUsecase = new GuesthouseUsecase(guesthouseRepository, objectStorageService, dbTransaction);
     const guesthouseController: GuesthouseController = new GuesthouseController(guesthouseUsecase);
 
+    // Rent Plan Module
+    const rentPlanRepository: RentPlanRepositoryInterface = new RentPlanRepository(prisma);
+    const rentPlanUsecase: RentPlanUsecase = new RentPlanUsecase(rentPlanRepository, guesthouseRoomRepository, cityHallRepository, dbTransaction);
+    const rentPlanController: RentPlanController = new RentPlanController(rentPlanUsecase);
+
     const router: APIRouter = new APIRouter(
         renterController,
         adminController,
         cityHallController,
         guesthouseController,
         guesthouseRoomController,
+        rentPlanController,
     );
 
     const webServer: WebServer = new WebServer(

@@ -9,6 +9,7 @@ import { isSuperAdminMiddleware } from '../middleware/is-super-admin';
 import { CityHallController } from '../controller/city-hall';
 import { GuesthouseController } from '../controller/guesthouse';
 import { GuesthouseRoomController } from '../controller/guesthouse-room';
+import { RentPlanController } from '../controller/rent-plan';
 
 export class APIRouter {
     public multerUpload: multer.Multer;
@@ -16,13 +17,15 @@ export class APIRouter {
     public adminRouter: express.Router;
     public cityHallRouter: express.Router;
     public guesthouseRouter: express.Router;
+    public rentPlanRouter: express.Router;
 
     constructor(
         private renterController: RenterController,
         private adminController: AdminController,
         private cityHallController: CityHallController,
         private guesthouseController: GuesthouseController,
-        private guesthouseRoomController: GuesthouseRoomController
+        private guesthouseRoomController: GuesthouseRoomController,
+        private rentPlanController: RentPlanController,
     ) {
         this.multerUpload = multer({
             storage: multer.memoryStorage(),
@@ -35,11 +38,13 @@ export class APIRouter {
         this.adminRouter = express.Router();
         this.cityHallRouter = express.Router();
         this.guesthouseRouter = express.Router();
+        this.rentPlanRouter = express.Router();
 
         this.configRentersRoutes();
         this.configAdminRoutes();
         this.configCityHallRoutes();
         this.configGuesthouseRoutes();
+        this.configRentPlanRoutes();
     }
 
     private configRentersRoutes(): void {
@@ -94,5 +99,11 @@ export class APIRouter {
         this.guesthouseRouter.delete("/:guesthouse_id/rooms/:room_id", this.guesthouseRoomController.deleteGuesthouseRoom.bind(this.guesthouseRoomController));
     }
     
-    
+    private configRentPlanRoutes(): void {
+        this.rentPlanRouter.use(jwtMiddleware);
+        this.rentPlanRouter.get("", this.rentPlanController.getAllRenterRentPlans.bind(this.rentPlanController));
+        this.rentPlanRouter.post("", this.rentPlanController.createRentPlan.bind(this.rentPlanController));
+        this.rentPlanRouter.put("/:id", this.rentPlanController.updateRentPlan.bind(this.rentPlanController));
+        this.rentPlanRouter.delete("/:id", this.rentPlanController.deleteRentPlan.bind(this.rentPlanController));
+    }
 }

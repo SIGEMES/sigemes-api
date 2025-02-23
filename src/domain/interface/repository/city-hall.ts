@@ -6,6 +6,7 @@ export interface CityHallRepositoryInterface {
     getAllCityHalls(): Promise<CityHall[]>;
     getCityHallById(id: number, transaction?: any): Promise<CityHall|null>;
     getCityHallMediaById(id: number, transaction?: any): Promise<CityHallMedia|null>;
+    getCityHallPricingById(id: number, transaction?: any): Promise<CityHallPricing|null>;
     createCityHall(cityHall: CityHall, transaction?: any): Promise<CityHall>;
     createCityHallMedia(cityHallMedia: CityHallMedia[], transaction?: any): Promise<CityHallMedia[]>;
     createCityHallPricing(cityHallPricing: CityHallPricing[], transaction?: any): Promise<CityHallPricing[]>;

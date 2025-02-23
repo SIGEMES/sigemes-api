@@ -70,6 +70,22 @@ export class CityHallRepository implements CityHallRepositoryInterface {
         return cityHallMedia;
     }
 
+    public async getCityHallPricingById(id: number, transaction?: any): Promise<CityHallPricing|null> {
+        const prisma = transaction || this.prisma;
+        const cityHallPricing: CityHallPricing|null = await prisma.cityHallPricing.findUnique(
+            {
+                where: {
+                    id: id
+                },
+                include: {
+                    cityHall: true,
+                }
+            }
+        );
+
+        return cityHallPricing;
+    }
+
     public async createCityHall(cityHall: CityHall, transaction?: any): Promise<CityHall> {
         const prisma = transaction || this.prisma;
         const createdCityHall: CityHall = await prisma.cityHall.create(
