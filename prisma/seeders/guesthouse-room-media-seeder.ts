@@ -79,27 +79,39 @@ export async function seedGuesthouseRoomMedia(): Promise<void> {
             },
             {
                 guesthouseRoomId: 4,
-                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/vip1-1.jpeg",
+                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/standard1-1.jpeg",
             },
             {
                 guesthouseRoomId: 4,
-                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/vip1-2.jpeg",
+                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/standard1-2.jpeg",
+            },
+            {
+                guesthouseRoomId: 4,
+                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/standard1-3.jpeg",
             },
             {
                 guesthouseRoomId: 5,
-                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/vip2-1.jpeg",
+                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/standard2-1.jpeg",
             },
             {
                 guesthouseRoomId: 5,
-                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/vip2-2.jpeg",
+                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/standard2-2.jpeg",
+            },
+            {
+                guesthouseRoomId: 5,
+                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/standard2-3.jpeg",
+            },
+            {
+                guesthouseRoomId: 5,
+                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/standard2-4.jpeg",
             },
             {
                 guesthouseRoomId: 6,
-                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/vip3-1.jpeg",
+                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/standard3-1.jpeg",
             },
             {
                 guesthouseRoomId: 6,
-                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/vip3-2.jpeg",
+                url: "https://storage.googleapis.com/sigemes-storage/guesthouse-media/standard3-2.jpeg",
             },
         ],
     });

@@ -36,7 +36,7 @@ export async function seedGuesthouseRooms(): Promise<void> {
                 guesthouseId: 1,
                 name: "Standard 1",
                 type: "standard",
-                facilities: "Single bed; Kamar mandi dalam",
+                facilities: "King size bed (2); Kamar mandi dalam",
                 areaM2: 100,
                 availableSlot:1,
                 totalSlot:1
@@ -45,7 +45,7 @@ export async function seedGuesthouseRooms(): Promise<void> {
                 guesthouseId: 1,
                 name: "Standard 2",
                 type: "standard",
-                facilities: "Twin bed; Kamar mandi dalam",
+                facilities: "King size bed; Single bed; Kamar mandi dalam",
                 areaM2: 100,
                 availableSlot:2,
                 totalSlot:2
@@ -54,7 +54,7 @@ export async function seedGuesthouseRooms(): Promise<void> {
                 guesthouseId: 1,
                 name: "Standard 3",
                 type: "standard",
-                facilities: "Single bed; Kamar mandi dalam; Toilet duduk",
+                facilities: "King size bed; Kamar mandi luar",
                 areaM2: 100,
                 availableSlot:1,
                 totalSlot:1
