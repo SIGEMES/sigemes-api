@@ -23,6 +23,7 @@ export class WebServer {
         this.app.use("/api/v1/city-halls", this.APIRouter.cityHallRouter);
         this.app.use("/api/v1/guesthouses", this.APIRouter.guesthouseRouter);
         this.app.use("/api/v1/rent-plans", this.APIRouter.rentPlanRouter);
+        this.app.use("/api/v1/rents", this.APIRouter.rentRouter);
         this.app.use(errorMiddleware);
     }
 
