@@ -10,6 +10,7 @@ import { CityHallController } from '../controller/city-hall';
 import { GuesthouseController } from '../controller/guesthouse';
 import { GuesthouseRoomController } from '../controller/guesthouse-room';
 import { RentPlanController } from '../controller/rent-plan';
+import { RentController } from '../controller/rent';
 
 export class APIRouter {
     public multerUpload: multer.Multer;
@@ -18,6 +19,7 @@ export class APIRouter {
     public cityHallRouter: express.Router;
     public guesthouseRouter: express.Router;
     public rentPlanRouter: express.Router;
+    public rentRouter: express.Router;
 
     constructor(
         private renterController: RenterController,
@@ -26,6 +28,7 @@ export class APIRouter {
         private guesthouseController: GuesthouseController,
         private guesthouseRoomController: GuesthouseRoomController,
         private rentPlanController: RentPlanController,
+        private rentController: RentController,
     ) {
         this.multerUpload = multer({
             storage: multer.memoryStorage(),
@@ -39,12 +42,14 @@ export class APIRouter {
         this.cityHallRouter = express.Router();
         this.guesthouseRouter = express.Router();
         this.rentPlanRouter = express.Router();
+        this.rentRouter = express.Router();
 
         this.configRentersRoutes();
         this.configAdminRoutes();
         this.configCityHallRoutes();
         this.configGuesthouseRoutes();
         this.configRentPlanRoutes();
+        this.configRentRoutes()
     }
 
     private configRentersRoutes(): void {
@@ -105,5 +110,16 @@ export class APIRouter {
         this.rentPlanRouter.post("", this.rentPlanController.createRentPlan.bind(this.rentPlanController));
         this.rentPlanRouter.put("/:id", this.rentPlanController.updateRentPlan.bind(this.rentPlanController));
         this.rentPlanRouter.delete("/:id", this.rentPlanController.deleteRentPlan.bind(this.rentPlanController));
+    }
+
+    private configRentRoutes(): void {
+        this.rentRouter.use(jwtMiddleware);
+        this.rentRouter.get("", this.rentController.getAllRents.bind(this.rentController));
+        this.rentRouter.get("/:id", this.rentController.getRentById.bind(this.rentController));
+        this.rentRouter.post("", this.rentController.createRent.bind(this.rentController));
+        this.rentRouter.put("/:id", this.rentController.cancelRent.bind(this.rentController));
+        this.rentRouter.use(isAdminMiddleware);
+        this.rentRouter.put("/:id/check-in", this.rentController.checkInRent.bind(this.rentController));
+        this.rentRouter.put("/:id/check-out", this.rentController.checkOutRent.bind(this.rentController));
     }
 }

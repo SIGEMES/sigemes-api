@@ -73,9 +73,6 @@ export class GuesthouseRoomRepository implements GuesthouseRoomRepositoryInterfa
                 where: {
                     id: id
                 },
-                include: {
-                    guesthouseRoom: true
-                },
             },
         ) as GuesthouseRoomPricing;
 

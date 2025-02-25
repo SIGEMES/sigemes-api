@@ -33,6 +33,7 @@ model Renter {
   createdAt              DateTime   @default(now())
   updatedAt              DateTime   @updatedAt
   rentPlan               RentPlan[]
+  Rent                   Rent[]
 
   @@map("renters")
 }
@@ -91,6 +92,7 @@ model CityHallPricing {
   pricePerDay  Float      @map("price_per_day") @db.DoublePrecision
   isActive     Boolean    @default(true) @map("is_active")
   RentPlan     RentPlan[]
+  Rent         Rent[]
 
   @@map("city_hall_pricing")
 }
@@ -159,6 +161,7 @@ model GuesthouseRoomPricing {
   pricePerDay      Float          @map("price_per_day") @db.DoublePrecision
   isActive         Boolean        @default(true) @map("is_active")
   RentPlan         RentPlan[]
+  Rent             Rent[]
 
   @@map("guesthouse_room_pricing")
 }
@@ -179,4 +182,32 @@ model RentPlan {
   cityHallPricing         CityHallPricing?       @relation(fields: [cityHallPricingId], references: [id])
 
   @@map("rent_plans")
+}
+
+enum RentStatus {
+  pending
+  dikonfirmasi
+  dibatalkan
+  selesai
+}
+
+model Rent {
+  id                      Int                    @id @default(autoincrement())
+  renterId                Int                    @map("renter_id")
+  guesthouseRoomPricingId Int?                   @map("guesthouse_room_pricing_id")
+  cityHallPricingId       Int?                   @map("city_hall_pricing_id")
+  slot                    Int                    @default(1)
+  startDate               DateTime               @map("start_date")
+  endDate                 DateTime               @map("end_date")
+  renterGender            Gender                 @map("renter_gender")
+  checkIn                 DateTime?              @map("check_in")
+  checkOut                DateTime?              @map("check_out")
+  status                  RentStatus             @default(pending) @map("status")
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime               @updatedAt
+  renter                  Renter                 @relation(fields: [renterId], references: [id])
+  guesthouseRoomPricing   GuesthouseRoomPricing? @relation(fields: [guesthouseRoomPricingId], references: [id])
+  cityHallPricing         CityHallPricing?       @relation(fields: [cityHallPricingId], references: [id])
+
+  @@map("rents")
 }

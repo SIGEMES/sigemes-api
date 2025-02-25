@@ -77,9 +77,6 @@ export class CityHallRepository implements CityHallRepositoryInterface {
                 where: {
                     id: id
                 },
-                include: {
-                    cityHall: true,
-                }
             }
         );
 

@@ -24,6 +24,10 @@ import { RentPlanRepository } from "./infrastructure/repository/rent-plan";
 import { RentPlanUsecase } from "./usecase/rent-plan";
 import { RentPlanController } from "./presentation/controller/rent-plan";
 
+import { RentRepository } from "./infrastructure/repository/rent";
+import { RentUsecase } from "./usecase/rent";
+import { RentController } from "./presentation/controller/rent";
+
 import { JwtService } from "./infrastructure/authentication/jwt";
 import { BcryptService } from "./infrastructure/authentication/bcrypt";
 import { MailerService } from "./infrastructure/mailer/mailer";
@@ -37,6 +41,7 @@ import { CityHallRepositoryInterface } from "./domain/interface/repository/city-
 import { GuesthouseRepositoryInterface } from "./domain/interface/repository/guesthouse";
 import { GuesthouseRoomRepositoryInterface } from "./domain/interface/repository/guesthouse-room";
 import { RentPlanRepositoryInterface } from "./domain/interface/repository/rent-plan";
+import { RentRepositoryInterface } from "./domain/interface/repository/rent";
 import { MailerInterface } from "./domain/interface/external-service/mailer";
 import { ObjectStorageInterface } from "./domain/interface/external-service/object-storage";
 import { CloudStorageService } from "./infrastructure/object-storage/cloud-storage";
@@ -81,6 +86,11 @@ export async function main(): Promise<void> {
     const rentPlanUsecase: RentPlanUsecase = new RentPlanUsecase(rentPlanRepository, guesthouseRoomRepository, cityHallRepository, dbTransaction);
     const rentPlanController: RentPlanController = new RentPlanController(rentPlanUsecase);
 
+    // Rent Module
+    const rentRepository: RentRepositoryInterface = new RentRepository(prisma);
+    const rentUsecase: RentUsecase = new RentUsecase(rentRepository, guesthouseRoomRepository, cityHallRepository, dbTransaction);
+    const rentController: RentController = new RentController(rentUsecase);
+
     const router: APIRouter = new APIRouter(
         renterController,
         adminController,
@@ -88,6 +98,7 @@ export async function main(): Promise<void> {
         guesthouseController,
         guesthouseRoomController,
         rentPlanController,
+        rentController,
     );
 
     const webServer: WebServer = new WebServer(
