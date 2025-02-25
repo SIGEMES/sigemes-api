@@ -150,7 +150,7 @@ export class RentUsecase {
             if (rent.renterId !== userId) {
                 throw new ResponseError("You are not authorized to cancel this rent", 403);
             }
-            if (rent.rentStatus !== "pending") {
+            if (rent.status !== "pending") {
                 throw new ResponseError("Rent cannot be cancelled", 400);
             }
         }
@@ -165,7 +165,7 @@ export class RentUsecase {
             throw new ResponseError("Rent not found", 404);
         }
 
-        if (rent.rentStatus !== "dikonfirmasi") {
+        if (rent.status !== "dikonfirmasi") {
             throw new ResponseError("Rent cannot be checked in", 400);
         }
 
@@ -183,7 +183,7 @@ export class RentUsecase {
             throw new ResponseError("Rent not found", 404);
         }
 
-        if (rent.rentStatus !== "dikonfirmasi" || !rent.checkIn) {
+        if (rent.status !== "dikonfirmasi" || !rent.checkIn) {
             throw new ResponseError("Rent cannot be checked out", 400);
         }
 

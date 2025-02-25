@@ -16,7 +16,7 @@ export class Rent {
         public renterGender: Gender = 'laki_laki',
         public checkIn: Date | null = null,
         public checkOut: Date | null = null,
-        public rentStatus: RentStatus = 'pending',
+        public status: RentStatus = 'pending',
         public createdAt: Date = new Date(),
         public updatedAt: Date = new Date(),
 

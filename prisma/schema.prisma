@@ -202,7 +202,7 @@ model Rent {
   renterGender            Gender                 @map("renter_gender")
   checkIn                 DateTime?              @map("check_in")
   checkOut                DateTime?              @map("check_out")
-  rentStatus              RentStatus             @default(pending) @map("rent_status")
+  status                  RentStatus             @default(pending) @map("status")
   createdAt               DateTime               @default(now())
   updatedAt               DateTime               @updatedAt
   renter                  Renter                 @relation(fields: [renterId], references: [id])

@@ -13,7 +13,7 @@ export async function seedRents(): Promise<void> {
             startDate: new Date('2025-02-25'),
             endDate: new Date('2025-02-27'),
             renterGender: "laki_laki",
-            rentStatus: "dikonfirmasi",
+            status: "dikonfirmasi",
         },
         {
             renterId: 2,
@@ -22,7 +22,7 @@ export async function seedRents(): Promise<void> {
             startDate: new Date('2025-02-25'),
             endDate: new Date('2025-02-27'),
             renterGender: "laki_laki",
-            rentStatus: "selesai",
+            status: "selesai",
         },
         {
             renterId: 1,
@@ -31,7 +31,7 @@ export async function seedRents(): Promise<void> {
             startDate: new Date('2025-02-28'),
             endDate: new Date('2025-03-01'),
             renterGender: "perempuan",
-            rentStatus: "dikonfirmasi",
+            status: "dikonfirmasi",
         },
         {
             renterId: 1,
@@ -40,7 +40,7 @@ export async function seedRents(): Promise<void> {
             startDate: new Date('2025-02-25'),
             endDate: new Date('2025-02-27'),
             renterGender: "perempuan",
-            rentStatus: "selesai",
+            status: "selesai",
         },
     ],
   })

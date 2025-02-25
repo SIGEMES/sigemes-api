@@ -10,7 +10,7 @@ import { seedGuesthouseRooms } from './guesthouse-room-seeder'
 import { seedGuesthouseRoomMedia } from './guesthouse-room-media-seeder'
 import { seedGuesthouseRoomPricing } from './guesthouse-room-pricing-seeder'
 import { seedRentPlans } from './rent-plan-seeder'
-import { seedRents } from './rents-seeder'
+import { seedRents } from './rent-seeder'
 
 const prisma: PrismaClient = new PrismaClient()
 

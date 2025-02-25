@@ -29,7 +29,7 @@ export class GetRentResponse {
             rent.renterGender,
             rent.checkIn,
             rent.checkOut,
-            rent.rentStatus,
+            rent.status,
             GetCityHallPricingResponse.fromEntity(rent.cityHallPricing),
             GetGuesthouseRoomPricingResponse.fromEntity(rent.guesthouseRoomPricing),
             rent.createdAt,

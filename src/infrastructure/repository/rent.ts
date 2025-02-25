@@ -113,7 +113,7 @@ export class RentRepository implements RentRepositoryInterface {
                 guesthouseRoomPricingId: {
                     in: guesthouseRoomPricingIds,
                 },
-                rentStatus: {
+                status: {
                     in: ['pending', 'dikonfirmasi'],
                 }
             },
@@ -128,7 +128,7 @@ export class RentRepository implements RentRepositoryInterface {
                 cityHallPricingId: {
                     in: cityHallPricingIds,
                 },
-                rentStatus: {
+                status: {
                     in: ['pending', 'dikonfirmasi'],
                 }
             },
