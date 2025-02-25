@@ -117,5 +117,9 @@ export class APIRouter {
         this.rentRouter.get("", this.rentController.getAllRents.bind(this.rentController));
         this.rentRouter.get("/:id", this.rentController.getRentById.bind(this.rentController));
         this.rentRouter.post("", this.rentController.createRent.bind(this.rentController));
+        this.rentRouter.put("/:id", this.rentController.cancelRent.bind(this.rentController));
+        this.rentRouter.use(isAdminMiddleware);
+        this.rentRouter.put("/:id/check-in", this.rentController.checkInRent.bind(this.rentController));
+        this.rentRouter.put("/:id/check-out", this.rentController.checkOutRent.bind(this.rentController));
     }
 }

@@ -137,6 +137,56 @@ export class RentUsecase {
 
             return createdRent;
         });
+    }
 
+    public async cancelRent(rentId: number, userId: number, userRole: string): Promise<Rent> {
+        const rent: Rent = await this.rentRepository.getRentById(rentId);
+
+        if (!rent) {
+            throw new ResponseError("Rent not found", 404);
+        }
+
+        if  (userRole === "renter") {
+            if (rent.renterId !== userId) {
+                throw new ResponseError("You are not authorized to cancel this rent", 403);
+            }
+            if (rent.rentStatus !== "pending") {
+                throw new ResponseError("Rent cannot be cancelled", 400);
+            }
+        }
+
+        return await this.rentRepository.updateRentStatus(rentId, "dibatalkan");
+    }
+
+    public async checkInRent(rentId: number): Promise<Rent> {
+        const rent: Rent = await this.rentRepository.getRentById(rentId);
+
+        if (!rent) {
+            throw new ResponseError("Rent not found", 404);
+        }
+
+        if (rent.rentStatus !== "dikonfirmasi") {
+            throw new ResponseError("Rent cannot be checked in", 400);
+        }
+
+        if (new Date() < rent.startDate) {
+            throw new ResponseError("Rent cannot be checked in yet", 400);
+        }
+
+        return await this.rentRepository.updateRentCheckIn(rentId);
+    }
+
+    public async checkOutRent(rentId: number): Promise<Rent> {
+        const rent: Rent = await this.rentRepository.getRentById(rentId);
+
+        if (!rent) {
+            throw new ResponseError("Rent not found", 404);
+        }
+
+        if (rent.rentStatus !== "dikonfirmasi" || !rent.checkIn) {
+            throw new ResponseError("Rent cannot be checked out", 400);
+        }
+
+        return await this.rentRepository.updateRentCheckOut(rentId);
     }
 }
