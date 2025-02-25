@@ -116,5 +116,6 @@ export class APIRouter {
         this.rentRouter.use(jwtMiddleware);
         this.rentRouter.get("", this.rentController.getAllRents.bind(this.rentController));
         this.rentRouter.get("/:id", this.rentController.getRentById.bind(this.rentController));
+        this.rentRouter.post("", this.rentController.createRent.bind(this.rentController));
     }
 }

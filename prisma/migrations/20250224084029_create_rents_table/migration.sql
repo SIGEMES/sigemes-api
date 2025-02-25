@@ -13,7 +13,7 @@ CREATE TABLE "rents" (
     "renter_gender" "Gender" NOT NULL,
     "check_in" TIMESTAMP(3),
     "check_out" TIMESTAMP(3),
-    "rent_status" "RentStatus" NOT NULL DEFAULT 'selesai',
+    "rent_status" "RentStatus" NOT NULL DEFAULT 'pending',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

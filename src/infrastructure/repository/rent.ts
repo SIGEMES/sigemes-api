@@ -106,4 +106,77 @@ export class RentRepository implements RentRepositoryInterface {
 
         return rent;
     }
+
+    public async getActiveRentsByGuesthouseRoomPricingIds(guesthouseRoomPricingIds: number[]): Promise<Rent[]> {
+        const rents: Rent[] = await this.prisma.rent.findMany({
+            where: {
+                guesthouseRoomPricingId: {
+                    in: guesthouseRoomPricingIds,
+                },
+                rentStatus: {
+                    in: ['pending', 'dikonfirmasi'],
+                }
+            },
+        }) as Rent[];
+
+        return rents;
+    }
+
+    public async getActiveRentsByCityHallPricingIds(cityHallPricingIds: number[]): Promise<Rent[]> {
+        const rents: Rent[] = await this.prisma.rent.findMany({
+            where: {
+                cityHallPricingId: {
+                    in: cityHallPricingIds,
+                },
+                rentStatus: {
+                    in: ['pending', 'dikonfirmasi'],
+                }
+            },
+        }) as Rent[];
+
+        return rents;
+    }
+
+    public async createRent(rent: Rent, transaction?: any): Promise<Rent> {
+        const prisma = transaction || this.prisma;
+
+        const createdRent: Rent = await prisma.rent.create({
+            data: {
+                renterId: rent.renterId,
+                guesthouseRoomPricingId: rent.guesthouseRoomPricingId,
+                cityHallPricingId: rent.cityHallPricingId,
+                slot: rent.slot,
+                startDate: rent.startDate,
+                endDate: rent.endDate,
+                renterGender: rent.renterGender,
+            },
+            include: {
+                guesthouseRoomPricing: {
+                    include: {
+                        guesthouseRoom: {
+                            include: {
+                                guesthouseRoomMedia: true,
+                                guesthouse: {
+                                    include: {
+                                        guesthouseMedia: true,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                cityHallPricing: {
+                    include: {
+                        cityHall: {
+                            include: {
+                                cityHallMedia: true,
+                            },
+                        },
+                    },
+                },
+            },
+        }) as Rent;
+
+        return createdRent;
+    }
 }
