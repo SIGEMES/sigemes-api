@@ -138,7 +138,7 @@ export class RentRepository implements RentRepositoryInterface {
                     {
                         endDate: { gte: startDate }
                     }
-                ]
+                ],
             },
         }) as Rent[];
 
@@ -154,6 +154,29 @@ export class RentRepository implements RentRepositoryInterface {
                 status: {
                     in: ['pending', 'dikonfirmasi'],
                 }
+            },
+        }) as Rent[];
+
+        return rents;
+    }
+    
+    public async getFilteredActiveRentsByCityHallPricingIds(cityHallPricingIds: number[], startDate: Date, endDate: Date): Promise<Rent[]> {
+        const rents: Rent[] = await this.prisma.rent.findMany({
+            where: {
+                cityHallPricingId: {
+                    in: cityHallPricingIds,
+                },
+                status: {
+                    in: ['pending', 'dikonfirmasi'],
+                },
+                AND: [
+                    {
+                        startDate: { lte: endDate }
+                    },
+                    {
+                        endDate: { gte: startDate }
+                    }
+                ],
             },
         }) as Rent[];
 

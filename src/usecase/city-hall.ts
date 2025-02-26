@@ -1,21 +1,68 @@
 import { CityHall } from "../domain/entity/city-hall";
 import { CityHallMedia } from "../domain/entity/city-hall-media";
 import { CityHallPricing } from "../domain/entity/city-hall-pricing";
+import { Rent } from "../domain/entity/rent";
 import { ResponseError } from "../domain/error/response-error";
 import { ObjectStorageInterface } from "../domain/interface/external-service/object-storage";
 import { File } from "../domain/interface/library/file";
 import { CityHallRepositoryInterface } from "../domain/interface/repository/city-hall";
 import { DbTransactionInterface } from "../domain/interface/repository/db-transaction";
+import { RentRepositoryInterface } from "../domain/interface/repository/rent";
 
 export class CityHallUsecase {
     constructor(
         private cityHallRepository: CityHallRepositoryInterface,
+        private rentRepository: RentRepositoryInterface,
         private objectStorageService: ObjectStorageInterface,
         private dbTransaction: DbTransactionInterface,
     ) {}
 
-    public async getAllCityHalls(): Promise<CityHall[]> {
-        const cityHalls: CityHall[] = await this.cityHallRepository.getAllCityHalls();
+    public async getAllCityHalls(userRole: string, startDate: Date|null, endDate: Date|null): Promise<CityHall[]> {
+        let cityHalls: CityHall[] = await this.cityHallRepository.getAllCityHalls();
+
+        if (userRole === "renter") {
+            if (!startDate || !endDate) {
+                throw new ResponseError("Start date and end date must be provided", 400);
+            }
+
+            if (startDate > endDate) {
+                throw new ResponseError("Start date must be before end date", 400);
+            }
+
+            const oneWeekFromNow: Date = new Date();
+            oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
+
+            if (startDate < oneWeekFromNow) {
+                throw new ResponseError("Start date must be at least 1 week from now", 400);
+            }
+
+            const cityHallPricingIds: number[] = cityHalls.flatMap(cityHall =>
+                cityHall.cityHallPricing.map(cityHallPricing => cityHallPricing.id)
+            )
+
+            const rentedCityHalls: Rent[] = await this.rentRepository.getFilteredActiveRentsByCityHallPricingIds(
+                cityHallPricingIds,
+                startDate,
+                endDate,
+            );
+
+            const rentMap: Map<number, Rent> = new Map();
+            for (const rentedCityHall of rentedCityHalls) {
+                if (rentedCityHall.cityHallPricingId) {
+                    rentMap.set(rentedCityHall.cityHallPricingId, rentedCityHall);
+                }
+            }
+
+            for (const cityHall of cityHalls) {
+                for (const pricing of cityHall.cityHallPricing) {
+                    const rentedCityHall: Rent|undefined = rentMap.get(pricing.id);
+                    if (rentedCityHall) {
+                        cityHall.status = "tidak_tersedia";
+                        break;
+                    }
+                }
+            }
+        }
 
         return cityHalls;
     }
