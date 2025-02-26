@@ -66,12 +66,12 @@ export async function main(): Promise<void> {
     const adminUsecase: AdminUsecase = new AdminUsecase(adminRepository, jwtService, bcryptService, objectStorageService);
     const adminController: AdminController = new AdminController(adminUsecase);
 
+    const rentRepository: RentRepositoryInterface = new RentRepository(prisma);
+
     // City Hall Module
     const cityHallRepository: CityHallRepositoryInterface = new CityHallRepository(prisma);
-    const cityHallUsecase: CityHallUsecase = new CityHallUsecase(cityHallRepository, objectStorageService, dbTransaction);
+    const cityHallUsecase: CityHallUsecase = new CityHallUsecase(cityHallRepository, rentRepository, objectStorageService, dbTransaction);
     const cityHallController: CityHallController = new CityHallController(cityHallUsecase);
-
-    const rentRepository: RentRepositoryInterface = new RentRepository(prisma);
 
     // Guesthouse Room Module
     const guesthouseRoomRepository: GuesthouseRoomRepositoryInterface = new GuesthouseRoomRepository(prisma);

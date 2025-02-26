@@ -12,11 +12,27 @@ import { CityHallMediaRequest } from '../dto/request/city-hall/media';
 import { CityHallMedia } from '../../domain/entity/city-hall-media';
 
 export class CityHallController {
-    constructor(private cityHallUsecase: CityHallUsecase) {}
+    constructor(private cityHallUsecase: CityHallUsecase) { }
 
     public async getAllCityHalls(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const cityHalls: CityHall[] = await this.cityHallUsecase.getAllCityHalls();
+            const startDateStr = req.query.start_date as string;
+            const endDateStr = req.query.end_date as string;
+
+            const startDate = startDateStr ? new Date(startDateStr) : null;
+            const endDate = endDateStr ? new Date(endDateStr) : null;
+
+            const {
+                start_date: validatedStartDate,
+                end_date: validatedEndDate,
+            } = CityHallValidation.filter.parse({
+                start_date: startDate,
+                end_date: endDate,
+            });
+
+            const userRole: string = res.locals.user.role;
+
+            const cityHalls: CityHall[] = await this.cityHallUsecase.getAllCityHalls(userRole, validatedStartDate, validatedEndDate);
             const cityHallsResponse: GetCityHallDataResponse[] = cityHalls.map(cityHall => GetCityHallDataResponse.fromEntity(cityHall));
             res.status(200).json(new BaseSuccessResponse(true, "Get all city hall success", cityHallsResponse));
         } catch (error) {
@@ -26,7 +42,7 @@ export class CityHallController {
 
     public async getCityHallById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { id } = CityHallValidation.id.parse({ id: Number(req.params.id)});
+            const { id } = CityHallValidation.id.parse({ id: Number(req.params.id) });
             const cityHall: CityHall = await this.cityHallUsecase.getCityHallById(id);
             const cityHallResponse: GetCityHallDataResponse = GetCityHallDataResponse.fromEntity(cityHall);
             res.status(200).json(new BaseSuccessResponse(true, "Get city hall success", cityHallResponse));
@@ -97,7 +113,7 @@ export class CityHallController {
                 req.body.deleted_media_object_data = JSON.parse(req.body.deleted_media_object_data);
             }
 
-            const { id } = CityHallValidation.id.parse({ id: Number(req.params.id)});
+            const { id } = CityHallValidation.id.parse({ id: Number(req.params.id) });
             const cityHall: UpdateCityHallRequest = CityHallValidation.updateCityHall.parse(req.body);
 
             if (req.files && Array.isArray(req.files)) {
@@ -115,7 +131,7 @@ export class CityHallController {
             }
 
             const updateCityHallEntity: CityHall = UpdateCityHallRequest.toEntity(cityHall);
-            
+
             const deletedMediaEntity: CityHallMedia[] = deletedMedia.map((media) => ({
                 id: media.id,
                 cityHallId: 0,
@@ -132,7 +148,7 @@ export class CityHallController {
 
     public async deleteCityHall(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { id } = CityHallValidation.id.parse({ id: Number(req.params.id)});
+            const { id } = CityHallValidation.id.parse({ id: Number(req.params.id) });
             await this.cityHallUsecase.deleteCityHall(id);
             res.status(200).json(new BaseSuccessResponse(true, "Delete city hall success", null));
         } catch (error) {

@@ -47,4 +47,9 @@ export class CityHallValidation {
         id: z.number(),
         url: z.string(),
     }));
+
+    public static filter = z.object({
+        start_date: z.date().nullable(),
+        end_date: z.date().nullable(),
+    });
 }
