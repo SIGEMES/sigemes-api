@@ -1,28 +1,76 @@
 import { GuesthouseRoom } from "../domain/entity/guesthouse-room";
 import { GuesthouseRoomMedia } from "../domain/entity/guesthouse-room-media";
 import { GuesthouseRoomPricing } from "../domain/entity/guesthouse-room-pricing";
+import { RentRepositoryInterface } from "../domain/interface/repository/rent";
 import { ResponseError } from "../domain/error/response-error";
 import { ObjectStorageInterface } from "../domain/interface/external-service/object-storage";
 import { File } from "../domain/interface/library/file";
 import { GuesthouseRoomRepositoryInterface } from "../domain/interface/repository/guesthouse-room";
 import { DbTransactionInterface } from "../domain/interface/repository/db-transaction";
-import { GuesthouseRoomValidation } from "../presentation/validation/guesthouse-room";
+import { Rent } from "../domain/entity/rent";
 
 export class GuesthouseRoomUsecase {
     constructor(
         private guesthouseRoomRepository: GuesthouseRoomRepositoryInterface,
+        private rentRepository: RentRepositoryInterface,
         private objectStorageService: ObjectStorageInterface,
         private dbTransaction: DbTransactionInterface,
-    ) {}
+    ) { }
 
-    public async getAllGuesthouseRooms(guesthouseId: number): Promise<GuesthouseRoom[]> {
-        const guesthouseRooms: GuesthouseRoom[] = await this.guesthouseRoomRepository.getAllRoomsByGuesthouseId(guesthouseId);
+    public async getAllGuesthouseRooms(guesthouseId: number, userRole: string, startDate: Date | null, endDate: Date | null, renterGender: string | null): Promise<GuesthouseRoom[]> {
+        let guesthouseRooms: GuesthouseRoom[] = await this.guesthouseRoomRepository.getAllRoomsByGuesthouseId(guesthouseId);
+
+        if (userRole === "renter") {
+            if (!startDate || !endDate || !renterGender) {
+                throw new ResponseError("Required query parameter: start_date, end_date and gender for renter", 400);
+            }
+
+            // Ambil semua guesthousePricingIds dalam satu kali iterasi
+            const guesthousePricingIds: number[] = guesthouseRooms.flatMap(room =>
+                room.guesthouseRoomPricing.map(pricing => pricing.id)
+            );
+
+            // Ambil semua data sewa dalam SATU query
+            const rentedGuesthouseRooms: Rent[] = await this.rentRepository.getFilteredActiveRentsByGuesthouseRoomPricingIds(
+                guesthousePricingIds,
+                startDate,
+                endDate
+            );
+
+            // Buat Map untuk akses cepat berdasarkan guesthouseRoomPricingId
+            const rentMap = new Map<number, Rent[]>();
+            for (const rent of rentedGuesthouseRooms) {
+                if (rent.guesthouseRoomPricingId !== null) { // Cek agar tidak null
+                    if (!rentMap.has(rent.guesthouseRoomPricingId)) {
+                        rentMap.set(rent.guesthouseRoomPricingId, []);
+                    }
+                    rentMap.get(rent.guesthouseRoomPricingId)?.push(rent);
+                }
+            }
+
+            // Proses pengurangan slot
+            for (const room of guesthouseRooms) {
+                for (const pricing of room.guesthouseRoomPricing) {
+                    const rents = rentMap.get(pricing.id) || [];
+
+                    for (const rent of rents) {
+                        if (rent.renterGender === renterGender) {
+                            room.totalSlot -= rent.slot;
+                        } else {
+                            room.totalSlot = 0;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
 
         return guesthouseRooms;
     }
 
+
     public async getGuesthouseRoomById(id: number): Promise<GuesthouseRoom> {
-        const guesthouseRoom: GuesthouseRoom|null = await this.guesthouseRoomRepository.getGuesthouseRoomById(id);
+        const guesthouseRoom: GuesthouseRoom | null = await this.guesthouseRoomRepository.getGuesthouseRoomById(id);
 
         if (!guesthouseRoom) {
             throw new ResponseError("Guesthouse room not found", 404);
@@ -55,12 +103,12 @@ export class GuesthouseRoomUsecase {
     public async updateGuesthouseRoom(room: GuesthouseRoom, roomMediaReq: File[], deletedObjectMedia: GuesthouseRoomMedia[]): Promise<GuesthouseRoom> {
         // Using transaction to ensure data consistency
         return await this.dbTransaction.run(async (tx) => {
-            const oldRoomData: GuesthouseRoom|null = await this.guesthouseRoomRepository.getGuesthouseRoomById(room.id);
-    
+            const oldRoomData: GuesthouseRoom | null = await this.guesthouseRoomRepository.getGuesthouseRoomById(room.id);
+
             if (!oldRoomData) {
                 throw new ResponseError("Guesthouse room not found", 404);
             }
-    
+
             const updatedRoom: GuesthouseRoom = await this.guesthouseRoomRepository.updateGuesthouseRoomOnly(room, tx);
 
             const oldRoomPricingCount: number = oldRoomData.guesthouseRoomPricing.length;
@@ -136,7 +184,7 @@ export class GuesthouseRoomUsecase {
             let deletedRoomMediaId: number[] = [];
             if (deletedObjectMedia.length > 0) {
                 for (const media of deletedObjectMedia) {
-                    const roomMedia: GuesthouseRoomMedia|null = await this.guesthouseRoomRepository.getGuesthouseRoomMediaById(media.id);
+                    const roomMedia: GuesthouseRoomMedia | null = await this.guesthouseRoomRepository.getGuesthouseRoomMediaById(media.id);
                     if (!roomMedia) {
                         throw new ResponseError("Room media not found", 404);
                     }
@@ -170,7 +218,7 @@ export class GuesthouseRoomUsecase {
     }
 
     public async deleteGuesthouseRoom(id: number): Promise<void> {
-        const room: GuesthouseRoom|null = await this.guesthouseRoomRepository.getGuesthouseRoomById(id);
+        const room: GuesthouseRoom | null = await this.guesthouseRoomRepository.getGuesthouseRoomById(id);
 
         if (!room) {
             throw new ResponseError("Guesthouse room not found", 404);
