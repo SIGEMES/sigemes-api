@@ -87,10 +87,8 @@ export class GuesthouseRoomRepository implements GuesthouseRoomRepositoryInterfa
                     name: room.name,
                     type: room.type,
                     facilities: room.facilities,
-                    availableSlot: room.availableSlot,
                     totalSlot: room.totalSlot,
                     areaM2: room.areaM2,
-                    status: room.status,
                     guesthouseRoomMedia: {
                         create: room.guesthouseRoomMedia.map(media => ({
                             url: media.url
@@ -110,10 +108,8 @@ export class GuesthouseRoomRepository implements GuesthouseRoomRepositoryInterfa
                     name: true,
                     type: true,
                     facilities: true,
-                    availableSlot: true,
                     totalSlot: true,
                     areaM2: true,
-                    status: true,
                     guesthouseRoomMedia: {
                         select: {
                             id: true,
@@ -189,10 +185,8 @@ export class GuesthouseRoomRepository implements GuesthouseRoomRepositoryInterfa
                     name: room.name,
                     type: room.type,
                     facilities: room.facilities,
-                    availableSlot: room.availableSlot,
                     totalSlot: room.totalSlot,
                     areaM2: room.areaM2,
-                    status: room.status,
                 },
                 select: {
                     id: true,

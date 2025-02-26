@@ -11,8 +11,7 @@ export async function seedGuesthouseRooms(): Promise<void> {
                 type: "vip",
                 facilities: "King-size bed; AC; TV; Meja rias; Kamar mandi dalam; Toilet duduk; Lemari (2)",
                 areaM2: 100,
-                availableSlot:2,
-                totalSlot:2
+                totalSlot: 2,
             },
             {
                 guesthouseId: 1,
@@ -20,8 +19,7 @@ export async function seedGuesthouseRooms(): Promise<void> {
                 type: "vip",
                 facilities: "King-size bed; Personal-size bed; AC; TV; Lemari; Meja rias; Kamar mandi dalam; Toilet duduk",
                 areaM2: 100,
-                availableSlot:3,
-                totalSlot:3
+                totalSlot: 3,
             },
             {
                 guesthouseId: 1,
@@ -29,8 +27,7 @@ export async function seedGuesthouseRooms(): Promise<void> {
                 type: "vip",
                 facilities: "Twin bed (2); AC; Kamar mandi dalam; Toilet duduk",
                 areaM2: 100,
-                availableSlot:2,
-                totalSlot:2
+                totalSlot: 2,
             },
             {
                 guesthouseId: 1,
@@ -38,8 +35,7 @@ export async function seedGuesthouseRooms(): Promise<void> {
                 type: "standard",
                 facilities: "King size bed (2); Kamar mandi dalam",
                 areaM2: 100,
-                availableSlot:1,
-                totalSlot:1
+                totalSlot: 4,
             },
             {
                 guesthouseId: 1,
@@ -47,8 +43,7 @@ export async function seedGuesthouseRooms(): Promise<void> {
                 type: "standard",
                 facilities: "King size bed; Single bed; Kamar mandi dalam",
                 areaM2: 100,
-                availableSlot:2,
-                totalSlot:2
+                totalSlot: 3,
             },
             {
                 guesthouseId: 1,
@@ -56,8 +51,7 @@ export async function seedGuesthouseRooms(): Promise<void> {
                 type: "standard",
                 facilities: "King size bed; Kamar mandi luar",
                 areaM2: 100,
-                availableSlot:1,
-                totalSlot:1
+                totalSlot: 2,
             }
         ],
     });

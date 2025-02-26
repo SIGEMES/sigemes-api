@@ -71,9 +71,11 @@ export async function main(): Promise<void> {
     const cityHallUsecase: CityHallUsecase = new CityHallUsecase(cityHallRepository, objectStorageService, dbTransaction);
     const cityHallController: CityHallController = new CityHallController(cityHallUsecase);
 
+    const rentRepository: RentRepositoryInterface = new RentRepository(prisma);
+
     // Guesthouse Room Module
     const guesthouseRoomRepository: GuesthouseRoomRepositoryInterface = new GuesthouseRoomRepository(prisma);
-    const guesthouseRoomUsecase: GuesthouseRoomUsecase = new GuesthouseRoomUsecase(guesthouseRoomRepository, objectStorageService, dbTransaction);
+    const guesthouseRoomUsecase: GuesthouseRoomUsecase = new GuesthouseRoomUsecase(guesthouseRoomRepository, rentRepository, objectStorageService, dbTransaction);
     const guesthouseRoomController: GuesthouseRoomController = new GuesthouseRoomController(guesthouseRoomUsecase);
 
     // Guesthouse Module
@@ -87,7 +89,6 @@ export async function main(): Promise<void> {
     const rentPlanController: RentPlanController = new RentPlanController(rentPlanUsecase);
 
     // Rent Module
-    const rentRepository: RentRepositoryInterface = new RentRepository(prisma);
     const rentUsecase: RentUsecase = new RentUsecase(rentRepository, guesthouseRoomRepository, cityHallRepository, dbTransaction);
     const rentController: RentController = new RentController(rentUsecase);
 

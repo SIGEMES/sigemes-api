@@ -3,7 +3,6 @@ import { GuesthouseRoomMedia } from "./guesthouse-room-media";
 import { Guesthouse } from "./guesthouse";
 
 export type RoomType = "vip" | "standard";
-export type Status = "tersedia" | "tidak_tersedia";
 
 export class GuesthouseRoom {
     constructor(
@@ -12,10 +11,8 @@ export class GuesthouseRoom {
         public name: string = '',
         public type: RoomType = 'standard',
         public facilities: string = '',
-        public availableSlot: number = 0,
         public totalSlot: number = 0,
         public areaM2: number = 0,
-        public status: Status = 'tersedia',
     
         public guesthouseRoomPricing: GuesthouseRoomPricing[] = [],
         public guesthouseRoomMedia: GuesthouseRoomMedia[] = [],

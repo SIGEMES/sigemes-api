@@ -134,10 +134,8 @@ model GuesthouseRoom {
   name                  String                  @db.VarChar(50)
   type                  RoomType                @default(standard)
   facilities            String                  @db.Text
-  availableSlot         Int                     @map("available_slot") @db.Integer
   totalSlot             Int                     @map("total_slot") @db.Integer
   areaM2                Float                   @map("area_m2") @db.DoublePrecision
-  status                Status                  @default(tersedia)
   guesthouseRoomMedia   GuesthouseRoomMedia[]
   guesthouseRoomPricing GuesthouseRoomPricing[]
 

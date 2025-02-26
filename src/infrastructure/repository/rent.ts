@@ -121,6 +121,29 @@ export class RentRepository implements RentRepositoryInterface {
 
         return rents;
     }
+    
+    public async getFilteredActiveRentsByGuesthouseRoomPricingIds(guesthouseRoomPricingIds: number[], startDate: Date, endDate: Date): Promise<Rent[]> {
+        const rents: Rent[] = await this.prisma.rent.findMany({
+            where: {
+                guesthouseRoomPricingId: {
+                    in: guesthouseRoomPricingIds,
+                },
+                status: {
+                    in: ['pending', 'dikonfirmasi'],
+                },
+                AND: [
+                    {
+                        startDate: { lte: endDate }
+                    },
+                    {
+                        endDate: { gte: startDate }
+                    }
+                ]
+            },
+        }) as Rent[];
+
+        return rents;
+    }
 
     public async getActiveRentsByCityHallPricingIds(cityHallPricingIds: number[]): Promise<Rent[]> {
         const rents: Rent[] = await this.prisma.rent.findMany({

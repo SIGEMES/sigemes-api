@@ -41,4 +41,10 @@ export class GuesthouseRoomValidation {
         id: z.number(),
         url: z.string(),
     }));
+
+    public static filter = z.object({
+        start_date: z.date().nullable(),
+        end_date: z.date().nullable(),
+        renter_gender: z.enum(["perempuan", "laki_laki"]).nullable(),
+    });
 }
