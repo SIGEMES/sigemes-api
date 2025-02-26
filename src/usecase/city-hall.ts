@@ -26,7 +26,7 @@ export class CityHallUsecase {
             }
 
             if (startDate > endDate) {
-                throw new ResponseError("Start date must be before end date", 400);
+                throw new ResponseError("Start date must be before or equal to end date", 400);
             }
 
             const oneWeekFromNow: Date = new Date();

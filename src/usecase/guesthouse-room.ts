@@ -25,6 +25,10 @@ export class GuesthouseRoomUsecase {
                 throw new ResponseError("Required query parameter: start_date, end_date and gender for renter", 400);
             }
 
+            if (startDate > endDate) {
+                throw new ResponseError("Start date must be before or equal to end date", 400);
+            }
+
             // Ambil semua guesthousePricingIds dalam satu kali iterasi
             const guesthousePricingIds: number[] = guesthouseRooms.flatMap(room =>
                 room.guesthouseRoomPricing.map(pricing => pricing.id)
