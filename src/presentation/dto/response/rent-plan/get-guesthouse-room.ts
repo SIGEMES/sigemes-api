@@ -9,10 +9,8 @@ export class GetGuesthouseRoomResponse {
         public name: string,
         public type: string,
         public facilities: string,
-        public available_slot: number,
         public total_slot: number,
         public area_m2: number,
-        public status: string,
         public media: GetGuesthouseRoomMediaResponse[],
         public guesthouse: GetGuesthouseResponse,
     ) {}
@@ -24,10 +22,8 @@ export class GetGuesthouseRoomResponse {
             guesthouseRoom.name,
             guesthouseRoom.type,
             guesthouseRoom.facilities,
-            guesthouseRoom.availableSlot,
             guesthouseRoom.totalSlot,
             guesthouseRoom.areaM2,
-            guesthouseRoom.status,
             guesthouseRoom.guesthouseRoomMedia.map(GetGuesthouseRoomMediaResponse.fromEntity),
             GetGuesthouseResponse.fromEntity(guesthouseRoom.guesthouse),
         );

@@ -35,10 +35,6 @@ export class RentPlanUsecase {
                 throw new ResponseError("Guesthouse room pricing is not available", 400);
             }
 
-            if (guesthouseRoomPricing.guesthouseRoom.availableSlot <= rentPlan.slot) {
-                throw new ResponseError("Guesthouse room available slot is not enough", 400);
-            }
-
             createdRentPlan = await this.rentPlanRepository.createRentPlan(rentPlan);
 
         } else if (rentPlan.cityHallPricingId) {
@@ -92,10 +88,6 @@ export class RentPlanUsecase {
 
             if (guesthouseRoomPricing.isActive === false) {
                 throw new ResponseError("Guesthouse room pricing is not available", 400);
-            }
-
-            if (guesthouseRoomPricing.guesthouseRoom.availableSlot <= rentPlan.slot) {
-                throw new ResponseError("Guesthouse room available slot is not enough", 400);
             }
 
             updatedRentPlan = await this.rentPlanRepository.updateRentPlan(rentPlan);
