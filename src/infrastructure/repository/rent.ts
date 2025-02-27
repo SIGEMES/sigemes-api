@@ -107,21 +107,6 @@ export class RentRepository implements RentRepositoryInterface {
         return rent;
     }
 
-    public async getActiveRentsByGuesthouseRoomPricingIds(guesthouseRoomPricingIds: number[]): Promise<Rent[]> {
-        const rents: Rent[] = await this.prisma.rent.findMany({
-            where: {
-                guesthouseRoomPricingId: {
-                    in: guesthouseRoomPricingIds,
-                },
-                status: {
-                    in: ['pending', 'dikonfirmasi'],
-                }
-            },
-        }) as Rent[];
-
-        return rents;
-    }
-    
     public async getFilteredActiveRentsByGuesthouseRoomPricingIds(guesthouseRoomPricingIds: number[], startDate: Date, endDate: Date): Promise<Rent[]> {
         const rents: Rent[] = await this.prisma.rent.findMany({
             where: {
@@ -136,8 +121,16 @@ export class RentRepository implements RentRepositoryInterface {
                         startDate: { lte: endDate }
                     },
                     {
-                        endDate: { gte: startDate }
-                    }
+                        OR: [
+                            {
+                                checkOut: null,
+                                endDate: { gte: startDate }
+                            },
+                            {
+                                checkOut: { not: null, gte: startDate }
+                            }
+                        ],
+                    },
                 ],
             },
         }) as Rent[];
@@ -145,21 +138,6 @@ export class RentRepository implements RentRepositoryInterface {
         return rents;
     }
 
-    public async getActiveRentsByCityHallPricingIds(cityHallPricingIds: number[]): Promise<Rent[]> {
-        const rents: Rent[] = await this.prisma.rent.findMany({
-            where: {
-                cityHallPricingId: {
-                    in: cityHallPricingIds,
-                },
-                status: {
-                    in: ['pending', 'dikonfirmasi'],
-                }
-            },
-        }) as Rent[];
-
-        return rents;
-    }
-    
     public async getFilteredActiveRentsByCityHallPricingIds(cityHallPricingIds: number[], startDate: Date, endDate: Date): Promise<Rent[]> {
         const rents: Rent[] = await this.prisma.rent.findMany({
             where: {
@@ -174,8 +152,16 @@ export class RentRepository implements RentRepositoryInterface {
                         startDate: { lte: endDate }
                     },
                     {
-                        endDate: { gte: startDate }
-                    }
+                        OR: [
+                            {
+                                checkOut: null,
+                                endDate: { gte: startDate }
+                            },
+                            {
+                                checkOut: { not: null, gte: startDate }
+                            }
+                        ],
+                    },
                 ],
             },
         }) as Rent[];

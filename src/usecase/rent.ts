@@ -47,6 +47,10 @@ export class RentUsecase {
             if (rent.guesthouseRoomPricingId && rent.cityHallPricingId) {
                 throw new ResponseError("Please choose one of guesthouse room pricing or city hall pricing", 400);
             } else if (rent.guesthouseRoomPricingId) {
+                if (rent.startDate > rent.endDate) {
+                    throw new ResponseError("Start date must be before or equal to end date", 400);
+                }
+                
                 const guesthouseRoomPricing: GuesthouseRoomPricing | null = await this.guesthouseRoomRepository.getGuesthouseRoomPricingById(rent.guesthouseRoomPricingId);
                 if (!guesthouseRoomPricing) {
                     throw new ResponseError("Guesthouse room pricing not found", 404);
@@ -63,26 +67,15 @@ export class RentUsecase {
 
                 let allGuesthouserRoomPricingIds: number[] = guesthouseRoom.guesthouseRoomPricing.map((pricing) => pricing.id);
 
-                const rentedGuesthouseRooms = await this.rentRepository.getActiveRentsByGuesthouseRoomPricingIds(allGuesthouserRoomPricingIds);
+                const rentedGuesthouseRooms: Rent[] = await this.rentRepository.getFilteredActiveRentsByGuesthouseRoomPricingIds(allGuesthouserRoomPricingIds, rent.startDate, rent.endDate);
 
                 let bookedSlot = 0;
-                rentedGuesthouseRooms.forEach(({ startDate, endDate, checkOut, slot, renterGender }) => {
-                    const actualEndDate = checkOut || endDate;
-
-                    const isOverlapping =
-                        (startDate <= rent.startDate && actualEndDate >= rent.startDate) ||
-                        (startDate >= rent.startDate && startDate <= rent.endDate) ||
-                        (startDate <= rent.startDate && actualEndDate >= rent.endDate);
-
-                    if (isOverlapping) {
-                        bookedSlot += slot;
-
-                        if (renterGender !== rent.renterGender) {
-                            throw new ResponseError("Room is rented by different gender", 400);
-                        }
+                for (const rentedRoom of rentedGuesthouseRooms) {
+                    if (rentedRoom.renterGender === rent.renterGender) {
+                        throw new ResponseError("Room is rented by different gender", 400);
                     }
-                });
-
+                    bookedSlot += rentedRoom.slot;
+                }
 
                 const availableSlot = guesthouseRoom.totalSlot - bookedSlot;
                 if (rent.slot > availableSlot) {
@@ -97,7 +90,7 @@ export class RentUsecase {
                 oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
 
                 if (rent.startDate > rent.endDate) {
-                    throw new ResponseError("Start date must be less than end date", 400);
+                    throw new ResponseError("Start date must be before or equal to end date", 400);
                 }
 
                 if (rent.startDate < oneWeekFromNow) {
@@ -115,19 +108,10 @@ export class RentUsecase {
                 }
 
                 let allCityHallPricingIds: number[] = cityHall.cityHallPricing.map((pricing) => pricing.id);
-                const rentedCityHalls = await this.rentRepository.getActiveRentsByCityHallPricingIds(allCityHallPricingIds);
-                rentedCityHalls.forEach(({ startDate, endDate, checkOut }) => {
-                    const actualEndDate = checkOut || endDate;
-
-                    const isOverlapping =
-                        (startDate <= rent.startDate && actualEndDate >= rent.startDate) ||
-                        (startDate >= rent.startDate && startDate <= rent.endDate) ||
-                        (startDate <= rent.startDate && actualEndDate >= rent.endDate);
-
-                    if (isOverlapping) {
-                        throw new ResponseError("City hall is not available", 400);
-                    }
-                });
+                const rentedCityHalls: Rent[] = await this.rentRepository.getFilteredActiveRentsByCityHallPricingIds(allCityHallPricingIds, rent.startDate, rent.endDate);
+                if (rentedCityHalls.length > 0) {
+                    throw new ResponseError("City hall is not available", 400);
+                }
 
                 createdRent = await this.rentRepository.createRent(rent);
 
