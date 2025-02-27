@@ -10,6 +10,7 @@ export class GetGuesthouseRoomDataResponse {
         public type: string,
         public facilities: string,
         public total_slot: number,
+        public available_slot: number,
         public area_m2: number,
 
         public media: GetGuesthouseRoomMediaResponse[],
@@ -24,6 +25,7 @@ export class GetGuesthouseRoomDataResponse {
             guesthouseRoom.type,
             guesthouseRoom.facilities,
             guesthouseRoom.totalSlot,
+            guesthouseRoom.availableSlot,
             guesthouseRoom.areaM2,
             guesthouseRoom.guesthouseRoomMedia.map(GetGuesthouseRoomMediaResponse.fromEntity),
             guesthouseRoom.guesthouseRoomPricing.map(GetGuesthouseRoomPricingResponse.fromEntity),

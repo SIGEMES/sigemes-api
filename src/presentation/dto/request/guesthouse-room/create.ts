@@ -19,6 +19,7 @@ export class CreateGuesthouseRoomRequest {
             data.type,
             data.facilities,
             data.total_slot,
+            data.total_slot,
             data.area_m2,
             data.room_pricing.map(pricing => GuesthouseRoomPricingRequest.toEntity(pricing)),
             [],

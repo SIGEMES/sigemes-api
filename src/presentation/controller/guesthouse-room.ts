@@ -48,7 +48,28 @@ export class GuesthouseRoomController {
     public async getGuesthouseRoomById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { id } = GuesthouseRoomValidation.id.parse({ id: Number(req.params.room_id)});
-            const guesthouseRoom: GuesthouseRoom = await this.guesthouseRoomUsecase.getGuesthouseRoomById(id);
+
+            const startDateStr = req.query.start_date as string;
+            const endDateStr = req.query.end_date as string;
+            const renterGenderStr = req.query.renter_gender as string;
+
+            const startDate = startDateStr ? new Date(startDateStr) : null;
+            const endDate = endDateStr ? new Date(endDateStr) : null;
+            const renterGender = renterGenderStr ? renterGenderStr : null;
+
+            const {
+                start_date: validatedStartDate,
+                end_date: validatedEndDate,
+                renter_gender: validatedRenterGender,
+            } = GuesthouseRoomValidation.filter.parse({
+                start_date: startDate,
+                end_date: endDate,
+                renter_gender: renterGender,
+            });
+
+            const userRole: string = res.locals.user.role;
+
+            const guesthouseRoom: GuesthouseRoom = await this.guesthouseRoomUsecase.getGuesthouseRoomById(id, userRole, validatedStartDate, validatedEndDate, validatedRenterGender);
             const guesthouseRoomResponse: GetGuesthouseRoomDataResponse = GetGuesthouseRoomDataResponse.fromEntity(guesthouseRoom);
             res.status(200).json(new BaseSuccessResponse(true, "Get guesthouse room success", guesthouseRoomResponse));
         } catch (error) {
