@@ -20,10 +20,6 @@ import { GuesthouseRoomRepository } from "./infrastructure/repository/guesthouse
 import { GuesthouseRoomUsecase } from "./usecase/guesthouse-room";
 import { GuesthouseRoomController } from "./presentation/controller/guesthouse-room";
 
-import { RentPlanRepository } from "./infrastructure/repository/rent-plan";
-import { RentPlanUsecase } from "./usecase/rent-plan";
-import { RentPlanController } from "./presentation/controller/rent-plan";
-
 import { RentRepository } from "./infrastructure/repository/rent";
 import { RentUsecase } from "./usecase/rent";
 import { RentController } from "./presentation/controller/rent";
@@ -40,7 +36,6 @@ import { AdminRepositoryInterface } from "./domain/interface/repository/admin";
 import { CityHallRepositoryInterface } from "./domain/interface/repository/city-hall";
 import { GuesthouseRepositoryInterface } from "./domain/interface/repository/guesthouse";
 import { GuesthouseRoomRepositoryInterface } from "./domain/interface/repository/guesthouse-room";
-import { RentPlanRepositoryInterface } from "./domain/interface/repository/rent-plan";
 import { RentRepositoryInterface } from "./domain/interface/repository/rent";
 import { MailerInterface } from "./domain/interface/external-service/mailer";
 import { ObjectStorageInterface } from "./domain/interface/external-service/object-storage";
@@ -55,41 +50,29 @@ export async function main(): Promise<void> {
     const mailerService: MailerInterface = new MailerService();
     const objectStorageService: ObjectStorageInterface = new CloudStorageService();
     const dbTransaction: DbTransactionInterface = new DbTransaction(prisma);
-
-    // Renter Module
+    
+    // Repository Instance
     const renterRepository: RenterRepositoryInterface = new RenterRepository(prisma);
-    const renterUsecase: RenterUsecase = new RenterUsecase(renterRepository, jwtService, bcryptService, mailerService, objectStorageService);
-    const renterController: RenterController = new RenterController(renterUsecase);
-
-    // Admin Module
     const adminRepository: AdminRepositoryInterface = new AdminRepository(prisma);
-    const adminUsecase: AdminUsecase = new AdminUsecase(adminRepository, jwtService, bcryptService, objectStorageService);
-    const adminController: AdminController = new AdminController(adminUsecase);
-
-    const rentRepository: RentRepositoryInterface = new RentRepository(prisma);
-
-    // City Hall Module
     const cityHallRepository: CityHallRepositoryInterface = new CityHallRepository(prisma);
-    const cityHallUsecase: CityHallUsecase = new CityHallUsecase(cityHallRepository, rentRepository, objectStorageService, dbTransaction);
-    const cityHallController: CityHallController = new CityHallController(cityHallUsecase);
-
-    // Guesthouse Room Module
-    const guesthouseRoomRepository: GuesthouseRoomRepositoryInterface = new GuesthouseRoomRepository(prisma);
-    const guesthouseRoomUsecase: GuesthouseRoomUsecase = new GuesthouseRoomUsecase(guesthouseRoomRepository, rentRepository, objectStorageService, dbTransaction);
-    const guesthouseRoomController: GuesthouseRoomController = new GuesthouseRoomController(guesthouseRoomUsecase);
-
-    // Guesthouse Module
     const guesthouseRepository: GuesthouseRepositoryInterface = new GuesthouseRepository(prisma);
+    const guesthouseRoomRepository: GuesthouseRoomRepositoryInterface = new GuesthouseRoomRepository(prisma);
+    const rentRepository: RentRepositoryInterface = new RentRepository(prisma);
+    
+    // Usecase Instance
+    const renterUsecase: RenterUsecase = new RenterUsecase(renterRepository, jwtService, bcryptService, mailerService, objectStorageService);
+    const adminUsecase: AdminUsecase = new AdminUsecase(adminRepository, jwtService, bcryptService, objectStorageService);
+    const cityHallUsecase: CityHallUsecase = new CityHallUsecase(cityHallRepository, rentRepository, objectStorageService, dbTransaction);
     const guesthouseUsecase: GuesthouseUsecase = new GuesthouseUsecase(guesthouseRepository, objectStorageService, dbTransaction);
-    const guesthouseController: GuesthouseController = new GuesthouseController(guesthouseUsecase);
-
-    // Rent Plan Module
-    const rentPlanRepository: RentPlanRepositoryInterface = new RentPlanRepository(prisma);
-    const rentPlanUsecase: RentPlanUsecase = new RentPlanUsecase(rentPlanRepository, guesthouseRoomRepository, cityHallRepository, dbTransaction);
-    const rentPlanController: RentPlanController = new RentPlanController(rentPlanUsecase);
-
-    // Rent Module
+    const guesthouseRoomUsecase: GuesthouseRoomUsecase = new GuesthouseRoomUsecase(guesthouseRoomRepository, rentRepository, objectStorageService, dbTransaction);
     const rentUsecase: RentUsecase = new RentUsecase(rentRepository, guesthouseRoomRepository, cityHallRepository, dbTransaction);
+    
+    // Controller Instance
+    const renterController: RenterController = new RenterController(renterUsecase);
+    const adminController: AdminController = new AdminController(adminUsecase);
+    const cityHallController: CityHallController = new CityHallController(cityHallUsecase);
+    const guesthouseRoomController: GuesthouseRoomController = new GuesthouseRoomController(guesthouseRoomUsecase);
+    const guesthouseController: GuesthouseController = new GuesthouseController(guesthouseUsecase);
     const rentController: RentController = new RentController(rentUsecase);
 
     const router: APIRouter = new APIRouter(
@@ -98,7 +81,6 @@ export async function main(): Promise<void> {
         cityHallController,
         guesthouseController,
         guesthouseRoomController,
-        rentPlanController,
         rentController,
     );
 

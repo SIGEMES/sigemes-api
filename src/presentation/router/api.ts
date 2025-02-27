@@ -9,7 +9,6 @@ import { isSuperAdminMiddleware } from '../middleware/is-super-admin';
 import { CityHallController } from '../controller/city-hall';
 import { GuesthouseController } from '../controller/guesthouse';
 import { GuesthouseRoomController } from '../controller/guesthouse-room';
-import { RentPlanController } from '../controller/rent-plan';
 import { RentController } from '../controller/rent';
 
 export class APIRouter {
@@ -18,7 +17,6 @@ export class APIRouter {
     public adminRouter: express.Router;
     public cityHallRouter: express.Router;
     public guesthouseRouter: express.Router;
-    public rentPlanRouter: express.Router;
     public rentRouter: express.Router;
 
     constructor(
@@ -27,7 +25,6 @@ export class APIRouter {
         private cityHallController: CityHallController,
         private guesthouseController: GuesthouseController,
         private guesthouseRoomController: GuesthouseRoomController,
-        private rentPlanController: RentPlanController,
         private rentController: RentController,
     ) {
         this.multerUpload = multer({
@@ -41,14 +38,12 @@ export class APIRouter {
         this.adminRouter = express.Router();
         this.cityHallRouter = express.Router();
         this.guesthouseRouter = express.Router();
-        this.rentPlanRouter = express.Router();
         this.rentRouter = express.Router();
 
         this.configRentersRoutes();
         this.configAdminRoutes();
         this.configCityHallRoutes();
         this.configGuesthouseRoutes();
-        this.configRentPlanRoutes();
         this.configRentRoutes()
     }
 
@@ -102,14 +97,6 @@ export class APIRouter {
         this.guesthouseRouter.post("/:guesthouse_id/rooms", this.multerUpload.array('room_media'), this.guesthouseRoomController.createGuesthouseRoom.bind(this.guesthouseRoomController));
         this.guesthouseRouter.put("/:guesthouse_id/rooms/:room_id", this.multerUpload.array('room_media'), this.guesthouseRoomController.updateGuesthouseRoom.bind(this.guesthouseRoomController));
         this.guesthouseRouter.delete("/:guesthouse_id/rooms/:room_id", this.guesthouseRoomController.deleteGuesthouseRoom.bind(this.guesthouseRoomController));
-    }
-    
-    private configRentPlanRoutes(): void {
-        this.rentPlanRouter.use(jwtMiddleware);
-        this.rentPlanRouter.get("", this.rentPlanController.getAllRenterRentPlans.bind(this.rentPlanController));
-        this.rentPlanRouter.post("", this.rentPlanController.createRentPlan.bind(this.rentPlanController));
-        this.rentPlanRouter.put("/:id", this.rentPlanController.updateRentPlan.bind(this.rentPlanController));
-        this.rentPlanRouter.delete("/:id", this.rentPlanController.deleteRentPlan.bind(this.rentPlanController));
     }
 
     private configRentRoutes(): void {
