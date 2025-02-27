@@ -43,7 +43,24 @@ export class CityHallController {
     public async getCityHallById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { id } = CityHallValidation.id.parse({ id: Number(req.params.id) });
-            const cityHall: CityHall = await this.cityHallUsecase.getCityHallById(id);
+
+            const startDateStr = req.query.start_date as string;
+            const endDateStr = req.query.end_date as string;
+
+            const startDate = startDateStr ? new Date(startDateStr) : null;
+            const endDate = endDateStr ? new Date(endDateStr) : null;
+
+            const {
+                start_date: validatedStartDate,
+                end_date: validatedEndDate,
+            } = CityHallValidation.filter.parse({
+                start_date: startDate,
+                end_date: endDate,
+            });
+
+            const userRole: string = res.locals.user.role;
+
+            const cityHall: CityHall = await this.cityHallUsecase.getCityHallById(id, userRole, validatedStartDate, validatedEndDate);
             const cityHallResponse: GetCityHallDataResponse = GetCityHallDataResponse.fromEntity(cityHall);
             res.status(200).json(new BaseSuccessResponse(true, "Get city hall success", cityHallResponse));
         } catch (error) {
