@@ -20,11 +20,11 @@ export class GuesthouseRoomUsecase {
     public async getAllGuesthouseRooms(guesthouseId: number, userRole: string, startDate: Date | null, endDate: Date | null, renterGender: string | null): Promise<GuesthouseRoom[]> {
         let guesthouseRooms: GuesthouseRoom[] = await this.guesthouseRoomRepository.getAllRoomsByGuesthouseId(guesthouseId);
 
-        if (userRole === "renter") {
-            if (!startDate || !endDate || !renterGender) {
-                throw new ResponseError("Required query parameter: start_date, end_date and gender for renter", 400);
-            }
+        if (userRole === "renter" && (!startDate || !endDate || !renterGender)) {
+            throw new ResponseError("Required query parameter: start_date, end_date and gender for renter", 400);
+        }       
 
+        if (startDate && endDate && renterGender) {
             if (startDate > endDate) {
                 throw new ResponseError("Start date must be before or equal to end date", 400);
             }
@@ -73,11 +73,40 @@ export class GuesthouseRoomUsecase {
     }
 
 
-    public async getGuesthouseRoomById(id: number): Promise<GuesthouseRoom> {
-        const guesthouseRoom: GuesthouseRoom | null = await this.guesthouseRoomRepository.getGuesthouseRoomById(id);
+    public async getGuesthouseRoomById(id: number, userRole: string, startDate: Date | null, endDate: Date | null, renterGender: string | null): Promise<GuesthouseRoom> {
+        let guesthouseRoom: GuesthouseRoom | null = await this.guesthouseRoomRepository.getGuesthouseRoomById(id);
 
         if (!guesthouseRoom) {
             throw new ResponseError("Guesthouse room not found", 404);
+        }
+
+        if (userRole === "renter" && (!startDate || !endDate || !renterGender)) {
+            throw new ResponseError("Required query parameter: start_date, end_date and gender for renter", 400);
+        }       
+
+        if (startDate && endDate && renterGender) {
+            if (startDate > endDate) {
+                throw new ResponseError("Start date must be before or equal to end date", 400);
+            }
+
+            const guesthouseRoomPricingIds: number[] = guesthouseRoom.guesthouseRoomPricing.map(pricing => pricing.id);
+
+            // Ambil semua data sewa
+            const rentedGuesthouseRooms: Rent[] = await this.rentRepository.getFilteredActiveRentsByGuesthouseRoomPricingIds(
+                guesthouseRoomPricingIds,
+                startDate,
+                endDate
+            );
+
+            // Proses pengurangan slot
+            for (const rentedRoom of rentedGuesthouseRooms) {
+                if (rentedRoom.renterGender !== renterGender) {
+                    guesthouseRoom.totalSlot = 0;
+                    break;
+                }
+
+                guesthouseRoom.totalSlot -= rentedRoom.slot;
+            }
         }
 
         return guesthouseRoom;
