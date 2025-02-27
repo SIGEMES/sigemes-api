@@ -1,3 +1,4 @@
+import { start } from "repl";
 import { CityHall } from "../domain/entity/city-hall";
 import { CityHallMedia } from "../domain/entity/city-hall-media";
 import { CityHallPricing } from "../domain/entity/city-hall-pricing";
@@ -20,11 +21,11 @@ export class CityHallUsecase {
     public async getAllCityHalls(userRole: string, startDate: Date|null, endDate: Date|null): Promise<CityHall[]> {
         let cityHalls: CityHall[] = await this.cityHallRepository.getAllCityHalls();
 
-        if (userRole === "renter") {
-            if (!startDate || !endDate) {
-                throw new ResponseError("Start date and end date must be provided", 400);
-            }
+        if (userRole === "renter" && (!startDate || !endDate)) {
+            throw new ResponseError("Required query parameter: start_date and end_date for renter", 400);
+        }
 
+        if (startDate && endDate) {
             if (startDate > endDate) {
                 throw new ResponseError("Start date must be before or equal to end date", 400);
             }
@@ -67,11 +68,38 @@ export class CityHallUsecase {
         return cityHalls;
     }
 
-    public async getCityHallById(id: number): Promise<CityHall> {
+    public async getCityHallById(id: number, userRole: string, startDate: Date|null, endDate: Date|null): Promise<CityHall> {
         const cityHall: CityHall|null = await this.cityHallRepository.getCityHallById(id);
 
         if (!cityHall) {
             throw new ResponseError("City hall not found", 404);
+        }
+
+        if (userRole === "renter" && (!startDate || !endDate)) {
+            throw new ResponseError("Required query parameter: start_date and end_date for renter", 400);
+        }
+
+        if (startDate && endDate) {
+            if (startDate > endDate) {
+                throw new ResponseError("Start date must be before or equal to end date", 400);
+            }
+
+            const oneWeekFromNow: Date = new Date();
+            oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
+
+            if (startDate < oneWeekFromNow) {
+                throw new ResponseError("Start date must be at least 1 week from now", 400);
+            }
+
+            const rentedCityHalls: Rent[] = await this.rentRepository.getFilteredActiveRentsByCityHallPricingIds(
+                cityHall.cityHallPricing.map(pricing => pricing.id),
+                startDate,
+                endDate,
+            );
+
+            if (rentedCityHalls.length > 0) {
+                cityHall.status = "tidak_tersedia";
+            }
         }
 
         return cityHall;
