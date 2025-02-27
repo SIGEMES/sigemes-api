@@ -12,6 +12,7 @@ export class GuesthouseRoom {
         public type: RoomType = 'standard',
         public facilities: string = '',
         public totalSlot: number = 0,
+        public availableSlot: number = totalSlot,
         public areaM2: number = 0,
     
         public guesthouseRoomPricing: GuesthouseRoomPricing[] = [],

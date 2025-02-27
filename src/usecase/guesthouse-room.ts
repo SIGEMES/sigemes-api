@@ -54,14 +54,15 @@ export class GuesthouseRoomUsecase {
 
             // Proses pengurangan slot
             for (const room of guesthouseRooms) {
+                room.availableSlot = room.totalSlot;
                 for (const pricing of room.guesthouseRoomPricing) {
                     const rents = rentMap.get(pricing.id) || [];
 
                     for (const rent of rents) {
                         if (rent.renterGender === renterGender) {
-                            room.totalSlot -= rent.slot;
+                            room.availableSlot -= rent.slot;
                         } else {
-                            room.totalSlot = 0;
+                            room.availableSlot = 0;
                             break;
                         }
                     }
@@ -99,13 +100,14 @@ export class GuesthouseRoomUsecase {
             );
 
             // Proses pengurangan slot
+            guesthouseRoom.availableSlot = guesthouseRoom.totalSlot;
             for (const rentedRoom of rentedGuesthouseRooms) {
                 if (rentedRoom.renterGender !== renterGender) {
-                    guesthouseRoom.totalSlot = 0;
+                    guesthouseRoom.availableSlot = 0;
                     break;
                 }
 
-                guesthouseRoom.totalSlot -= rentedRoom.slot;
+                guesthouseRoom.availableSlot -= rentedRoom.slot;
             }
         }
 
