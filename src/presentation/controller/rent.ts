@@ -39,9 +39,9 @@ export class RentController {
             const validatedData: CreateRentRequest = RentValidation.create.parse(req.body);
             const rentEntity = CreateRentRequest.toEntity(validatedData);
             rentEntity.renterId = res.locals.user.id;
-            const rentPlan: Rent = await this.rentUsecase.createRent(rentEntity);
-            const rentPlanResponse: GetRentResponse = GetRentResponse.fromEntity(rentPlan);
-            res.status(201).json(new BaseSuccessResponse(true, "Create rent plan success", rentPlanResponse));
+            const rent: Rent = await this.rentUsecase.createRent(rentEntity);
+            const rentResponse: GetRentResponse = GetRentResponse.fromEntity(rent);
+            res.status(201).json(new BaseSuccessResponse(true, "Create rent plan success", rentResponse));
         } catch (error) {
             next(error);
         }

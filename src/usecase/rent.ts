@@ -6,6 +6,7 @@ import { RentRepositoryInterface } from "../domain/interface/repository/rent";
 import { GuesthouseRoomRepositoryInterface } from "../domain/interface/repository/guesthouse-room";
 import { CityHallRepositoryInterface } from "../domain/interface/repository/city-hall";
 import { DbTransactionInterface } from "../domain/interface/repository/db-transaction";
+import { PaymentGatewayInterface } from "../domain/interface/external-service/payment-gateway";
 import { CityHall } from "../domain/entity/city-hall";
 import { CityHallPricing } from "../domain/entity/city-hall-pricing";
 
@@ -15,6 +16,7 @@ export class RentUsecase {
         private guesthouseRoomRepository: GuesthouseRoomRepositoryInterface,
         private cityHallRepository: CityHallRepositoryInterface,
         private dbTransaction: DbTransactionInterface,
+        private paymentGatewayService: PaymentGatewayInterface
     ) {}
 
     public async getAllRents(userId: number, userRole: string): Promise<Rent[]> {
@@ -43,6 +45,7 @@ export class RentUsecase {
         // Using transaction to ensure data consistency
         return await this.dbTransaction.run(async (tx) => {
             let createdRent: Rent;
+            let totalPrice: number = 0;
 
             if (rent.guesthouseRoomPricingId && rent.cityHallPricingId) {
                 throw new ResponseError("Please choose one of guesthouse room pricing or city hall pricing", 400);
@@ -83,7 +86,11 @@ export class RentUsecase {
                 }
 
                 createdRent = await this.rentRepository.createRent(rent, tx);
-                return createdRent;
+                const daysRent: number = ((rent.endDate.getTime() - rent.startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+                totalPrice = guesthouseRoomPricing.pricePerDay * daysRent;
+                if (guesthouseRoomPricing.retributionType !== "Khusus Booking 1 Kamar") {
+                    totalPrice *= rent.slot;
+                }
 
             } else if (rent.cityHallPricingId) {
                 const oneWeekFromNow: Date = new Date();
@@ -114,10 +121,18 @@ export class RentUsecase {
                 }
 
                 createdRent = await this.rentRepository.createRent(rent);
+                const daysRent: number = ((rent.endDate.getTime() - rent.startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+                totalPrice = cityHallPricing.pricePerDay * daysRent;
 
             } else {
                 throw new ResponseError("Bad request", 400);
             }
+
+            if (totalPrice <= 0) {
+                throw new ResponseError("Unexpected error", 500);
+            }
+
+            // const token: string = await this.paymentGatewayService.createTransaction(createdRent.id, totalPrice);
 
             return createdRent;
         });
