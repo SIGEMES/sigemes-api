@@ -24,6 +24,10 @@ import { RentRepository } from "./infrastructure/repository/rent";
 import { RentUsecase } from "./usecase/rent";
 import { RentController } from "./presentation/controller/rent";
 
+import { PaymentRepository } from "./infrastructure/repository/payment";
+import { PaymentUsecase } from "./usecase/payment";
+import { PaymentController } from "./presentation/controller/payment";
+
 import { JwtService } from "./infrastructure/authentication/jwt";
 import { BcryptService } from "./infrastructure/authentication/bcrypt";
 import { MailerService } from "./infrastructure/mailer/mailer";
@@ -62,6 +66,7 @@ export async function main(): Promise<void> {
     const guesthouseRepository: GuesthouseRepositoryInterface = new GuesthouseRepository(prisma);
     const guesthouseRoomRepository: GuesthouseRoomRepositoryInterface = new GuesthouseRoomRepository(prisma);
     const rentRepository: RentRepositoryInterface = new RentRepository(prisma);
+    const paymentRepository: PaymentRepository = new PaymentRepository(prisma);
     
     // Usecase Instance
     const renterUsecase: RenterUsecase = new RenterUsecase(renterRepository, jwtService, bcryptService, mailerService, objectStorageService);
@@ -69,7 +74,8 @@ export async function main(): Promise<void> {
     const cityHallUsecase: CityHallUsecase = new CityHallUsecase(cityHallRepository, rentRepository, objectStorageService, dbTransaction);
     const guesthouseUsecase: GuesthouseUsecase = new GuesthouseUsecase(guesthouseRepository, objectStorageService, dbTransaction);
     const guesthouseRoomUsecase: GuesthouseRoomUsecase = new GuesthouseRoomUsecase(guesthouseRoomRepository, rentRepository, objectStorageService, dbTransaction);
-    const rentUsecase: RentUsecase = new RentUsecase(rentRepository, guesthouseRoomRepository, cityHallRepository, dbTransaction, paymentGatewayService);
+    const rentUsecase: RentUsecase = new RentUsecase(rentRepository, guesthouseRoomRepository, cityHallRepository, paymentRepository, dbTransaction, paymentGatewayService);
+    const paymentUsecase: PaymentUsecase = new PaymentUsecase(paymentRepository, rentRepository, dbTransaction);
     
     // Controller Instance
     const renterController: RenterController = new RenterController(renterUsecase);
@@ -78,6 +84,7 @@ export async function main(): Promise<void> {
     const guesthouseRoomController: GuesthouseRoomController = new GuesthouseRoomController(guesthouseRoomUsecase);
     const guesthouseController: GuesthouseController = new GuesthouseController(guesthouseUsecase);
     const rentController: RentController = new RentController(rentUsecase);
+    const paymentController: PaymentController = new PaymentController(paymentUsecase);
 
     const router: APIRouter = new APIRouter(
         renterController,
@@ -86,6 +93,7 @@ export async function main(): Promise<void> {
         guesthouseController,
         guesthouseRoomController,
         rentController,
+        paymentController,
     );
 
     const webServer: WebServer = new WebServer(

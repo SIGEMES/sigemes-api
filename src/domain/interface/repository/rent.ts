@@ -1,4 +1,4 @@
-import { Rent } from "../../entity/rent";
+import { Rent, RentStatus } from "../../entity/rent";
 
 export interface RentRepositoryInterface {
     getAllRents(): Promise<Rent[]>;
@@ -7,7 +7,7 @@ export interface RentRepositoryInterface {
     getFilteredActiveRentsByGuesthouseRoomPricingIds(guesthouseRoomPricingIds: number[], startDate: Date, endDate: Date): Promise<Rent[]>;
     getFilteredActiveRentsByCityHallPricingIds(cityHallPricingIds: number[], startDate: Date, endDate: Date): Promise<Rent[]>;
     createRent(rent: Rent, transaction?: any): Promise<Rent>;
-    updateRentStatus(rentId: number, rentStatus: string, transaction?: any): Promise<Rent>;
+    updateRentStatus(rentId: number, rentStatus: RentStatus, transaction?: any): Promise<Rent>;
     updateRentCheckIn(rentId: number, transaction?: any): Promise<Rent>;
     updateRentCheckOut(rentId: number, transaction?: any): Promise<Rent>;
 }

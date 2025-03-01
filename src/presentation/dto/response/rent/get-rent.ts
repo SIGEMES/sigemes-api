@@ -1,6 +1,8 @@
 import { Rent } from "../../../../domain/entity/rent";
 import { GetCityHallPricingResponse } from "./get-cityhall-pricing";
 import { GetGuesthouseRoomPricingResponse } from "./get-guesthouse-room-pricing";
+import { GetPaymentResponse } from "./get-payment";
+import { GetRenterResponse } from "./get-renter";
 
 export class GetRentResponse {
     constructor(
@@ -15,6 +17,8 @@ export class GetRentResponse {
         public rent_status: string,
         public city_hall_pricing: GetCityHallPricingResponse | null,
         public guesthouse_room_pricing: GetGuesthouseRoomPricingResponse | null,
+        public payment: GetPaymentResponse | null,
+        public renter: GetRenterResponse | null,
         public created_at: Date,
         public updated_at: Date,
     ) {}
@@ -32,8 +36,16 @@ export class GetRentResponse {
             rent.status,
             GetCityHallPricingResponse.fromEntity(rent.cityHallPricing),
             GetGuesthouseRoomPricingResponse.fromEntity(rent.guesthouseRoomPricing),
+            GetPaymentResponse.fromEntity(rent.payment),
+            GetRenterResponse.fromEntity(rent.renter),
             rent.createdAt,
             rent.updatedAt
+        );
+    }
+
+    public toJSON() {
+        return Object.fromEntries(
+            Object.entries(this).filter(([_, v]) => v !== null)
         );
     }
 }
