@@ -10,6 +10,7 @@ import { CityHallController } from '../controller/city-hall';
 import { GuesthouseController } from '../controller/guesthouse';
 import { GuesthouseRoomController } from '../controller/guesthouse-room';
 import { RentController } from '../controller/rent';
+import { PaymentController } from '../controller/payment';
 
 export class APIRouter {
     public multerUpload: multer.Multer;
@@ -18,6 +19,7 @@ export class APIRouter {
     public cityHallRouter: express.Router;
     public guesthouseRouter: express.Router;
     public rentRouter: express.Router;
+    public paymentRouter: express.Router;
 
     constructor(
         private renterController: RenterController,
@@ -26,6 +28,7 @@ export class APIRouter {
         private guesthouseController: GuesthouseController,
         private guesthouseRoomController: GuesthouseRoomController,
         private rentController: RentController,
+        private paymentController: PaymentController
     ) {
         this.multerUpload = multer({
             storage: multer.memoryStorage(),
@@ -39,12 +42,14 @@ export class APIRouter {
         this.cityHallRouter = express.Router();
         this.guesthouseRouter = express.Router();
         this.rentRouter = express.Router();
+        this.paymentRouter = express.Router();
 
         this.configRentersRoutes();
         this.configAdminRoutes();
         this.configCityHallRoutes();
         this.configGuesthouseRoutes();
         this.configRentRoutes()
+        this.configPaymentRoutes();
     }
 
     private configRentersRoutes(): void {
@@ -108,5 +113,9 @@ export class APIRouter {
         this.rentRouter.use(isAdminMiddleware);
         this.rentRouter.put("/:id/check-in", this.rentController.checkInRent.bind(this.rentController));
         this.rentRouter.put("/:id/check-out", this.rentController.checkOutRent.bind(this.rentController));
+    }
+
+    private configPaymentRoutes(): void {
+        this.paymentRouter.post("/handle-notification", this.paymentController.handlePaymentNotification.bind(this.paymentController));
     }
 }

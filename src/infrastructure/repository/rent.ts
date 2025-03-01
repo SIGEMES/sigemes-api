@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { RentRepositoryInterface } from "../../domain/interface/repository/rent";
-import { Rent } from "../../domain/entity/rent";
+import { Rent, RentStatus } from "../../domain/entity/rent";
 
 export class RentRepository implements RentRepositoryInterface {
     constructor(private prisma: PrismaClient) { }
@@ -101,6 +101,8 @@ export class RentRepository implements RentRepositoryInterface {
                         },
                     },
                 },
+                payment: true,
+                renter: true,
             },
         }) as Rent;
 
@@ -206,13 +208,14 @@ export class RentRepository implements RentRepositoryInterface {
                         },
                     },
                 },
+                renter: true,
             },
         }) as Rent;
 
         return createdRent;
     }
 
-    public async updateRentStatus(rentId: number, rentStatus: string, transaction?: any): Promise<Rent> {
+    public async updateRentStatus(rentId: number, rentStatus: RentStatus, transaction?: any): Promise<Rent> {
         const prisma = transaction || this.prisma;
 
         const updatedRent: Rent = await prisma.rent.update({
@@ -220,7 +223,7 @@ export class RentRepository implements RentRepositoryInterface {
                 id: rentId,
             },
             data: {
-                rentStatus: rentStatus,
+                status: rentStatus,
             },
             include: {
                 guesthouseRoomPricing: {

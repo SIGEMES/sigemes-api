@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  bigint   = "number"
 }
 
 datasource db {
@@ -19,20 +20,19 @@ enum Gender {
 }
 
 model Renter {
-  id                     Int        @id @default(autoincrement())
-  email                  String     @unique @db.VarChar(320)
-  password               String     @db.VarChar(255)
-  fullname               String     @db.VarChar(100)
-  phoneNumber            String     @map("phone_number") @db.VarChar(15)
+  id                     Int       @id @default(autoincrement())
+  email                  String    @unique @db.VarChar(320)
+  password               String    @db.VarChar(255)
+  fullname               String    @db.VarChar(100)
+  phoneNumber            String    @map("phone_number") @db.VarChar(15)
   gender                 Gender
-  profilePicture         String     @default("https://storage.googleapis.com/sigemes-storage/profile-pictures/default-picture.png") @map("profile_picture")
-  emailVerified          Boolean    @default(false) @map("email_verified")
-  otp                    String?    @db.VarChar(5)
-  otpExpiry              DateTime?  @map("otp_expiry")
-  forgotPasswordVerified Boolean    @default(false) @map("forgot_password_verified")
-  createdAt              DateTime   @default(now())
-  updatedAt              DateTime   @updatedAt
-  rentPlan               RentPlan[]
+  profilePicture         String    @default("https://storage.googleapis.com/sigemes-storage/profile-pictures/default-picture.png") @map("profile_picture")
+  emailVerified          Boolean   @default(false) @map("email_verified")
+  otp                    String?   @db.VarChar(5)
+  otpExpiry              DateTime? @map("otp_expiry")
+  forgotPasswordVerified Boolean   @default(false) @map("forgot_password_verified")
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
   Rent                   Rent[]
 
   @@map("renters")
@@ -84,14 +84,13 @@ model CityHallMedia {
 }
 
 model CityHallPricing {
-  id           Int        @id @default(autoincrement())
-  cityHall     CityHall   @relation(fields: [cityHallId], references: [id], onDelete: Cascade)
-  cityHallId   Int        @map("city_hall_id")
-  activityType String     @map("activity_type") @db.VarChar(50)
-  facilities   String     @db.Text
-  pricePerDay  Float      @map("price_per_day") @db.DoublePrecision
-  isActive     Boolean    @default(true) @map("is_active")
-  RentPlan     RentPlan[]
+  id           Int      @id @default(autoincrement())
+  cityHall     CityHall @relation(fields: [cityHallId], references: [id], onDelete: Cascade)
+  cityHallId   Int      @map("city_hall_id")
+  activityType String   @map("activity_type") @db.VarChar(50)
+  facilities   String   @db.Text
+  pricePerDay  Float    @map("price_per_day") @db.DoublePrecision
+  isActive     Boolean  @default(true) @map("is_active")
   Rent         Rent[]
 
   @@map("city_hall_pricing")
@@ -158,28 +157,9 @@ model GuesthouseRoomPricing {
   retributionType  String         @map("retribution_type") @db.VarChar(100)
   pricePerDay      Float          @map("price_per_day") @db.DoublePrecision
   isActive         Boolean        @default(true) @map("is_active")
-  RentPlan         RentPlan[]
   Rent             Rent[]
 
   @@map("guesthouse_room_pricing")
-}
-
-model RentPlan {
-  id                      Int                    @id @default(autoincrement())
-  renterId                Int                    @map("renter_id")
-  guesthouseRoomPricingId Int?                   @map("guesthouse_room_pricing_id")
-  cityHallPricingId       Int?                   @map("city_hall_pricing_id")
-  slot                    Int                    @default(1)
-  startDate               DateTime               @map("start_date")
-  endDate                 DateTime               @map("end_date")
-  renterGender            Gender                 @map("renter_gender")
-  createdAt               DateTime               @default(now())
-  updatedAt               DateTime               @updatedAt
-  renter                  Renter                 @relation(fields: [renterId], references: [id])
-  guesthouseRoomPricing   GuesthouseRoomPricing? @relation(fields: [guesthouseRoomPricingId], references: [id])
-  cityHallPricing         CityHallPricing?       @relation(fields: [cityHallPricingId], references: [id])
-
-  @@map("rent_plans")
 }
 
 enum RentStatus {
@@ -206,6 +186,27 @@ model Rent {
   renter                  Renter                 @relation(fields: [renterId], references: [id])
   guesthouseRoomPricing   GuesthouseRoomPricing? @relation(fields: [guesthouseRoomPricingId], references: [id])
   cityHallPricing         CityHallPricing?       @relation(fields: [cityHallPricingId], references: [id])
+  payment                 Payment?
 
   @@map("rents")
+}
+
+enum PaymentStatus {
+  pending
+  dibayar
+  gagal
+}
+
+model Payment {
+  id                  String        @id @default(uuid()) @db.Uuid
+  rentId              Int           @map("rent_id") @unique
+  amount              Int           
+  method              String?       @db.VarChar(50)
+  status              PaymentStatus @default(pending)
+  paymentGatewayToken String?       @map("payment_gateway_token") @db.VarChar(255)
+  paymentTriggeredAt  DateTime?     @map("payment_triggered_at")
+  paymentConfirmedAt  DateTime?     @map("payment_confirmed_at")
+  Rent                Rent          @relation(fields: [rentId], references: [id])
+
+  @@map("payments")
 }

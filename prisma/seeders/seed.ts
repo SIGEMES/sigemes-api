@@ -9,8 +9,8 @@ import { seedGuesthouseMedia } from './guesthouse-media-seeder'
 import { seedGuesthouseRooms } from './guesthouse-room-seeder'
 import { seedGuesthouseRoomMedia } from './guesthouse-room-media-seeder'
 import { seedGuesthouseRoomPricing } from './guesthouse-room-pricing-seeder'
-import { seedRentPlans } from './rent-plan-seeder'
 import { seedRents } from './rent-seeder'
+import { seedPayments } from './payment-seeder'
 
 const prisma: PrismaClient = new PrismaClient()
 
@@ -25,8 +25,8 @@ async function main() {
     await seedGuesthouseRooms()
     await seedGuesthouseRoomMedia()
     await seedGuesthouseRoomPricing()
-    await seedRentPlans()
     await seedRents()
+    await seedPayments()
 }
 
 main()

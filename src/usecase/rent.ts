@@ -6,15 +6,20 @@ import { RentRepositoryInterface } from "../domain/interface/repository/rent";
 import { GuesthouseRoomRepositoryInterface } from "../domain/interface/repository/guesthouse-room";
 import { CityHallRepositoryInterface } from "../domain/interface/repository/city-hall";
 import { DbTransactionInterface } from "../domain/interface/repository/db-transaction";
+import { PaymentGatewayInterface } from "../domain/interface/external-service/payment-gateway";
 import { CityHall } from "../domain/entity/city-hall";
 import { CityHallPricing } from "../domain/entity/city-hall-pricing";
+import { PaymentRepositoryInterface } from "../domain/interface/repository/payment";
+import { Payment } from "../domain/entity/payment";
 
 export class RentUsecase {
     constructor(
         private rentRepository: RentRepositoryInterface,
         private guesthouseRoomRepository: GuesthouseRoomRepositoryInterface,
         private cityHallRepository: CityHallRepositoryInterface,
+        private paymentRepository: PaymentRepositoryInterface,
         private dbTransaction: DbTransactionInterface,
+        private paymentGatewayService: PaymentGatewayInterface
     ) {}
 
     public async getAllRents(userId: number, userRole: string): Promise<Rent[]> {
@@ -43,6 +48,10 @@ export class RentUsecase {
         // Using transaction to ensure data consistency
         return await this.dbTransaction.run(async (tx) => {
             let createdRent: Rent;
+            let totalPrice: number = 0;
+            let itemName: string = "";
+            let itemType: string = "";
+            let itemCategory: string = "";
 
             if (rent.guesthouseRoomPricingId && rent.cityHallPricingId) {
                 throw new ResponseError("Please choose one of guesthouse room pricing or city hall pricing", 400);
@@ -83,8 +92,16 @@ export class RentUsecase {
                 }
 
                 createdRent = await this.rentRepository.createRent(rent, tx);
-                return createdRent;
+                const daysRent: number = ((rent.endDate.getTime() - rent.startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+                totalPrice = guesthouseRoomPricing.pricePerDay * daysRent;
+                if (guesthouseRoomPricing.retributionType !== "Khusus Booking 1 Kamar") {
+                    totalPrice *= rent.slot;
+                }
 
+                itemName = guesthouseRoomPricing.guesthouseRoom.name;
+                itemType = "Kamar Mess";
+                itemCategory = guesthouseRoomPricing.retributionType;
+                
             } else if (rent.cityHallPricingId) {
                 const oneWeekFromNow: Date = new Date();
                 oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
@@ -114,10 +131,46 @@ export class RentUsecase {
                 }
 
                 createdRent = await this.rentRepository.createRent(rent);
+                const daysRent: number = ((rent.endDate.getTime() - rent.startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+                totalPrice = cityHallPricing.pricePerDay * daysRent;
 
+                itemName = cityHall.name;
+                itemType = "Gedung Nasional";
+                itemCategory = cityHallPricing.activityType;
             } else {
                 throw new ResponseError("Bad request", 400);
             }
+
+            if (totalPrice <= 0) {
+                throw new ResponseError("Unexpected error", 500);
+            }
+
+            const createdPayment: Payment = await this.paymentRepository.createPayment({
+                id:"",
+                rentId: createdRent.id,
+                amount: totalPrice,
+                method: null,
+                status: "pending",
+                paymentGatewayToken: null,
+                paymentTriggeredAt: null,
+                paymentConfirmedAt: null,
+            }, tx);
+
+            if (!createdRent.renter) {
+                throw new ResponseError("Renter not found", 404);
+            }
+
+            const renterEmail: string = createdRent.renter.email;
+            const renterName: string = createdRent.renter.fullname;
+            const renterPhone: string = createdRent.renter.phoneNumber;
+            const token: string = await this.paymentGatewayService.createTransaction(createdPayment.id, renterName, renterEmail, renterPhone, itemName, itemType, itemCategory, totalPrice);
+
+            if (!token) {
+                throw new ResponseError("Failed to create transaction", 500);
+            }
+
+            createdPayment.paymentGatewayToken = token;
+            createdRent.payment = createdPayment;
 
             return createdRent;
         });
