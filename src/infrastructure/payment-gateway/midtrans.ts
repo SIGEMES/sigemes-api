@@ -17,6 +17,9 @@ export class MidtransService implements PaymentGatewayInterface {
         item_brand: string,
         item_category: string,
         grossAmount: number,
+        actualAmount: number,
+        tax: number,
+        transactionFee: number,
     ): Promise<string> {
         const response = await snap.createTransaction({
             transaction_details: {
@@ -30,11 +33,21 @@ export class MidtransService implements PaymentGatewayInterface {
             },
             item_details: [
                 {
-                    price: grossAmount,
+                    price: actualAmount,
                     quantity: 1,
                     name: item_name,
                     brand: item_brand,
                     category: item_category
+                },
+                {
+                    price: tax,
+                    quantity: 1,
+                    name: 'PPN 11%',
+                },
+                {
+                    price: transactionFee,
+                    quantity: 1,
+                    name: 'Biaya Layanan',
                 }
             ]
         });
