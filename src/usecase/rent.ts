@@ -161,8 +161,7 @@ export class RentUsecase {
             const renterEmail: string = createdRent.renter.email;
             const renterName: string = createdRent.renter.fullname;
             const renterPhone: string = createdRent.renter.phoneNumber;
-            // const token: string = await this.paymentGatewayService.createTransaction(createdPayment.id, renterName, renterEmail, renterPhone, itemName, itemType, itemCategory, totalPrice, actualTotalPrice, tax, paymentGatewayTransactionFee);
-            const token: string = "dummy-token";
+            const token: string = await this.paymentGatewayService.createTransaction(createdPayment.id, renterName, renterEmail, renterPhone, itemName, itemType, itemCategory, totalPrice, actualTotalPrice, tax, paymentGatewayTransactionFee);
             if (!token) {
                 throw new ResponseError("Failed to create transaction", 500);
             }
