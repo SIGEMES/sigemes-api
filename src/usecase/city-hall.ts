@@ -30,13 +30,6 @@ export class CityHallUsecase {
                 throw new ResponseError("Start date must be before or equal to end date", 400);
             }
 
-            const oneWeekFromNow: Date = new Date();
-            oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
-
-            if (startDate < oneWeekFromNow) {
-                throw new ResponseError("Start date must be at least 1 week from now", 400);
-            }
-
             const cityHallPricingIds: number[] = cityHalls.flatMap(cityHall =>
                 cityHall.cityHallPricing.map(cityHallPricing => cityHallPricing.id)
             )
@@ -82,13 +75,6 @@ export class CityHallUsecase {
         if (startDate && endDate) {
             if (startDate > endDate) {
                 throw new ResponseError("Start date must be before or equal to end date", 400);
-            }
-
-            const oneWeekFromNow: Date = new Date();
-            oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
-
-            if (startDate < oneWeekFromNow) {
-                throw new ResponseError("Start date must be at least 1 week from now", 400);
             }
 
             const rentedCityHalls: Rent[] = await this.rentRepository.getFilteredActiveRentsByCityHallPricingIds(

@@ -40,15 +40,15 @@ export class MidtransService implements PaymentGatewayInterface {
                     category: item_category
                 },
                 {
+                    price: transactionFee,
+                    quantity: 1,
+                    name: 'Biaya Layanan',
+                },
+                {
                     price: tax,
                     quantity: 1,
                     name: 'PPN 11%',
                 },
-                {
-                    price: transactionFee,
-                    quantity: 1,
-                    name: 'Biaya Layanan',
-                }
             ]
         });
 
