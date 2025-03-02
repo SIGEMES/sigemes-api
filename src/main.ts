@@ -30,6 +30,7 @@ import { PaymentController } from "./presentation/controller/payment";
 
 import { JwtService } from "./infrastructure/authentication/jwt";
 import { BcryptService } from "./infrastructure/authentication/bcrypt";
+import { CryptoService } from "./infrastructure/authentication/crypto";
 import { MailerService } from "./infrastructure/mailer/mailer";
 import { CloudStorageService } from "./infrastructure/object-storage/cloud-storage";
 import { MidtransService } from "./infrastructure/payment-gateway/midtrans";
@@ -37,6 +38,7 @@ import { DbTransaction } from "./infrastructure/repository/db-transaction";
 
 import { JwtInterface } from "./domain/interface/library/jwt";
 import { BcryptInterface } from "./domain/interface/library/bcrypt";
+import { CryptoInterface } from "./domain/interface/library/crypto";
 import { RenterRepositoryInterface } from "./domain/interface/repository/renter";
 import { AdminRepositoryInterface } from "./domain/interface/repository/admin";
 import { CityHallRepositoryInterface } from "./domain/interface/repository/city-hall";
@@ -54,6 +56,7 @@ export async function main(): Promise<void> {
     // Third Party Library or External Service Instance
     const jwtService: JwtInterface = new JwtService();
     const bcryptService: BcryptInterface = new BcryptService();
+    const cryptoService: CryptoInterface = new CryptoService();
     const mailerService: MailerInterface = new MailerService();
     const objectStorageService: ObjectStorageInterface = new CloudStorageService();
     const paymentGatewayService: PaymentGatewayInterface = new MidtransService();
@@ -75,7 +78,7 @@ export async function main(): Promise<void> {
     const guesthouseUsecase: GuesthouseUsecase = new GuesthouseUsecase(guesthouseRepository, objectStorageService, dbTransaction);
     const guesthouseRoomUsecase: GuesthouseRoomUsecase = new GuesthouseRoomUsecase(guesthouseRoomRepository, rentRepository, objectStorageService, dbTransaction);
     const rentUsecase: RentUsecase = new RentUsecase(rentRepository, guesthouseRoomRepository, cityHallRepository, paymentRepository, dbTransaction, paymentGatewayService);
-    const paymentUsecase: PaymentUsecase = new PaymentUsecase(paymentRepository, rentRepository, dbTransaction);
+    const paymentUsecase: PaymentUsecase = new PaymentUsecase(paymentRepository, rentRepository, dbTransaction, paymentGatewayService, cryptoService);
     
     // Controller Instance
     const renterController: RenterController = new RenterController(renterUsecase);
