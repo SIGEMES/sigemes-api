@@ -110,6 +110,7 @@ export class APIRouter {
         this.rentRouter.get("/:id", this.rentController.getRentById.bind(this.rentController));
         this.rentRouter.post("", this.rentController.createRent.bind(this.rentController));
         this.rentRouter.put("/:id", this.rentController.cancelRent.bind(this.rentController));
+        this.rentRouter.put("/:id/renew-payment", this.paymentController.renewPaymentGatewayToken.bind(this.paymentController));
         this.rentRouter.use(isAdminMiddleware);
         this.rentRouter.put("/:id/check-in", this.rentController.checkInRent.bind(this.rentController));
         this.rentRouter.put("/:id/check-out", this.rentController.checkOutRent.bind(this.rentController));
@@ -117,5 +118,6 @@ export class APIRouter {
 
     private configPaymentRoutes(): void {
         this.paymentRouter.post("/handle-notification", this.paymentController.handlePaymentNotification.bind(this.paymentController));
+        this.paymentRouter.use(jwtMiddleware);
     }
 }

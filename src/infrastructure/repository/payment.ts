@@ -1,11 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import { Payment, PaymentStatus } from "../../domain/entity/payment";
 import { PaymentRepositoryInterface } from "../../domain/interface/repository/payment";
+import { randomUUID } from "crypto";
 
 export class PaymentRepository implements PaymentRepositoryInterface {
     constructor(private prisma: PrismaClient) {}
 
-    public async findPaymentById(paymentId: string): Promise<Payment | null> {
+    public async getPaymentById(paymentId: string): Promise<Payment | null> {
         const payment: Payment | null = await this.prisma.payment.findUnique({
             where: {
                 id: paymentId
@@ -31,6 +32,22 @@ export class PaymentRepository implements PaymentRepositoryInterface {
         });
 
         return createdPayment;
+    }
+
+    public async updatePaymentIdToken(oldId: string, newId: string, paymentGatewayToken: string, transaction?: any): Promise<Payment> {
+        const prisma = transaction || this.prisma;
+
+        const updatedPayment: Payment = await prisma.payment.update({
+            where: {
+                id: oldId
+            },
+            data: {
+                id: newId,
+                paymentGatewayToken: paymentGatewayToken
+            }
+        });
+
+        return updatedPayment;
     }
 
     public async updatePaymentMethodStatusTriggeredAt(paymentId: string, method: string, status: PaymentStatus, paymentTriggeredAt: Date, transaction?: any): Promise<Payment> {
