@@ -20,7 +20,7 @@ export class RentUsecase {
         private paymentRepository: PaymentRepositoryInterface,
         private dbTransaction: DbTransactionInterface,
         private paymentGatewayService: PaymentGatewayInterface
-    ) {}
+    ) { }
 
     public async getAllRents(userId: number, userRole: string): Promise<Rent[]> {
         if (userRole === "renter") {
@@ -48,18 +48,18 @@ export class RentUsecase {
         // Using transaction to ensure data consistency
         return await this.dbTransaction.run(async (tx) => {
             let createdRent: Rent;
-            let totalPrice: number = 0;
+            let actualTotalPrice: number = 0;
             let itemName: string = "";
             let itemType: string = "";
             let itemCategory: string = "";
 
             if (rent.guesthouseRoomPricingId && rent.cityHallPricingId) {
                 throw new ResponseError("Please choose one of guesthouse room pricing or city hall pricing", 400);
-            } else if (rent.guesthouseRoomPricingId) {
+            } else if (rent.guesthouseRoomPricingId && rent.guesthouseRoomPricingId > 0) {
                 if (rent.startDate > rent.endDate) {
                     throw new ResponseError("Start date must be before or equal to end date", 400);
                 }
-                
+
                 const guesthouseRoomPricing: GuesthouseRoomPricing | null = await this.guesthouseRoomRepository.getGuesthouseRoomPricingById(rent.guesthouseRoomPricingId);
                 if (!guesthouseRoomPricing) {
                     throw new ResponseError("Guesthouse room pricing not found", 404);
@@ -80,7 +80,7 @@ export class RentUsecase {
 
                 let bookedSlot = 0;
                 for (const rentedRoom of rentedGuesthouseRooms) {
-                    if (rentedRoom.renterGender === rent.renterGender) {
+                    if (rentedRoom.renterGender !== rent.renterGender) {
                         throw new ResponseError("Room is rented by different gender", 400);
                     }
                     bookedSlot += rentedRoom.slot;
@@ -93,25 +93,19 @@ export class RentUsecase {
 
                 createdRent = await this.rentRepository.createRent(rent, tx);
                 const daysRent: number = ((rent.endDate.getTime() - rent.startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-                totalPrice = guesthouseRoomPricing.pricePerDay * daysRent;
+                actualTotalPrice = guesthouseRoomPricing.pricePerDay * daysRent;
                 if (guesthouseRoomPricing.retributionType !== "Khusus Booking 1 Kamar") {
-                    totalPrice *= rent.slot;
+                    actualTotalPrice *= rent.slot;
                 }
 
-                itemName = guesthouseRoomPricing.guesthouseRoom.name;
+                itemName = guesthouseRoom.name;
                 itemType = "Kamar Mess";
                 itemCategory = guesthouseRoomPricing.retributionType;
-                
-            } else if (rent.cityHallPricingId) {
-                const oneWeekFromNow: Date = new Date();
-                oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
 
+            } else if (rent.cityHallPricingId && rent.cityHallPricingId > 0) {
+                
                 if (rent.startDate > rent.endDate) {
                     throw new ResponseError("Start date must be before or equal to end date", 400);
-                }
-
-                if (rent.startDate < oneWeekFromNow) {
-                    throw new ResponseError("Start date must be at least 1 week from now", 400);
                 }
 
                 const cityHallPricing: CityHallPricing | null = await this.cityHallRepository.getCityHallPricingById(rent.cityHallPricingId);
@@ -130,9 +124,9 @@ export class RentUsecase {
                     throw new ResponseError("City hall is not available", 400);
                 }
 
-                createdRent = await this.rentRepository.createRent(rent);
+                createdRent = await this.rentRepository.createRent(rent,tx);
                 const daysRent: number = ((rent.endDate.getTime() - rent.startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-                totalPrice = cityHallPricing.pricePerDay * daysRent;
+                actualTotalPrice = cityHallPricing.pricePerDay * daysRent;
 
                 itemName = cityHall.name;
                 itemType = "Gedung Nasional";
@@ -141,12 +135,16 @@ export class RentUsecase {
                 throw new ResponseError("Bad request", 400);
             }
 
-            if (totalPrice <= 0) {
+            if (actualTotalPrice <= 0) {
                 throw new ResponseError("Unexpected error", 500);
             }
 
+            const paymentGatewayTransactionFee: number = 5000;
+            const tax: number = 0.11 * paymentGatewayTransactionFee;
+            const totalPrice: number = Math.ceil(actualTotalPrice + tax + paymentGatewayTransactionFee);
+
             const createdPayment: Payment = await this.paymentRepository.createPayment({
-                id:"",
+                id: "",
                 rentId: createdRent.id,
                 amount: totalPrice,
                 method: null,
@@ -163,8 +161,8 @@ export class RentUsecase {
             const renterEmail: string = createdRent.renter.email;
             const renterName: string = createdRent.renter.fullname;
             const renterPhone: string = createdRent.renter.phoneNumber;
-            const token: string = await this.paymentGatewayService.createTransaction(createdPayment.id, renterName, renterEmail, renterPhone, itemName, itemType, itemCategory, totalPrice);
-
+            // const token: string = await this.paymentGatewayService.createTransaction(createdPayment.id, renterName, renterEmail, renterPhone, itemName, itemType, itemCategory, totalPrice, actualTotalPrice, tax, paymentGatewayTransactionFee);
+            const token: string = "dummy-token";
             if (!token) {
                 throw new ResponseError("Failed to create transaction", 500);
             }
@@ -183,7 +181,7 @@ export class RentUsecase {
             throw new ResponseError("Rent not found", 404);
         }
 
-        if  (userRole === "renter") {
+        if (userRole === "renter") {
             if (rent.renterId !== userId) {
                 throw new ResponseError("You are not authorized to cancel this rent", 403);
             }
