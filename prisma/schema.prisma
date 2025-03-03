@@ -39,15 +39,16 @@ model Renter {
 }
 
 model Admin {
-  id             Int      @id @default(autoincrement())
-  email          String   @unique @db.VarChar(320)
-  password       String   @db.VarChar(255)
-  fullname       String   @db.VarChar(100)
-  phoneNumber    String   @map("telephone_number") @db.VarChar(15)
-  isSuperAdmin   Boolean  @default(false) @map("is_super_admin")
-  profilePicture String   @default("https://storage.googleapis.com/sigemes-storage/profile-pictures/default-picture.png") @map("profile_picture")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id             Int           @id @default(autoincrement())
+  email          String        @unique @db.VarChar(320)
+  password       String        @db.VarChar(255)
+  fullname       String        @db.VarChar(100)
+  phoneNumber    String        @map("telephone_number") @db.VarChar(15)
+  isSuperAdmin   Boolean       @default(false) @map("is_super_admin")
+  profilePicture String        @default("https://storage.googleapis.com/sigemes-storage/profile-pictures/default-picture.png") @map("profile_picture")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  ReviewReply    ReviewReply[]
 
   @@map("admins")
 }
@@ -181,12 +182,13 @@ model Rent {
   checkIn                 DateTime?              @map("check_in")
   checkOut                DateTime?              @map("check_out")
   status                  RentStatus             @default(pending) @map("status")
-  createdAt               DateTime               @default(now())
-  updatedAt               DateTime               @updatedAt
+  createdAt               DateTime               @default(now()) @map("created_at")
+  updatedAt               DateTime               @updatedAt @map("updated_at")
   renter                  Renter                 @relation(fields: [renterId], references: [id])
   guesthouseRoomPricing   GuesthouseRoomPricing? @relation(fields: [guesthouseRoomPricingId], references: [id])
   cityHallPricing         CityHallPricing?       @relation(fields: [cityHallPricingId], references: [id])
   payment                 Payment?
+  Review                  Review[]
 
   @@map("rents")
 }
@@ -199,8 +201,8 @@ enum PaymentStatus {
 
 model Payment {
   id                  String        @id @default(uuid()) @db.Uuid
-  rentId              Int           @map("rent_id") @unique
-  amount              Int           
+  rentId              Int           @unique @map("rent_id")
+  amount              Int
   method              String?       @db.VarChar(50)
   status              PaymentStatus @default(pending)
   paymentGatewayToken String?       @map("payment_gateway_token") @db.VarChar(255)
@@ -209,4 +211,40 @@ model Payment {
   Rent                Rent          @relation(fields: [rentId], references: [id])
 
   @@map("payments")
+}
+
+model Review {
+  id          Int           @id @default(autoincrement())
+  rentId      Int           @map("rent_id")
+  rating      Int
+  comment     String        @db.Text
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  Rent        Rent          @relation(fields: [rentId], references: [id])
+  ReviewMedia ReviewMedia[]
+  ReviewReply ReviewReply?
+
+  @@map("reviews")
+}
+
+model ReviewMedia {
+  id       Int    @id @default(autoincrement())
+  reviewId Int    @map("review_id")
+  url      String
+  review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@map("review_media")
+}
+
+model ReviewReply {
+  id        Int      @id @default(autoincrement())
+  reviewId  Int      @map("review_id") @unique
+  adminId   Int      @map("admin_id")
+  comment   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  Review    Review   @relation(fields: [reviewId], references: [id])
+  Admin     Admin    @relation(fields: [adminId], references: [id])
+
+  @@map("review_replies")
 }
