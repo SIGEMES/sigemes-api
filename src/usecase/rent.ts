@@ -11,6 +11,7 @@ import { CityHall } from "../domain/entity/city-hall";
 import { CityHallPricing } from "../domain/entity/city-hall-pricing";
 import { PaymentRepositoryInterface } from "../domain/interface/repository/payment";
 import { Payment } from "../domain/entity/payment";
+import { CryptoInterface } from "../domain/interface/library/crypto";
 
 export class RentUsecase {
     constructor(
@@ -19,7 +20,8 @@ export class RentUsecase {
         private cityHallRepository: CityHallRepositoryInterface,
         private paymentRepository: PaymentRepositoryInterface,
         private dbTransaction: DbTransactionInterface,
-        private paymentGatewayService: PaymentGatewayInterface
+        private paymentGatewayService: PaymentGatewayInterface,
+        private cryptoService: CryptoInterface,
     ) { }
 
     public async getAllRents(userId: number, userRole: string): Promise<Rent[]> {
@@ -103,7 +105,7 @@ export class RentUsecase {
                 itemCategory = guesthouseRoomPricing.retributionType;
 
             } else if (rent.cityHallPricingId && rent.cityHallPricingId > 0) {
-                
+
                 if (rent.startDate > rent.endDate) {
                     throw new ResponseError("Start date must be before or equal to end date", 400);
                 }
@@ -124,7 +126,7 @@ export class RentUsecase {
                     throw new ResponseError("City hall is not available", 400);
                 }
 
-                createdRent = await this.rentRepository.createRent(rent,tx);
+                createdRent = await this.rentRepository.createRent(rent, tx);
                 const daysRent: number = ((rent.endDate.getTime() - rent.startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
                 actualTotalPrice = cityHallPricing.pricePerDay * daysRent;
 
@@ -143,16 +145,6 @@ export class RentUsecase {
             const tax: number = 0.11 * paymentGatewayTransactionFee;
             const totalPrice: number = Math.ceil(actualTotalPrice + tax + paymentGatewayTransactionFee);
 
-            const createdPayment: Payment = await this.paymentRepository.createPayment({
-                id: "",
-                rentId: createdRent.id,
-                amount: totalPrice,
-                method: null,
-                status: "pending",
-                paymentGatewayToken: null,
-                paymentTriggeredAt: null,
-                paymentConfirmedAt: null,
-            }, tx);
 
             if (!createdRent.renter) {
                 throw new ResponseError("Renter not found", 404);
@@ -161,12 +153,24 @@ export class RentUsecase {
             const renterEmail: string = createdRent.renter.email;
             const renterName: string = createdRent.renter.fullname;
             const renterPhone: string = createdRent.renter.phoneNumber;
-            const token: string = await this.paymentGatewayService.createTransaction(createdPayment.id, renterName, renterEmail, renterPhone, itemName, itemType, itemCategory, totalPrice, actualTotalPrice, tax, paymentGatewayTransactionFee);
+
+            const newPaymentId: string = this.cryptoService.generateUUIDv4();
+            const token: string = await this.paymentGatewayService.createTransaction(newPaymentId, renterName, renterEmail, renterPhone, itemName, itemType, itemCategory, totalPrice, actualTotalPrice, tax, paymentGatewayTransactionFee);
             if (!token) {
                 throw new ResponseError("Failed to create transaction", 500);
             }
 
-            createdPayment.paymentGatewayToken = token;
+            const createdPayment: Payment = await this.paymentRepository.createPayment({
+                id: newPaymentId,
+                rentId: createdRent.id,
+                amount: totalPrice,
+                method: null,
+                status: "pending",
+                paymentGatewayToken: token,
+                paymentTriggeredAt: null,
+                paymentConfirmedAt: null,
+            }, tx);
+
             createdRent.payment = createdPayment;
 
             return createdRent;
