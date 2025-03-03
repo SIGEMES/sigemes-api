@@ -24,6 +24,7 @@ export class WebServer {
         this.app.use("/api/v1/guesthouses", this.APIRouter.guesthouseRouter);
         this.app.use("/api/v1/rents", this.APIRouter.rentRouter);
         this.app.use("/api/v1/payments", this.APIRouter.paymentRouter);
+        this.app.use("/api/v1/dashboard", this.APIRouter.dashboardRouter);
         this.app.use(errorMiddleware);
     }
 

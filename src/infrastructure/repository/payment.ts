@@ -97,4 +97,20 @@ export class PaymentRepository implements PaymentRepositoryInterface {
 
         return updatedPayment;
     }
+
+    public async getRevenue(startDate: Date, endDate: Date): Promise<number> {
+        const revenue = await this.prisma.payment.aggregate({
+            _sum: {
+                amount: true
+            },
+            where: {
+                paymentConfirmedAt: {
+                    gte: startDate,
+                    lt: endDate
+                }
+            }
+        });
+
+        return revenue._sum.amount || 0;
+    }
 }

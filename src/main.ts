@@ -28,6 +28,9 @@ import { PaymentRepository } from "./infrastructure/repository/payment";
 import { PaymentUsecase } from "./usecase/payment";
 import { PaymentController } from "./presentation/controller/payment";
 
+import { DashboardUsecase } from "./usecase/dashboard";
+import { DashboardController } from "./presentation/controller/dashboard";
+
 import { JwtService } from "./infrastructure/authentication/jwt";
 import { BcryptService } from "./infrastructure/authentication/bcrypt";
 import { CryptoService } from "./infrastructure/authentication/crypto";
@@ -79,6 +82,7 @@ export async function main(): Promise<void> {
     const guesthouseRoomUsecase: GuesthouseRoomUsecase = new GuesthouseRoomUsecase(guesthouseRoomRepository, rentRepository, objectStorageService, dbTransaction);
     const rentUsecase: RentUsecase = new RentUsecase(rentRepository, guesthouseRoomRepository, cityHallRepository, paymentRepository, dbTransaction, paymentGatewayService, cryptoService);
     const paymentUsecase: PaymentUsecase = new PaymentUsecase(paymentRepository, rentRepository, dbTransaction, paymentGatewayService, cryptoService);
+    const dashboardUsecase: DashboardUsecase = new DashboardUsecase(rentRepository, paymentRepository);
     
     // Controller Instance
     const renterController: RenterController = new RenterController(renterUsecase);
@@ -88,6 +92,7 @@ export async function main(): Promise<void> {
     const guesthouseController: GuesthouseController = new GuesthouseController(guesthouseUsecase);
     const rentController: RentController = new RentController(rentUsecase);
     const paymentController: PaymentController = new PaymentController(paymentUsecase);
+    const dashboardController: DashboardController = new DashboardController(dashboardUsecase);
 
     const router: APIRouter = new APIRouter(
         renterController,
@@ -97,6 +102,7 @@ export async function main(): Promise<void> {
         guesthouseRoomController,
         rentController,
         paymentController,
+        dashboardController,
     );
 
     const webServer: WebServer = new WebServer(
