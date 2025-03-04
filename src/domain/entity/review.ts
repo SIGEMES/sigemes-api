@@ -12,7 +12,7 @@ export class Review {
         public updatedAt: Date = new Date(),
 
         public reviewMedia: ReviewMedia[] = [],
-        public rent: Rent,
+        public rent: Rent | null = null,
         public reviewReply: ReviewReply | null = null,
     ) {}
 }

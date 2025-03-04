@@ -21,7 +21,6 @@ export class APIRouter {
     public guesthouseRouter: express.Router;
     public rentRouter: express.Router;
     public paymentRouter: express.Router;
-    public reviewRouter: express.Router;
 
     constructor(
         private renterController: RenterController,
@@ -46,7 +45,6 @@ export class APIRouter {
         this.guesthouseRouter = express.Router();
         this.rentRouter = express.Router();
         this.paymentRouter = express.Router();
-        this.reviewRouter = express.Router();
 
         this.configRentersRoutes();
         this.configAdminRoutes();
@@ -54,7 +52,6 @@ export class APIRouter {
         this.configGuesthouseRoutes();
         this.configRentRoutes()
         this.configPaymentRoutes();
-        this.configReviewRoutes();
     }
 
     private configRentersRoutes(): void {
@@ -118,6 +115,9 @@ export class APIRouter {
         this.rentRouter.post("", this.rentController.createRent.bind(this.rentController));
         this.rentRouter.put("/:id", this.rentController.cancelRent.bind(this.rentController));
         this.rentRouter.put("/:id/renew-payment", this.paymentController.renewPaymentGatewayToken.bind(this.paymentController));
+        this.rentRouter.get("/:rent_id/reviews", this.reviewController.getReviewByRentId.bind(this.reviewController));
+        this.rentRouter.post("/:rent_id/reviews", this.multerUpload.array('media'), this.reviewController.createReview.bind(this.reviewController));
+        this.rentRouter.put("/:rent_id/reviews/:review_id", this.multerUpload.array('media'), this.reviewController.updateReview.bind(this.reviewController));
         this.rentRouter.use(isAdminMiddleware);
         this.rentRouter.put("/:id/check-in", this.rentController.checkInRent.bind(this.rentController));
         this.rentRouter.put("/:id/check-out", this.rentController.checkOutRent.bind(this.rentController));
@@ -126,9 +126,5 @@ export class APIRouter {
     private configPaymentRoutes(): void {
         this.paymentRouter.post("/handle-notification", this.paymentController.handlePaymentNotification.bind(this.paymentController));
         this.paymentRouter.use(jwtMiddleware);
-    }
-
-    private configReviewRoutes(): void {
-        this.reviewRouter.use(jwtMiddleware);
     }
 }

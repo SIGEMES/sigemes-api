@@ -21,7 +21,11 @@ export class GetRentResponse {
         public updated_at: Date,
     ) {}
 
-    public static fromEntity(rent: Rent): GetRentResponse {
+    public static fromEntity(rent: Rent | null): GetRentResponse | null {
+        if (!rent) {
+            return null;
+        }
+
         return new GetRentResponse(
             rent.id,
             rent.renterId,
