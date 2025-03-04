@@ -11,6 +11,7 @@ import { GuesthouseController } from '../controller/guesthouse';
 import { GuesthouseRoomController } from '../controller/guesthouse-room';
 import { RentController } from '../controller/rent';
 import { PaymentController } from '../controller/payment';
+import { ReviewController } from '../controller/review';
 
 export class APIRouter {
     public multerUpload: multer.Multer;
@@ -20,6 +21,7 @@ export class APIRouter {
     public guesthouseRouter: express.Router;
     public rentRouter: express.Router;
     public paymentRouter: express.Router;
+    public reviewRouter: express.Router;
 
     constructor(
         private renterController: RenterController,
@@ -28,7 +30,8 @@ export class APIRouter {
         private guesthouseController: GuesthouseController,
         private guesthouseRoomController: GuesthouseRoomController,
         private rentController: RentController,
-        private paymentController: PaymentController
+        private paymentController: PaymentController,
+        private reviewController: ReviewController,
     ) {
         this.multerUpload = multer({
             storage: multer.memoryStorage(),
@@ -43,6 +46,7 @@ export class APIRouter {
         this.guesthouseRouter = express.Router();
         this.rentRouter = express.Router();
         this.paymentRouter = express.Router();
+        this.reviewRouter = express.Router();
 
         this.configRentersRoutes();
         this.configAdminRoutes();
@@ -50,6 +54,7 @@ export class APIRouter {
         this.configGuesthouseRoutes();
         this.configRentRoutes()
         this.configPaymentRoutes();
+        this.configReviewRoutes();
     }
 
     private configRentersRoutes(): void {
@@ -82,6 +87,7 @@ export class APIRouter {
         this.cityHallRouter.use(jwtMiddleware);
         this.cityHallRouter.get("", this.cityHallController.getAllCityHalls.bind(this.cityHallController));
         this.cityHallRouter.get("/:id", this.cityHallController.getCityHallById.bind(this.cityHallController));
+        this.cityHallRouter.get("/:id/reviews", this.reviewController.getReviewsByCityHallId.bind(this.reviewController));
         this.cityHallRouter.use(isAdminMiddleware);
         this.cityHallRouter.post("", this.multerUpload.array('city_hall_media'), this.cityHallController.createCityHall.bind(this.cityHallController));
         this.cityHallRouter.put("/:id", this.multerUpload.array('city_hall_media'), this.cityHallController.updateCityHall.bind(this.cityHallController));
@@ -94,6 +100,7 @@ export class APIRouter {
         this.guesthouseRouter.get("/:id", this.guesthouseController.getGuesthouseById.bind(this.guesthouseController));
         this.guesthouseRouter.get("/:guesthouse_id/rooms", this.guesthouseRoomController.getAllGuesthouseRooms.bind(this.guesthouseRoomController));
         this.guesthouseRouter.get("/:guesthouse_id/rooms/:room_id", this.guesthouseRoomController.getGuesthouseRoomById.bind(this.guesthouseRoomController));
+        this.guesthouseRouter.get("/:guesthouse_id/rooms/:room_id/reviews", this.reviewController.getReviewsByGuesthouseRoomId.bind(this.reviewController));
         
         this.guesthouseRouter.use(isAdminMiddleware);
         this.guesthouseRouter.post("", this.multerUpload.array('guesthouse_media'), this.guesthouseController.createGuesthouse.bind(this.guesthouseController));
@@ -119,5 +126,9 @@ export class APIRouter {
     private configPaymentRoutes(): void {
         this.paymentRouter.post("/handle-notification", this.paymentController.handlePaymentNotification.bind(this.paymentController));
         this.paymentRouter.use(jwtMiddleware);
+    }
+
+    private configReviewRoutes(): void {
+        this.reviewRouter.use(jwtMiddleware);
     }
 }
