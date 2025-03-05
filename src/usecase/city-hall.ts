@@ -40,19 +40,28 @@ export class CityHallUsecase {
                 endDate,
             );
 
-            const rentMap: Map<number, Rent> = new Map();
+            const rentMap: Map<number, Rent[]> = new Map();
             for (const rentedCityHall of rentedCityHalls) {
                 if (rentedCityHall.cityHallPricingId) {
-                    rentMap.set(rentedCityHall.cityHallPricingId, rentedCityHall);
+                    if (!rentMap.has(rentedCityHall.cityHallPricingId)) {
+                        rentMap.set(rentedCityHall.cityHallPricingId, []);
+                    }
+                    rentMap.get(rentedCityHall.cityHallPricingId)?.push(rentedCityHall);
                 }
             }
 
             for (const cityHall of cityHalls) {
                 for (const pricing of cityHall.cityHallPricing) {
-                    const rentedCityHall: Rent|undefined = rentMap.get(pricing.id);
-                    if (rentedCityHall) {
-                        cityHall.status = "tidak_tersedia";
-                        break;
+                    const rentedCityHalls: Rent[] = rentMap.get(pricing.id) || [];
+                    
+                    for (const rentedCityHall of rentedCityHalls) {
+                        const paymentGatewayTokenExpiry: Date = new Date(rentedCityHall.createdAt);
+                        paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+                        
+                        if (!(rentedCityHall.status === "pending" && new Date() >= paymentGatewayTokenExpiry)) {
+                            cityHall.status = "tidak_tersedia";
+                            break;
+                        }
                     }
                 }
             }
@@ -83,8 +92,14 @@ export class CityHallUsecase {
                 endDate,
             );
 
-            if (rentedCityHalls.length > 0) {
-                cityHall.status = "tidak_tersedia";
+            for (const rentedCityHall of rentedCityHalls) {
+                const paymentGatewayTokenExpiry: Date = new Date(rentedCityHall.createdAt);
+                paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+                
+                if (!(rentedCityHall.status === "pending" && new Date() >= paymentGatewayTokenExpiry)) {
+                    cityHall.status = "tidak_tersedia";
+                    break;
+                }
             }
         }
 

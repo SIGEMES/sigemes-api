@@ -80,15 +80,21 @@ export class RentUsecase {
 
                 const rentedGuesthouseRooms: Rent[] = await this.rentRepository.getFilteredActiveRentsByGuesthouseRoomPricingIds(allGuesthouserRoomPricingIds, rent.startDate, rent.endDate);
 
-                let bookedSlot = 0;
+                let bookedSlot: number = 0;
                 for (const rentedRoom of rentedGuesthouseRooms) {
+                    let paymentGatewayTokenExpiry: Date = new Date(rentedRoom.createdAt);
+                    paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+
                     if (rentedRoom.renterGender !== rent.renterGender) {
                         throw new ResponseError("Room is rented by different gender", 400);
                     }
-                    bookedSlot += rentedRoom.slot;
+
+                    if (!(rentedRoom.status === "pending" && new Date() >= paymentGatewayTokenExpiry)) {
+                        bookedSlot += rentedRoom.slot;
+                    }
                 }
 
-                const availableSlot = guesthouseRoom.totalSlot - bookedSlot;
+                const availableSlot: number = guesthouseRoom.totalSlot - bookedSlot;
                 if (rent.slot > availableSlot) {
                     throw new ResponseError("Slot is not available", 400);
                 }
@@ -122,8 +128,13 @@ export class RentUsecase {
 
                 let allCityHallPricingIds: number[] = cityHall.cityHallPricing.map((pricing) => pricing.id);
                 const rentedCityHalls: Rent[] = await this.rentRepository.getFilteredActiveRentsByCityHallPricingIds(allCityHallPricingIds, rent.startDate, rent.endDate);
-                if (rentedCityHalls.length > 0) {
-                    throw new ResponseError("City hall is not available", 400);
+                for (const rentedCityHall of rentedCityHalls) {
+                    let paymentGatewayTokenExpiry: Date = new Date(rentedCityHall.createdAt);
+                    paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+
+                    if (!(rentedCityHall.status === "pending" && new Date() >= paymentGatewayTokenExpiry)) {
+                        throw new ResponseError("City hall is not available", 400);
+                    }
                 }
 
                 createdRent = await this.rentRepository.createRent(rent, tx);

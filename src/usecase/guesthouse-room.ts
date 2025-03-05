@@ -56,11 +56,16 @@ export class GuesthouseRoomUsecase {
             for (const room of guesthouseRooms) {
                 room.availableSlot = room.totalSlot;
                 for (const pricing of room.guesthouseRoomPricing) {
-                    const rents = rentMap.get(pricing.id) || [];
+                    const rents: Rent[] = rentMap.get(pricing.id) || [];
 
                     for (const rent of rents) {
+                        const paymentGatewayTokenExpiry: Date = new Date(rent.createdAt);
+                        paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+
                         if (rent.renterGender === renterGender) {
-                            room.availableSlot -= rent.slot;
+                            if (!(rent.status === "pending" && new Date() >= paymentGatewayTokenExpiry)) {
+                                room.availableSlot -= rent.slot;
+                            }
                         } else {
                             room.availableSlot = 0;
                             break;
@@ -102,12 +107,17 @@ export class GuesthouseRoomUsecase {
             // Proses pengurangan slot
             guesthouseRoom.availableSlot = guesthouseRoom.totalSlot;
             for (const rentedRoom of rentedGuesthouseRooms) {
+                const paymentGatewayTokenExpiry: Date = new Date(rentedRoom.createdAt);
+                paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+
                 if (rentedRoom.renterGender !== renterGender) {
                     guesthouseRoom.availableSlot = 0;
                     break;
                 }
-
-                guesthouseRoom.availableSlot -= rentedRoom.slot;
+                
+                if (!(rentedRoom.status === "pending" && new Date() >= paymentGatewayTokenExpiry)) {
+                    guesthouseRoom.availableSlot -= rentedRoom.slot;
+                }                    
             }
         }
 
