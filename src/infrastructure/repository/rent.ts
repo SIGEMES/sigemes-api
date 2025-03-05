@@ -31,7 +31,12 @@ export class RentRepository implements RentRepositoryInterface {
                         },
                     },
                 },
+                payment: true,
+                renter: true,
             },
+            orderBy: {
+                id: 'desc',
+            }
         }) as Rent[];
 
         return rents;
@@ -66,7 +71,11 @@ export class RentRepository implements RentRepositoryInterface {
                         },
                     },
                 },
+                payment: true,
             },
+            orderBy: {
+                id: 'desc',
+            }
         }) as Rent[];
 
         return rents;

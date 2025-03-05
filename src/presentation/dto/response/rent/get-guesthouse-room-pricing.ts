@@ -10,9 +10,9 @@ export class GetGuesthouseRoomPricingResponse {
         public guesthouse_room: GetGuesthouseRoomResponse,
     ) {}
 
-    public static fromEntity(guesthouseRoomPricing: GuesthouseRoomPricing | null): GetGuesthouseRoomPricingResponse | null {
-        if (guesthouseRoomPricing === null) {
-            return null;
+    public static fromEntity(guesthouseRoomPricing: GuesthouseRoomPricing | null): GetGuesthouseRoomPricingResponse | undefined {
+        if (guesthouseRoomPricing === null || guesthouseRoomPricing === undefined) {
+            return undefined;
         }
         
         return new GetGuesthouseRoomPricingResponse(

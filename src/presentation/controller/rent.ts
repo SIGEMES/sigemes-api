@@ -13,7 +13,7 @@ export class RentController {
         try {
             const rents: Rent[] = await this.rentUsecase.getAllRents(res.locals.user.id, res.locals.user.role);
             const rentsResponse: GetRentResponse[] = rents.map(rent => GetRentResponse.fromEntity(rent));
-            res.status(200).json(new BaseSuccessResponse(true, "Get all rents success", rentsResponse.map(rent => rent.toJSON())));
+            res.status(200).json(new BaseSuccessResponse(true, "Get all rents success", rentsResponse));
         } catch (error) {
             next(error);
         }
@@ -24,7 +24,7 @@ export class RentController {
             const { id: rentId } = RentValidation.id.parse({ id: Number(req.params.id) });
             const rent: Rent = await this.rentUsecase.getRentById(rentId, res.locals.user.id, res.locals.user.role);
             const rentResponse: GetRentResponse = GetRentResponse.fromEntity(rent);
-            res.status(200).json(new BaseSuccessResponse(true, "Get rent success", rentResponse.toJSON()));
+            res.status(200).json(new BaseSuccessResponse(true, "Get rent success", rentResponse));
         } catch (error) {
             next(error);
         }
@@ -41,7 +41,7 @@ export class RentController {
             rentEntity.renterId = res.locals.user.id;
             const rent: Rent = await this.rentUsecase.createRent(rentEntity);
             const rentResponse: GetRentResponse = GetRentResponse.fromEntity(rent);
-            res.status(201).json(new BaseSuccessResponse(true, "Create rent plan success", rentResponse.toJSON()));
+            res.status(201).json(new BaseSuccessResponse(true, "Create rent plan success", rentResponse));
         } catch (error) {
             next(error);
         }
@@ -52,7 +52,7 @@ export class RentController {
             const { id: rentId } = RentValidation.id.parse({ id: Number(req.params.id) });
             const rent: Rent = await this.rentUsecase.cancelRent(rentId, res.locals.user.id, res.locals.user.role);
             const rentResponse: GetRentResponse = GetRentResponse.fromEntity(rent);
-            res.status(200).json(new BaseSuccessResponse(true, "Cancel rent success", rentResponse.toJSON()));
+            res.status(200).json(new BaseSuccessResponse(true, "Cancel rent success", rentResponse));
         } catch (error) {
             next(error);
         }
@@ -63,7 +63,7 @@ export class RentController {
             const { id: rentId } = RentValidation.id.parse({ id: Number(req.params.id) });
             const rent: Rent = await this.rentUsecase.checkInRent(rentId);
             const rentResponse: GetRentResponse = GetRentResponse.fromEntity(rent);
-            res.status(200).json(new BaseSuccessResponse(true, "Check in rent success", rentResponse.toJSON()));
+            res.status(200).json(new BaseSuccessResponse(true, "Check in rent success", rentResponse));
         } catch (error) {
             next(error);
         }
@@ -74,7 +74,7 @@ export class RentController {
             const { id: rentId } = RentValidation.id.parse({ id: Number(req.params.id) });
             const rent: Rent = await this.rentUsecase.checkOutRent(rentId);
             const rentResponse: GetRentResponse = GetRentResponse.fromEntity(rent);
-            res.status(200).json(new BaseSuccessResponse(true, "Check out rent success", rentResponse.toJSON()));
+            res.status(200).json(new BaseSuccessResponse(true, "Check out rent success", rentResponse));
         } catch (error) {
             next(error);
         }
