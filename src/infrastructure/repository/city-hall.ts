@@ -289,4 +289,21 @@ export class CityHallRepository implements CityHallRepositoryInterface {
 
         return deletedCityHall;
     }
+
+    public async getAllCityHallsWithPricing(): Promise<CityHall[]> {
+        const cityHalls: CityHall[] = await this.prisma.cityHall.findMany(
+            {
+                select: {
+                    name: true,
+                    cityHallPricing: {
+                        select: {
+                            id: true,
+                        },
+                    },
+                },
+            }
+        ) as CityHall[];
+
+        return cityHalls;
+    }
 }

@@ -130,5 +130,6 @@ export class APIRouter {
         this.dashboardRouter.get("/daily-revenue", this.dashboardController.getDailyRevenue.bind(this.dashboardController));
         this.dashboardRouter.get("/monthly-revenue", this.dashboardController.getMonthlyRevenue.bind(this.dashboardController));
         this.dashboardRouter.get("/annual-revenue", this.dashboardController.getAnnualRevenue.bind(this.dashboardController));
+        this.dashboardRouter.get("/financial-report-summary", this.dashboardController.getFinancialReportSummary.bind(this.dashboardController));
     }
 }

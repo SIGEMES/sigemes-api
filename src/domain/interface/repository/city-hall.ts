@@ -15,4 +15,5 @@ export interface CityHallRepositoryInterface {
     deleteCityHall(id: number, transaction?: any): Promise<CityHall>;
     deleteCityHallPricing(id: number, transaction?: any): Promise<CityHallPricing>;
     deleteCityHallMedia(id: number, transaction?: any): Promise<CityHallMedia>;
+    getAllCityHallsWithPricing(): Promise<CityHall[]>;
 }

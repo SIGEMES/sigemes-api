@@ -13,5 +13,6 @@ export class Guesthouse {
         public longitude: number = 0,
         public contactPerson: string = '',
         public guesthouseMedia: GuesthouseMedia[] = [],
+        public guesthouseRoom: GuesthouseRoom[] = []
     ) {}
 }
