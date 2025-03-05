@@ -107,7 +107,8 @@ export class PaymentRepository implements PaymentRepositoryInterface {
                 paymentConfirmedAt: {
                     gte: startDate,
                     lt: endDate
-                }
+                },
+                status: "dibayar"
             }
         });
 

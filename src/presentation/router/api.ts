@@ -127,6 +127,8 @@ export class APIRouter {
 
     private configDashboardRoutes(): void {
         this.dashboardRouter.use(jwtMiddleware, isAdminMiddleware);
-        this.dashboardRouter.get("/revenue-summary", this.dashboardController.getRevenueSummary.bind(this.dashboardController));
+        this.dashboardRouter.get("/daily-revenue", this.dashboardController.getDailyRevenue.bind(this.dashboardController));
+        this.dashboardRouter.get("/monthly-revenue", this.dashboardController.getMonthlyRevenue.bind(this.dashboardController));
+        this.dashboardRouter.get("/annual-revenue", this.dashboardController.getAnnualRevenue.bind(this.dashboardController));
     }
 }
