@@ -10,4 +10,5 @@ export interface GuesthouseRepositoryInterface {
     updateGuesthouseOnly(id: number, guesthouse: Guesthouse, transaction?: any): Promise<Guesthouse>;
     deleteGuesthouseMedia(id: number, transaction?: any): Promise<void>;
     deleteGuesthouse(id: number): Promise<void>;
+    getAllGuesthousesWithPricing(): Promise<Guesthouse[]>;
 }

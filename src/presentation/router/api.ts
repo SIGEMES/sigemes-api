@@ -11,6 +11,7 @@ import { GuesthouseController } from '../controller/guesthouse';
 import { GuesthouseRoomController } from '../controller/guesthouse-room';
 import { RentController } from '../controller/rent';
 import { PaymentController } from '../controller/payment';
+import { DashboardController } from '../controller/dashboard';
 import { ReviewController } from '../controller/review';
 
 export class APIRouter {
@@ -21,6 +22,7 @@ export class APIRouter {
     public guesthouseRouter: express.Router;
     public rentRouter: express.Router;
     public paymentRouter: express.Router;
+    public dashboardRouter: express.Router;
 
     constructor(
         private renterController: RenterController,
@@ -30,6 +32,7 @@ export class APIRouter {
         private guesthouseRoomController: GuesthouseRoomController,
         private rentController: RentController,
         private paymentController: PaymentController,
+        private dashboardController: DashboardController,
         private reviewController: ReviewController,
     ) {
         this.multerUpload = multer({
@@ -45,6 +48,7 @@ export class APIRouter {
         this.guesthouseRouter = express.Router();
         this.rentRouter = express.Router();
         this.paymentRouter = express.Router();
+        this.dashboardRouter = express.Router();
 
         this.configRentersRoutes();
         this.configAdminRoutes();
@@ -52,6 +56,7 @@ export class APIRouter {
         this.configGuesthouseRoutes();
         this.configRentRoutes()
         this.configPaymentRoutes();
+        this.configDashboardRoutes();
     }
 
     private configRentersRoutes(): void {
@@ -128,6 +133,13 @@ export class APIRouter {
 
     private configPaymentRoutes(): void {
         this.paymentRouter.post("/handle-notification", this.paymentController.handlePaymentNotification.bind(this.paymentController));
-        this.paymentRouter.use(jwtMiddleware);
+    }
+
+    private configDashboardRoutes(): void {
+        this.dashboardRouter.use(jwtMiddleware, isAdminMiddleware);
+        this.dashboardRouter.get("/daily-revenue", this.dashboardController.getDailyRevenue.bind(this.dashboardController));
+        this.dashboardRouter.get("/monthly-revenue", this.dashboardController.getMonthlyRevenue.bind(this.dashboardController));
+        this.dashboardRouter.get("/annual-revenue", this.dashboardController.getAnnualRevenue.bind(this.dashboardController));
+        this.dashboardRouter.get("/financial-report-summary", this.dashboardController.getFinancialReportSummary.bind(this.dashboardController));
     }
 }

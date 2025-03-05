@@ -28,6 +28,10 @@ import { PaymentRepository } from "./infrastructure/repository/payment";
 import { PaymentUsecase } from "./usecase/payment";
 import { PaymentController } from "./presentation/controller/payment";
 
+
+import { DashboardUsecase } from "./usecase/dashboard";
+import { DashboardController } from "./presentation/controller/dashboard";
+
 import { ReviewRepository } from "./infrastructure/repository/review";
 import { ReviewUsecase } from "./usecase/review";
 import { ReviewController } from "./presentation/controller/review";
@@ -86,6 +90,7 @@ export async function main(): Promise<void> {
     const guesthouseRoomUsecase: GuesthouseRoomUsecase = new GuesthouseRoomUsecase(guesthouseRoomRepository, rentRepository, objectStorageService, dbTransaction);
     const rentUsecase: RentUsecase = new RentUsecase(rentRepository, guesthouseRoomRepository, cityHallRepository, paymentRepository, dbTransaction, paymentGatewayService, cryptoService);
     const paymentUsecase: PaymentUsecase = new PaymentUsecase(paymentRepository, rentRepository, dbTransaction, paymentGatewayService, cryptoService);
+    const dashboardUsecase: DashboardUsecase = new DashboardUsecase(paymentRepository, guesthouseRepository, cityHallRepository);
     const reviewUsecase: ReviewUsecase = new ReviewUsecase(reviewRepository, dbTransaction, objectStorageService);
     
     // Controller Instance
@@ -96,6 +101,7 @@ export async function main(): Promise<void> {
     const guesthouseController: GuesthouseController = new GuesthouseController(guesthouseUsecase);
     const rentController: RentController = new RentController(rentUsecase);
     const paymentController: PaymentController = new PaymentController(paymentUsecase);
+    const dashboardController: DashboardController = new DashboardController(dashboardUsecase);
     const reviewController: ReviewController = new ReviewController(reviewUsecase);
 
     const router: APIRouter = new APIRouter(
@@ -106,6 +112,7 @@ export async function main(): Promise<void> {
         guesthouseRoomController,
         rentController,
         paymentController,
+        dashboardController,
         reviewController,
     );
 

@@ -97,4 +97,77 @@ export class PaymentRepository implements PaymentRepositoryInterface {
 
         return updatedPayment;
     }
+
+    public async getRevenue(startDate: Date, endDate: Date): Promise<number> {
+        const revenue = await this.prisma.payment.aggregate({
+            _sum: {
+                amount: true
+            },
+            where: {
+                paymentConfirmedAt: {
+                    gte: startDate,
+                    lt: endDate
+                },
+                status: "dibayar"
+            }
+        });
+
+        return revenue._sum.amount || 0;
+    }
+
+    public async getRevenueAndCountByGuesthousePricingIds(guesthousePricingIds: number[], startDate: Date, endDate: Date): Promise<{ revenue: number, count: number }> {
+        const revenue = await this.prisma.payment.aggregate({
+            _sum: {
+                amount: true
+            },
+            _count: {
+                amount: true
+            },
+            where: {
+                paymentConfirmedAt: {
+                    gte: startDate,
+                    lt: endDate
+                },
+                status: "dibayar",
+                Rent: {
+                    guesthouseRoomPricingId: {
+                        in: guesthousePricingIds
+                    }
+                }
+            }
+        });
+
+        return {
+            revenue: revenue._sum.amount || 0,
+            count: revenue._count.amount || 0
+        };
+    }
+
+    public async getRevenueAndCountByCityHallPricingIds(cityHallPricingIds: number[], startDate: Date, endDate: Date): Promise<{ revenue: number, count: number }> {
+        const revenue = await this.prisma.payment.aggregate({
+            _sum: {
+                amount: true
+            },
+            _count: {
+                amount: true
+            },
+            where: {
+                paymentConfirmedAt: {
+                    gte: startDate,
+                    lt: endDate
+                },
+                status: "dibayar",
+                Rent: {
+                    cityHallPricingId: {
+                        in: cityHallPricingIds
+                    }
+                }
+            }
+        });
+
+        return {
+            revenue: revenue._sum.amount || 0,
+            count: revenue._count.amount || 0
+        };
+    }
 }

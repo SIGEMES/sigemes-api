@@ -13,7 +13,7 @@ export class GuesthouseRepository implements GuesthouseRepositoryInterface {
                     guesthouseMedia: true,
                 }
             }
-        );
+        ) as Guesthouse[];
 
         return guesthouses;
     }
@@ -26,7 +26,7 @@ export class GuesthouseRepository implements GuesthouseRepositoryInterface {
             include: {
                 guesthouseMedia: true,
             }
-        });
+        }) as Guesthouse|null;
 
         return guesthouse;
     }
@@ -132,4 +132,22 @@ export class GuesthouseRepository implements GuesthouseRepositoryInterface {
         });
     }
 
+    public async getAllGuesthousesWithPricing(): Promise<Guesthouse[]> {
+        const guesthouses: Guesthouse[] = await this.prisma.guesthouse.findMany({
+            select : {
+                name: true,
+                guesthouseRoom: {
+                    select: {
+                        guesthouseRoomPricing: {
+                            select: {
+                                id: true,
+                            },
+                        },
+                    },
+                },
+            },
+        }) as Guesthouse[];
+
+        return guesthouses;
+    }
 }
