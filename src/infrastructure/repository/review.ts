@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { ReviewRepositoryInterface } from "../../domain/interface/repository/review";
 import { Review } from "../../domain/entity/review";
 import { ReviewMedia } from "../../domain/entity/review-media";
+import { ReviewReply } from "../../domain/entity/review-reply";
 
 export class ReviewRepository implements ReviewRepositoryInterface {
     private prisma: PrismaClient;
@@ -100,6 +101,26 @@ export class ReviewRepository implements ReviewRepositoryInterface {
         return review;
     }
 
+    public async getReviewReplyByReviewId(reviewId: number): Promise<ReviewReply> {
+        const reviewReply: ReviewReply = await this.prisma.reviewReply.findFirst({
+            where: {
+                reviewId: reviewId,
+            },
+        }) as ReviewReply;
+
+        return reviewReply;
+    }
+
+    public async getReviewReplyById(id: number): Promise<ReviewReply> {
+        const reviewReply: ReviewReply = await this.prisma.reviewReply.findUnique({
+            where: {
+                id: id,
+            },
+        }) as ReviewReply;
+
+        return reviewReply;
+    }
+
     public async createReview(review: Review): Promise<Review> {
         const createdReview: Review = await this.prisma.review.create({
             data: {
@@ -171,10 +192,46 @@ export class ReviewRepository implements ReviewRepositoryInterface {
 
         return createdReviewMedia;
     }
+    
+    public async createReviewReply(reviewReply: ReviewReply): Promise<ReviewReply> {
+        const createdReviewReply: ReviewReply = await this.prisma.reviewReply.create({
+            data: {
+                reviewId: reviewReply.reviewId,
+                adminId: reviewReply.adminId,
+                comment : reviewReply.comment,
+            },
+        }) as ReviewReply;
+
+        return createdReviewReply;
+    }
+
+    public async updateReviewReply(reviewReply: ReviewReply): Promise<ReviewReply> {
+        const updatedReviewReply: ReviewReply = await this.prisma.reviewReply.update({
+            where: {
+                id: reviewReply.id,
+            },
+            data: {
+                adminId: reviewReply.adminId,
+                comment: reviewReply.comment,
+            },
+        }) as ReviewReply;
+
+        return updatedReviewReply;
+    }
+
+    public async deleteReviewReplyById(reviewReplyId: number): Promise<boolean> {
+        await this.prisma.reviewReply.delete({
+            where: {
+                id: reviewReplyId,
+            },
+        });
+
+        return true;
+    }
 
     public async deleteReviewMediaByIds(ids: number[], transaction?: any): Promise<boolean> {
         const prisma = transaction || this.prisma;
-        
+
         await prisma.reviewMedia.deleteMany({
             where: {
                 id: {

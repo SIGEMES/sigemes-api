@@ -121,6 +121,9 @@ export class APIRouter {
         this.rentRouter.use(isAdminMiddleware);
         this.rentRouter.put("/:id/check-in", this.rentController.checkInRent.bind(this.rentController));
         this.rentRouter.put("/:id/check-out", this.rentController.checkOutRent.bind(this.rentController));
+        this.rentRouter.post("/:rent_id/reviews/:review_id/replies", this.reviewController.createReviewReply.bind(this.reviewController));
+        this.rentRouter.put("/:rent_id/reviews/:review_id/replies/:reply_id", this.reviewController.updateReviewReply.bind(this.reviewController));
+        this.rentRouter.delete("/:rent_id/reviews/:review_id/replies/:reply_id", this.reviewController.deleteReviewReply.bind(this.reviewController));
     }
 
     private configPaymentRoutes(): void {

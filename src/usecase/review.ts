@@ -1,5 +1,6 @@
 import { Review } from "../domain/entity/review";
 import { ReviewMedia } from "../domain/entity/review-media";
+import { ReviewReply } from "../domain/entity/review-reply";
 import { ResponseError } from "../domain/error/response-error";
 import { ObjectStorageInterface } from "../domain/interface/external-service/object-storage";
 import { File } from "../domain/interface/library/file";
@@ -137,5 +138,43 @@ export class ReviewUsecase {
 
             return updatedReview;
         });
+    }
+
+    public async createReviewReply(reviewReply: ReviewReply): Promise<ReviewReply> {
+        const review: Review | null = await this.reviewRepository.getReviewById(reviewReply.reviewId);
+        if (!review) {
+            throw new ResponseError("Review not found", 404);
+        }
+
+        const existingReviewReply: ReviewReply | null = await this.reviewRepository.getReviewReplyByReviewId(reviewReply.reviewId);
+        if (existingReviewReply) {
+            throw new ResponseError("Review reply already exists", 400);
+        }
+
+        const createdReviewReply: ReviewReply = await this.reviewRepository.createReviewReply(reviewReply);
+
+        return createdReviewReply;
+    }
+
+    public async updateReviewReply(reviewReply: ReviewReply): Promise<ReviewReply> {
+        const oldReviewReply: ReviewReply | null = await this.reviewRepository.getReviewReplyById(reviewReply.id);
+        if (!oldReviewReply) {
+            throw new ResponseError("Review reply not found", 404);
+        }
+
+        const updatedReviewReply: ReviewReply = await this.reviewRepository.updateReviewReply(reviewReply);
+
+        return updatedReviewReply;
+    }
+
+    public async deleteReviewReplyById(id: number): Promise<boolean> {
+        const reviewReply: ReviewReply | null = await this.reviewRepository.getReviewReplyById(id);
+        if (!reviewReply) {
+            throw new ResponseError("Review reply not found", 404);
+        }
+
+        const isDeleted: boolean = await this.reviewRepository.deleteReviewReplyById(id);
+
+        return isDeleted;
     }
 }

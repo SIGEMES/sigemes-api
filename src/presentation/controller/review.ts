@@ -8,6 +8,8 @@ import { File } from '../../domain/interface/library/file';
 import { CreateReviewRequest } from '../dto/request/review/create-review';
 import { DeletedReviewMediaRequest } from '../dto/request/review/deleted-media';
 import { ReviewMedia } from '../../domain/entity/review-media';
+import { ReviewReply } from '../../domain/entity/review-reply';
+import { ReviewReplyRequest } from '../dto/request/review/review-reply';
 
 export class ReviewController {
     constructor(private reviewUsecase: ReviewUsecase) { }
@@ -119,6 +121,44 @@ export class ReviewController {
             const updatedReview: Review = await this.reviewUsecase.updateReview(renterId, reviewEntity, reviewMedia, deletedMediaEntity);
             const reviewResponse: GetReviewResponse = GetReviewResponse.fromEntity(updatedReview);
             res.status(200).json(new BaseSuccessResponse(true, "Update review success", reviewResponse));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    public async createReviewReply(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { id: reviewId } = ReviewValidation.id.parse({ id: Number(req.params.review_id) });
+            const reviewReply: ReviewReplyRequest = ReviewValidation.createReviewReply.parse(req.body);
+            const reviewReplyEntity: ReviewReply = ReviewReplyRequest.toEntity(reviewReply);
+            reviewReplyEntity.reviewId = reviewId;
+            reviewReplyEntity.adminId = Number(res.locals.user.id);
+            const createdReviewReply: ReviewReply = await this.reviewUsecase.createReviewReply(reviewReplyEntity);
+            res.status(201).json(new BaseSuccessResponse(true, "Create review reply success", createdReviewReply));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    public async updateReviewReply(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { id: reviewReplyId } = ReviewValidation.id.parse({ id: Number(req.params.reply_id) });
+            const reviewReply: ReviewReplyRequest = ReviewValidation.createReviewReply.parse(req.body);
+            const reviewReplyEntity: ReviewReply = ReviewReplyRequest.toEntity(reviewReply);
+            reviewReplyEntity.id = reviewReplyId;
+            reviewReplyEntity.adminId = Number(res.locals.user.id);
+            const updatedReviewReply: ReviewReply = await this.reviewUsecase.updateReviewReply(reviewReplyEntity);
+            res.status(200).json(new BaseSuccessResponse(true, "Update review reply success", updatedReviewReply));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    public async deleteReviewReply(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { id: reviewReplyId } = ReviewValidation.id.parse({ id: Number(req.params.reply_id) });
+            const deleted: boolean = await this.reviewUsecase.deleteReviewReplyById(reviewReplyId);
+            res.status(200).json(new BaseSuccessResponse(true, "Delete review reply success", deleted));
         } catch (error) {
             next(error);
         }
