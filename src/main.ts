@@ -28,8 +28,13 @@ import { PaymentRepository } from "./infrastructure/repository/payment";
 import { PaymentUsecase } from "./usecase/payment";
 import { PaymentController } from "./presentation/controller/payment";
 
+
 import { DashboardUsecase } from "./usecase/dashboard";
 import { DashboardController } from "./presentation/controller/dashboard";
+
+import { ReviewRepository } from "./infrastructure/repository/review";
+import { ReviewUsecase } from "./usecase/review";
+import { ReviewController } from "./presentation/controller/review";
 
 import { JwtService } from "./infrastructure/authentication/jwt";
 import { BcryptService } from "./infrastructure/authentication/bcrypt";
@@ -48,6 +53,8 @@ import { CityHallRepositoryInterface } from "./domain/interface/repository/city-
 import { GuesthouseRepositoryInterface } from "./domain/interface/repository/guesthouse";
 import { GuesthouseRoomRepositoryInterface } from "./domain/interface/repository/guesthouse-room";
 import { RentRepositoryInterface } from "./domain/interface/repository/rent";
+import { PaymentRepositoryInterface } from "./domain/interface/repository/payment";
+import { ReviewRepositoryInterface } from "./domain/interface/repository/review";
 import { MailerInterface } from "./domain/interface/external-service/mailer";
 import { ObjectStorageInterface } from "./domain/interface/external-service/object-storage";
 import { DbTransactionInterface } from "./domain/interface/repository/db-transaction";
@@ -72,7 +79,8 @@ export async function main(): Promise<void> {
     const guesthouseRepository: GuesthouseRepositoryInterface = new GuesthouseRepository(prisma);
     const guesthouseRoomRepository: GuesthouseRoomRepositoryInterface = new GuesthouseRoomRepository(prisma);
     const rentRepository: RentRepositoryInterface = new RentRepository(prisma);
-    const paymentRepository: PaymentRepository = new PaymentRepository(prisma);
+    const paymentRepository: PaymentRepositoryInterface = new PaymentRepository(prisma);
+    const reviewRepository: ReviewRepositoryInterface = new ReviewRepository(prisma);
     
     // Usecase Instance
     const renterUsecase: RenterUsecase = new RenterUsecase(renterRepository, jwtService, bcryptService, mailerService, objectStorageService);
@@ -83,6 +91,7 @@ export async function main(): Promise<void> {
     const rentUsecase: RentUsecase = new RentUsecase(rentRepository, guesthouseRoomRepository, cityHallRepository, paymentRepository, dbTransaction, paymentGatewayService, cryptoService);
     const paymentUsecase: PaymentUsecase = new PaymentUsecase(paymentRepository, rentRepository, dbTransaction, paymentGatewayService, cryptoService);
     const dashboardUsecase: DashboardUsecase = new DashboardUsecase(paymentRepository, guesthouseRepository, cityHallRepository);
+    const reviewUsecase: ReviewUsecase = new ReviewUsecase(reviewRepository, dbTransaction, objectStorageService);
     
     // Controller Instance
     const renterController: RenterController = new RenterController(renterUsecase);
@@ -93,6 +102,7 @@ export async function main(): Promise<void> {
     const rentController: RentController = new RentController(rentUsecase);
     const paymentController: PaymentController = new PaymentController(paymentUsecase);
     const dashboardController: DashboardController = new DashboardController(dashboardUsecase);
+    const reviewController: ReviewController = new ReviewController(reviewUsecase);
 
     const router: APIRouter = new APIRouter(
         renterController,
@@ -103,6 +113,7 @@ export async function main(): Promise<void> {
         rentController,
         paymentController,
         dashboardController,
+        reviewController,
     );
 
     const webServer: WebServer = new WebServer(

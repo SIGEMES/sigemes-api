@@ -11,6 +11,9 @@ import { seedGuesthouseRoomMedia } from './guesthouse-room-media-seeder'
 import { seedGuesthouseRoomPricing } from './guesthouse-room-pricing-seeder'
 import { seedRents } from './rent-seeder'
 import { seedPayments } from './payment-seeder'
+import { seedReviews } from './review-seeder'
+import { seedReviewMedia } from './review-media-seeder'
+import { seedReviewReplies } from './review-reply-seeder'
 
 const prisma: PrismaClient = new PrismaClient()
 
@@ -27,6 +30,9 @@ async function main() {
     await seedGuesthouseRoomPricing()
     await seedRents()
     await seedPayments()
+    await seedReviews()
+    await seedReviewMedia()
+    await seedReviewReplies()
 }
 
 main()
