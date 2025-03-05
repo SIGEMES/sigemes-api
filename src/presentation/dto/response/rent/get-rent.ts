@@ -15,8 +15,8 @@ export class GetRentResponse {
         public check_in: Date | null,
         public check_out: Date | null,
         public rent_status: string,
-        public city_hall_pricing: GetCityHallPricingResponse | null,
-        public guesthouse_room_pricing: GetGuesthouseRoomPricingResponse | null,
+        public city_hall_pricing: GetCityHallPricingResponse | undefined,
+        public guesthouse_room_pricing: GetGuesthouseRoomPricingResponse | undefined,
         public payment: GetPaymentResponse | null,
         public renter: GetRenterResponse | null,
         public created_at: Date,
@@ -40,12 +40,6 @@ export class GetRentResponse {
             GetRenterResponse.fromEntity(rent.renter),
             rent.createdAt,
             rent.updatedAt
-        );
-    }
-
-    public toJSON() {
-        return Object.fromEntries(
-            Object.entries(this).filter(([_, v]) => v !== null)
         );
     }
 }

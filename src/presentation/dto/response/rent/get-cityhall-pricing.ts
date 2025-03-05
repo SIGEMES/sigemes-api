@@ -11,9 +11,9 @@ export class GetCityHallPricingResponse {
         public city_hall: GetCityHallResponse,
     ) {}
 
-    public static fromEntity(cityHallPricing: CityHallPricing | null): GetCityHallPricingResponse | null {
-        if (cityHallPricing === null) {
-            return null;
+    public static fromEntity(cityHallPricing: CityHallPricing | null): GetCityHallPricingResponse | undefined {
+        if (cityHallPricing === null || cityHallPricing === undefined) {
+            return undefined;
         } else {
             return new GetCityHallPricingResponse(
                 cityHallPricing.id,

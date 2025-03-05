@@ -13,7 +13,9 @@ export class GetPaymentResponse {
     ) {}
 
     public static fromEntity(payment: Payment | null): GetPaymentResponse | null {
-        if (!payment) return null;
+        if (payment === null || payment === undefined) {
+            return null
+        }
 
         return new GetPaymentResponse(
             payment.id,

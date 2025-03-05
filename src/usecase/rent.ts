@@ -141,9 +141,8 @@ export class RentUsecase {
                 throw new ResponseError("Unexpected error", 500);
             }
 
-            const paymentGatewayTransactionFee: number = 5000;
-            const tax: number = 0.11 * paymentGatewayTransactionFee;
-            const totalPrice: number = Math.ceil(actualTotalPrice + tax + paymentGatewayTransactionFee);
+            const paymentGatewayTransactionFee: number = 5550;
+            const totalPrice: number = Math.ceil(actualTotalPrice + paymentGatewayTransactionFee);
 
 
             if (!createdRent.renter) {
@@ -155,7 +154,7 @@ export class RentUsecase {
             const renterPhone: string = createdRent.renter.phoneNumber;
 
             const newPaymentId: string = this.cryptoService.generateUUIDv4();
-            const token: string = await this.paymentGatewayService.createTransaction(newPaymentId, renterName, renterEmail, renterPhone, itemName, itemType, itemCategory, totalPrice, actualTotalPrice, tax, paymentGatewayTransactionFee);
+            const token: string = await this.paymentGatewayService.createTransaction(newPaymentId, renterName, renterEmail, renterPhone, itemName, itemType, itemCategory, totalPrice, actualTotalPrice, paymentGatewayTransactionFee);
             if (!token) {
                 throw new ResponseError("Failed to create transaction", 500);
             }
@@ -163,7 +162,7 @@ export class RentUsecase {
             const createdPayment: Payment = await this.paymentRepository.createPayment({
                 id: newPaymentId,
                 rentId: createdRent.id,
-                amount: totalPrice,
+                amount: actualTotalPrice,
                 method: null,
                 status: "pending",
                 paymentGatewayToken: token,

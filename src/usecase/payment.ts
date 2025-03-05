@@ -93,9 +93,8 @@ export class PaymentUsecase {
                 throw new ResponseError("Rent pricing not found", 404);
             }
 
-            const paymentGatewayTransactionFee: number = 5000;
-            const tax: number = 0.11 * paymentGatewayTransactionFee;
-            const totalPrice: number = Math.ceil(actualTotalPrice + tax + paymentGatewayTransactionFee);
+            const paymentGatewayTransactionFee: number = 5500;
+            const totalPrice: number = Math.ceil(actualTotalPrice + paymentGatewayTransactionFee);
 
             if (!rent.renter) {
                 throw new ResponseError("Renter not found", 404);
@@ -105,7 +104,7 @@ export class PaymentUsecase {
             const renterEmail: string = rent.renter.email;
             const renterName: string = rent.renter.fullname;
             const renterPhone: string = rent.renter.phoneNumber;
-            const token: string = await this.paymentGatewayService.createTransaction(newPaymentId, renterName, renterEmail, renterPhone, itemName, itemType, itemCategory, totalPrice, actualTotalPrice, tax, paymentGatewayTransactionFee);
+            const token: string = await this.paymentGatewayService.createTransaction(newPaymentId, renterName, renterEmail, renterPhone, itemName, itemType, itemCategory, totalPrice, actualTotalPrice, paymentGatewayTransactionFee);
             if (!token) {
                 throw new ResponseError("Failed to create transaction", 500);
             }
