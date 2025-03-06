@@ -59,7 +59,8 @@ export class GuesthouseRoomUsecase {
                     const rents: Rent[] = rentMap.get(pricing.id) || [];
 
                     for (const rent of rents) {
-                        const paymentGatewayTokenExpiry: Date = new Date(rent.createdAt);
+                        const pendingDateTime: Date = rent.payment?.paymentTriggeredAt || rent.createdAt;
+                        let paymentGatewayTokenExpiry: Date = new Date(pendingDateTime);
                         paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
 
                         if (rent.renterGender === renterGender) {
@@ -107,7 +108,8 @@ export class GuesthouseRoomUsecase {
             // Proses pengurangan slot
             guesthouseRoom.availableSlot = guesthouseRoom.totalSlot;
             for (const rentedRoom of rentedGuesthouseRooms) {
-                const paymentGatewayTokenExpiry: Date = new Date(rentedRoom.createdAt);
+                const pendingDateTime: Date = rentedRoom.payment?.paymentTriggeredAt || rentedRoom.createdAt;
+                let paymentGatewayTokenExpiry: Date = new Date(pendingDateTime);
                 paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
 
                 if (rentedRoom.renterGender !== renterGender) {

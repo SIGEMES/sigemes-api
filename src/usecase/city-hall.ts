@@ -55,9 +55,10 @@ export class CityHallUsecase {
                     const rentedCityHalls: Rent[] = rentMap.get(pricing.id) || [];
                     
                     for (const rentedCityHall of rentedCityHalls) {
-                        const paymentGatewayTokenExpiry: Date = new Date(rentedCityHall.createdAt);
+                        const pendingDateTime: Date = rentedCityHall.payment?.paymentTriggeredAt || rentedCityHall.createdAt;
+                        let paymentGatewayTokenExpiry: Date = new Date(pendingDateTime);
                         paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
-                        
+
                         if (!(rentedCityHall.status === "pending" && new Date() >= paymentGatewayTokenExpiry)) {
                             cityHall.status = "tidak_tersedia";
                             break;
@@ -93,7 +94,8 @@ export class CityHallUsecase {
             );
 
             for (const rentedCityHall of rentedCityHalls) {
-                const paymentGatewayTokenExpiry: Date = new Date(rentedCityHall.createdAt);
+                const pendingDateTime: Date = rentedCityHall.payment?.paymentTriggeredAt || rentedCityHall.createdAt;
+                let paymentGatewayTokenExpiry: Date = new Date(pendingDateTime);
                 paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
                 
                 if (!(rentedCityHall.status === "pending" && new Date() >= paymentGatewayTokenExpiry)) {

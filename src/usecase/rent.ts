@@ -82,9 +82,10 @@ export class RentUsecase {
 
                 let bookedSlot: number = 0;
                 for (const rentedRoom of rentedGuesthouseRooms) {
-                    let paymentGatewayTokenExpiry: Date = new Date(rentedRoom.createdAt);
+                    const pendingDateTime: Date = rentedRoom.payment?.paymentConfirmedAt || rentedRoom.createdAt;
+                    let paymentGatewayTokenExpiry: Date = new Date(pendingDateTime);
                     paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
-
+                    
                     if (rentedRoom.renterGender !== rent.renterGender) {
                         throw new ResponseError("Room is rented by different gender", 400);
                     }

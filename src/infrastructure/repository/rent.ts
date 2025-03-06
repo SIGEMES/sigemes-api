@@ -144,6 +144,9 @@ export class RentRepository implements RentRepositoryInterface {
                     },
                 ],
             },
+            include: {
+                payment: true,
+            },
         }) as Rent[];
 
         return rents;
@@ -174,6 +177,9 @@ export class RentRepository implements RentRepositoryInterface {
                         ],
                     },
                 ],
+            },
+            include: {
+                payment: true,
             },
         }) as Rent[];
 

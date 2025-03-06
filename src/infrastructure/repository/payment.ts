@@ -21,6 +21,7 @@ export class PaymentRepository implements PaymentRepositoryInterface {
 
         const createdPayment: Payment = await prisma.payment.create({
             data: {
+                id: payment.id,
                 rentId: payment.rentId,
                 amount: payment.amount,
                 method: payment.method,
