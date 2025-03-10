@@ -22,7 +22,7 @@ export class GuesthouseRoomUsecase {
 
         if (userRole === "renter" && (!startDate || !endDate || !renterGender)) {
             throw new ResponseError("Required query parameter: start_date, end_date and gender for renter", 400);
-        }       
+        }
 
         if (startDate && endDate && renterGender) {
             if (startDate > endDate) {
@@ -59,9 +59,16 @@ export class GuesthouseRoomUsecase {
                     const rents: Rent[] = rentMap.get(pricing.id) || [];
 
                     for (const rent of rents) {
-                        const pendingDateTime: Date = rent.payment?.paymentTriggeredAt || rent.createdAt;
-                        let paymentGatewayTokenExpiry: Date = new Date(pendingDateTime);
-                        paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+                        let paymentGatewayTokenExpiry: Date = new Date();
+                        if (rent.payment?.paymentConfirmedAt) {
+                            const pendingDateTime: Date = rent.payment?.paymentConfirmedAt;
+                            paymentGatewayTokenExpiry = new Date(pendingDateTime);
+                            paymentGatewayTokenExpiry.setMinutes(paymentGatewayTokenExpiry.getMinutes() + 5);
+                        } else {
+                            const pendingDateTime: Date = rent.createdAt;
+                            paymentGatewayTokenExpiry = new Date(pendingDateTime);
+                            paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+                        }
 
                         if (rent.renterGender === renterGender) {
                             if (!(rent.status === "pending" && new Date() >= paymentGatewayTokenExpiry)) {
@@ -89,7 +96,7 @@ export class GuesthouseRoomUsecase {
 
         if (userRole === "renter" && (!startDate || !endDate || !renterGender)) {
             throw new ResponseError("Required query parameter: start_date, end_date and gender for renter", 400);
-        }       
+        }
 
         if (startDate && endDate && renterGender) {
             if (startDate > endDate) {
@@ -108,18 +115,25 @@ export class GuesthouseRoomUsecase {
             // Proses pengurangan slot
             guesthouseRoom.availableSlot = guesthouseRoom.totalSlot;
             for (const rentedRoom of rentedGuesthouseRooms) {
-                const pendingDateTime: Date = rentedRoom.payment?.paymentTriggeredAt || rentedRoom.createdAt;
-                let paymentGatewayTokenExpiry: Date = new Date(pendingDateTime);
-                paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+                let paymentGatewayTokenExpiry: Date = new Date();
+                if (rentedRoom.payment?.paymentConfirmedAt) {
+                    const pendingDateTime: Date = rentedRoom.payment?.paymentConfirmedAt;
+                    paymentGatewayTokenExpiry = new Date(pendingDateTime);
+                    paymentGatewayTokenExpiry.setMinutes(paymentGatewayTokenExpiry.getMinutes() + 5);
+                } else {
+                    const pendingDateTime: Date = rentedRoom.createdAt;
+                    paymentGatewayTokenExpiry = new Date(pendingDateTime);
+                    paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+                }
 
                 if (rentedRoom.renterGender !== renterGender) {
                     guesthouseRoom.availableSlot = 0;
                     break;
                 }
-                
+
                 if (!(rentedRoom.status === "pending" && new Date() >= paymentGatewayTokenExpiry)) {
                     guesthouseRoom.availableSlot -= rentedRoom.slot;
-                }                    
+                }
             }
         }
 

@@ -16,9 +16,9 @@ export class CityHallUsecase {
         private rentRepository: RentRepositoryInterface,
         private objectStorageService: ObjectStorageInterface,
         private dbTransaction: DbTransactionInterface,
-    ) {}
+    ) { }
 
-    public async getAllCityHalls(userRole: string, startDate: Date|null, endDate: Date|null): Promise<CityHall[]> {
+    public async getAllCityHalls(userRole: string, startDate: Date | null, endDate: Date | null): Promise<CityHall[]> {
         let cityHalls: CityHall[] = await this.cityHallRepository.getAllCityHalls();
 
         if (userRole === "renter" && (!startDate || !endDate)) {
@@ -53,11 +53,18 @@ export class CityHallUsecase {
             for (const cityHall of cityHalls) {
                 for (const pricing of cityHall.cityHallPricing) {
                     const rentedCityHalls: Rent[] = rentMap.get(pricing.id) || [];
-                    
+
                     for (const rentedCityHall of rentedCityHalls) {
-                        const pendingDateTime: Date = rentedCityHall.payment?.paymentTriggeredAt || rentedCityHall.createdAt;
-                        let paymentGatewayTokenExpiry: Date = new Date(pendingDateTime);
-                        paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+                        let paymentGatewayTokenExpiry: Date = new Date();
+                        if (rentedCityHall.payment?.paymentConfirmedAt) {
+                            const pendingDateTime: Date = rentedCityHall.payment?.paymentConfirmedAt;
+                            paymentGatewayTokenExpiry = new Date(pendingDateTime);
+                            paymentGatewayTokenExpiry.setMinutes(paymentGatewayTokenExpiry.getMinutes() + 5);
+                        } else {
+                            const pendingDateTime: Date = rentedCityHall.createdAt;
+                            paymentGatewayTokenExpiry = new Date(pendingDateTime);
+                            paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+                        }
 
                         if (!(rentedCityHall.status === "pending" && new Date() >= paymentGatewayTokenExpiry)) {
                             cityHall.status = "tidak_tersedia";
@@ -71,8 +78,8 @@ export class CityHallUsecase {
         return cityHalls;
     }
 
-    public async getCityHallById(id: number, userRole: string, startDate: Date|null, endDate: Date|null): Promise<CityHall> {
-        const cityHall: CityHall|null = await this.cityHallRepository.getCityHallById(id);
+    public async getCityHallById(id: number, userRole: string, startDate: Date | null, endDate: Date | null): Promise<CityHall> {
+        const cityHall: CityHall | null = await this.cityHallRepository.getCityHallById(id);
 
         if (!cityHall) {
             throw new ResponseError("City hall not found", 404);
@@ -94,10 +101,17 @@ export class CityHallUsecase {
             );
 
             for (const rentedCityHall of rentedCityHalls) {
-                const pendingDateTime: Date = rentedCityHall.payment?.paymentTriggeredAt || rentedCityHall.createdAt;
-                let paymentGatewayTokenExpiry: Date = new Date(pendingDateTime);
-                paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
-                
+                let paymentGatewayTokenExpiry: Date = new Date();
+                if (rentedCityHall.payment?.paymentConfirmedAt) {
+                    const pendingDateTime: Date = rentedCityHall.payment?.paymentConfirmedAt;
+                    paymentGatewayTokenExpiry = new Date(pendingDateTime);
+                    paymentGatewayTokenExpiry.setMinutes(paymentGatewayTokenExpiry.getMinutes() + 5);
+                } else {
+                    const pendingDateTime: Date = rentedCityHall.createdAt;
+                    paymentGatewayTokenExpiry = new Date(pendingDateTime);
+                    paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+                }
+
                 if (!(rentedCityHall.status === "pending" && new Date() >= paymentGatewayTokenExpiry)) {
                     cityHall.status = "tidak_tersedia";
                     break;
@@ -132,14 +146,14 @@ export class CityHallUsecase {
     public async updateCityHall(id: number, cityHall: CityHall, cityHallMediaReq: File[], deletedObjectMedia: CityHallMedia[]): Promise<CityHall> {
         // Using transaction to ensure data consistency
         return await this.dbTransaction.run(async (tx) => {
-            const oldCityHallData: CityHall|null = await this.cityHallRepository.getCityHallById(id);
-    
+            const oldCityHallData: CityHall | null = await this.cityHallRepository.getCityHallById(id);
+
             if (!oldCityHallData) {
                 throw new ResponseError("City hall not found", 404);
             }
-            
+
             const updatedCityHall: CityHall = await this.cityHallRepository.updateCityHallOnly(id, cityHall, tx);
-    
+
             const oldCityHallPricingCount: number = oldCityHallData.cityHallPricing.length;
             let notNewCityHallPricingCount: number = 0
             let newCityHallPricingData: CityHallPricing[] = [];
@@ -179,14 +193,14 @@ export class CityHallUsecase {
                     }
                 }
             }
-    
+
             let newCityHallPricingFinal: CityHallPricing[] = [];
             if (newCityHallPricingData.length > 0) {
                 newCityHallPricingFinal = await this.cityHallRepository.createCityHallPricing(newCityHallPricingData, tx);
             }
-    
+
             finalCityHallPricing = finalCityHallPricing.concat(newCityHallPricingFinal);
-    
+
             for (const pricing of oldCityHallData.cityHallPricing) {
                 if (!notDeletedCityHallPricingId.includes(pricing.id)) {
                     await this.cityHallRepository.deleteCityHallPricing(pricing.id, tx);
@@ -200,31 +214,31 @@ export class CityHallUsecase {
                     ...file,
                     originalName: `${Date.now()}-${Math.random().toString(36).substring(7)}-${file.originalName}`,
                 }));
-    
+
                 const cityHallMediaReqURL: string[] = await this.objectStorageService.uploadMultipleFiles(cityHallMediaReq, "city-hall-media");
-    
+
                 // map cityHallMediaReqURL to cityHallMedia attribute
                 const cityHallMedia: CityHallMedia[] = cityHallMediaReqURL.map((url, index) => ({
                     id: index,
                     cityHallId: id,
                     url,
                 }));
-    
+
                 newCityHallMedia = await this.cityHallRepository.createCityHallMedia(cityHallMedia, tx);
             }
-    
+
             let deletedMediaId: number[] = [];
             if (deletedObjectMedia.length > 0) {
                 for (const media of deletedObjectMedia) {
-                    const cityHallMedia: CityHallMedia|null = await this.cityHallRepository.getCityHallMediaById(media.id, tx);
+                    const cityHallMedia: CityHallMedia | null = await this.cityHallRepository.getCityHallMediaById(media.id, tx);
                     if (!cityHallMedia) {
                         throw new ResponseError("City hall media not found", 404);
                     }
-    
-                    if(cityHallMedia.url !== media.url) {
+
+                    if (cityHallMedia.url !== media.url) {
                         throw new ResponseError("City hall media not found", 404);
                     }
-    
+
                     const mediaName: string = media.url.split('/').pop() as string;
                     const mediaPath: string = `city-hall-media/${mediaName}`;
                     await this.objectStorageService.deleteFile(mediaPath);
@@ -232,7 +246,7 @@ export class CityHallUsecase {
                     deletedMediaId.push(media.id);
                 }
             }
-    
+
             let finalCityHallMedia: CityHallMedia[] = [];
             for (const media of oldCityHallData.cityHallMedia) {
                 if (!deletedMediaId.includes(media.id)) {
@@ -244,21 +258,21 @@ export class CityHallUsecase {
             // Assign finalCityHallPricing and finalCityHallMedia to updatedCityHall to return the complete updated data
             updatedCityHall.cityHallPricing = finalCityHallPricing;
             updatedCityHall.cityHallMedia = finalCityHallMedia;
-    
+
             return updatedCityHall;
         });
     }
 
     public async deleteCityHall(id: number): Promise<CityHall> {
-        const cityHall: CityHall|null = await this.cityHallRepository.getCityHallById(id);
+        const cityHall: CityHall | null = await this.cityHallRepository.getCityHallById(id);
 
         if (!cityHall) {
             throw new ResponseError("City hall not found", 404);
         }
 
         const deletedCityHall: CityHall = await this.cityHallRepository.deleteCityHall(id);
-        
-        if(cityHall.cityHallMedia.length > 0) {
+
+        if (cityHall.cityHallMedia.length > 0) {
             for (const media of cityHall.cityHallMedia) {
                 const mediaName: string = media.url.split('/').pop() as string;
                 const mediaPath: string = `city-hall-media/${mediaName}`;

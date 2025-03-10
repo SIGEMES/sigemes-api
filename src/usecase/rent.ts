@@ -82,9 +82,16 @@ export class RentUsecase {
 
                 let bookedSlot: number = 0;
                 for (const rentedRoom of rentedGuesthouseRooms) {
-                    const pendingDateTime: Date = rentedRoom.payment?.paymentConfirmedAt || rentedRoom.createdAt;
-                    let paymentGatewayTokenExpiry: Date = new Date(pendingDateTime);
-                    paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+                    let paymentGatewayTokenExpiry: Date = new Date();
+                    if (rentedRoom.payment?.paymentConfirmedAt) {
+                        const pendingDateTime: Date = rentedRoom.payment?.paymentConfirmedAt;
+                        paymentGatewayTokenExpiry = new Date(pendingDateTime);
+                        paymentGatewayTokenExpiry.setMinutes(paymentGatewayTokenExpiry.getMinutes() + 5);
+                    } else {
+                        const pendingDateTime: Date = rentedRoom.createdAt;
+                        paymentGatewayTokenExpiry = new Date(pendingDateTime);
+                        paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+                    }
                     
                     if (rentedRoom.renterGender !== rent.renterGender) {
                         throw new ResponseError("Room is rented by different gender", 400);
@@ -136,8 +143,16 @@ export class RentUsecase {
                 let allCityHallPricingIds: number[] = cityHall.cityHallPricing.map((pricing) => pricing.id);
                 const rentedCityHalls: Rent[] = await this.rentRepository.getFilteredActiveRentsByCityHallPricingIds(allCityHallPricingIds, rent.startDate, rent.endDate);
                 for (const rentedCityHall of rentedCityHalls) {
-                    let paymentGatewayTokenExpiry: Date = new Date(rentedCityHall.createdAt);
-                    paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+                    let paymentGatewayTokenExpiry: Date = new Date();
+                    if (rentedCityHall.payment?.paymentConfirmedAt) {
+                        const pendingDateTime: Date = rentedCityHall.payment?.paymentConfirmedAt;
+                        paymentGatewayTokenExpiry = new Date(pendingDateTime);
+                        paymentGatewayTokenExpiry.setMinutes(paymentGatewayTokenExpiry.getMinutes() + 5);
+                    } else {
+                        const pendingDateTime: Date = rentedCityHall.createdAt;
+                        paymentGatewayTokenExpiry = new Date(pendingDateTime);
+                        paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+                    }
 
                     if (!(rentedCityHall.status === "pending" && new Date() >= paymentGatewayTokenExpiry)) {
                         throw new ResponseError("City hall is not available", 400);
