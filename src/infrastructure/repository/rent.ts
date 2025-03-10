@@ -264,6 +264,7 @@ export class RentRepository implements RentRepositoryInterface {
                         },
                     },
                 },
+                payment: true,
             },
         }) as Rent;
 

@@ -50,4 +50,8 @@ export class MidtransService implements PaymentGatewayInterface {
 
         return response.token;
     }
+
+    async cancelTransaction(orderId: string): Promise<void> {
+        await snap.transaction.cancel(orderId);
+    }
 }

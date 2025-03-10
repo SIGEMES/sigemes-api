@@ -210,7 +210,20 @@ export class RentUsecase {
             }
         }
 
-        return await this.rentRepository.updateRentStatus(rentId, "dibatalkan");
+        // Using transaction to ensure data consistency
+        return await this.dbTransaction.run(async (tx) => {
+            if (!rent.payment?.id) {
+                throw new ResponseError("Payment not found", 404);
+            }
+            
+            await this.paymentRepository.updatePaymentStatus(rent.payment?.id, "gagal", tx);
+            const updatedRent: Rent = await this.rentRepository.updateRentStatus(rentId, "dibatalkan", tx);
+            if (rent.payment.paymentTriggeredAt) {
+                await this.paymentGatewayService.cancelTransaction(rent.payment.id);
+            }
+
+            return updatedRent;
+        });
     }
 
     public async checkInRent(rentId: number): Promise<Rent> {
