@@ -10,8 +10,8 @@ export class GetRenterResponse {
         public profile_picture: string,
     ) {}
 
-    public static fromEntity(renter: Renter|null): GetRenterResponse|null {
-        if (!renter) return null;
+    public static fromEntity(renter: Renter|null): GetRenterResponse|undefined {
+        if (!renter) return undefined;
         
         return new GetRenterResponse(
             renter.id,

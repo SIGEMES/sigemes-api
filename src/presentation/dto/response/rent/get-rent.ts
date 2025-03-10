@@ -18,7 +18,7 @@ export class GetRentResponse {
         public city_hall_pricing: GetCityHallPricingResponse | undefined,
         public guesthouse_room_pricing: GetGuesthouseRoomPricingResponse | undefined,
         public payment: GetPaymentResponse | null,
-        public renter: GetRenterResponse | null,
+        public renter: GetRenterResponse | undefined,
         public created_at: Date,
         public updated_at: Date,
     ) {}
