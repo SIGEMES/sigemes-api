@@ -58,8 +58,8 @@ export class RentUsecase {
             if (rent.guesthouseRoomPricingId && rent.cityHallPricingId) {
                 throw new ResponseError("Please choose one of guesthouse room pricing or city hall pricing", 400);
             } else if (rent.guesthouseRoomPricingId && rent.guesthouseRoomPricingId > 0) {
-                if (rent.startDate > rent.endDate) {
-                    throw new ResponseError("Start date must be before or equal to end date", 400);
+                if (rent.startDate >= rent.endDate) {
+                    throw new ResponseError("Start date must be before to end date", 400);
                 }
 
                 const guesthouseRoomPricing: GuesthouseRoomPricing | null = await this.guesthouseRoomRepository.getGuesthouseRoomPricingById(rent.guesthouseRoomPricingId);
@@ -101,7 +101,7 @@ export class RentUsecase {
                 }
 
                 createdRent = await this.rentRepository.createRent(rent, tx);
-                const daysRent: number = ((rent.endDate.getTime() - rent.startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+                const daysRent: number = ((rent.endDate.getTime() - rent.startDate.getTime()) / (1000 * 60 * 60 * 24));
                 actualTotalPrice = guesthouseRoomPricing.pricePerDay * daysRent;
                 if (guesthouseRoomPricing.retributionType !== "Khusus Booking 1 Kamar") {
                     actualTotalPrice *= rent.slot;
@@ -115,6 +115,12 @@ export class RentUsecase {
 
                 if (rent.startDate > rent.endDate) {
                     throw new ResponseError("Start date must be before or equal to end date", 400);
+                }
+
+                const twoWeeksFromNow: Date = new Date();
+                twoWeeksFromNow.setDate(twoWeeksFromNow.getDate() + 14);
+                if (rent.startDate > twoWeeksFromNow) {
+                    throw new ResponseError("Start date must be within the next 2 weeks", 400);
                 }
 
                 const cityHallPricing: CityHallPricing | null = await this.cityHallRepository.getCityHallPricingById(rent.cityHallPricingId);
