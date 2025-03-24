@@ -20,7 +20,7 @@ export class RenterUsecase {
         const renterData: Renter | null = await this.renterRepository.getRenterByEmail(email);
 
         if (!renterData) {
-            throw new ResponseError('Renter not found', 400);
+            throw new ResponseError('Email not found', 400);
         }
 
         const passwordMatch = await this.bcryptService.comparePassword(password, renterData.password);
@@ -48,7 +48,7 @@ export class RenterUsecase {
         const renterData: Renter | null = await this.renterRepository.getRenterById(id);
 
         if (!renterData) {
-            throw new ResponseError('Renter not found', 200);
+            throw new ResponseError('Renter data not found', 200);
         }
 
         return renterData;
@@ -73,7 +73,7 @@ export class RenterUsecase {
         const renterData: Renter | null = await this.renterRepository.getRenterByEmail(email);
 
         if (!renterData) {
-            throw new ResponseError('Renter not found', 200);
+            throw new ResponseError('Email not found', 200);
         }
 
         const otp: string = Math.floor(10000 + Math.random() * 90000).toString();
@@ -92,7 +92,7 @@ export class RenterUsecase {
         const renterData: Renter | null = await this.renterRepository.getRenterOTPByEmail(email);
 
         if (!renterData) {
-            throw new ResponseError('Renter not found', 400);
+            throw new ResponseError('Email not found', 400);
         }
 
         if (!renterData.otp || !renterData.otpExpiry) {
@@ -144,7 +144,7 @@ export class RenterUsecase {
         const renterData: Renter | null = await this.renterRepository.getRenterByEmail(email);
 
         if (!renterData) {
-            throw new ResponseError('Renter not found', 400);
+            throw new ResponseError('Email not found', 400);
         }
 
         if (renterData.forgotPasswordVerified === false) {
