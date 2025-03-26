@@ -73,7 +73,7 @@ export class RenterUsecase {
         const renterData: Renter | null = await this.renterRepository.getRenterByEmail(email);
 
         if (!renterData) {
-            throw new ResponseError('Email not found', 200);
+            throw new ResponseError('Email not found', 400);
         }
 
         const otp: string = Math.floor(10000 + Math.random() * 90000).toString();

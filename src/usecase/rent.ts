@@ -40,7 +40,7 @@ export class RentUsecase {
         }
 
         if (userRole === "renter" && rent.renterId !== userId) {
-            throw new ResponseError("You are not authorized to access this rent data", 403);
+            throw new ResponseError("You do not have permission to access this resource", 403);
         }
 
         return rent;
@@ -218,7 +218,7 @@ export class RentUsecase {
 
         if (userRole === "renter") {
             if (rent.renterId !== userId) {
-                throw new ResponseError("You are not authorized to cancel this rent", 403);
+                throw new ResponseError("You do not have permission to access this resource", 403);
             }
             if (rent.status !== "pending") {
                 throw new ResponseError("Rent cannot be cancelled", 400);

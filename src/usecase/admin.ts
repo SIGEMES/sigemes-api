@@ -18,7 +18,7 @@ export class AdminUsecase {
         const adminData: Admin | null = await this.adminRepository.getAdminByEmail(email);
 
         if (!adminData) {
-            throw new ResponseError('Admin not found', 400);
+            throw new ResponseError('Admin email not found', 400);
         }
 
         const passwordMatch = await this.bcryptService.comparePassword(password, adminData.password);
@@ -65,7 +65,7 @@ export class AdminUsecase {
         const adminData: Admin | null = await this.adminRepository.getAdminByEmail(admin.email);
 
         if (adminData) {
-            throw new ResponseError('Email already used', 400);
+            throw new ResponseError('Email already registered', 400);
         }
 
         const hashedPassword: string = await this.bcryptService.hashPassword(admin.password);
