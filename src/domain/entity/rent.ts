@@ -5,6 +5,8 @@ import { Renter } from "./renter";
 
 export type RentStatus = 'pending' | 'dikonfirmasi' | 'selesai' | 'dibatalkan';
 export type Gender = "laki_laki" | "perempuan";
+export type RentType = 'guesthouse' | 'city_hall';
+export type CheckinCheckoutStatus = 'belum_checkin' | 'sudah_checkin' | 'belum_checkout' | 'sudah_checkout';
 
 export class Rent {
     constructor (
@@ -26,5 +28,18 @@ export class Rent {
         public guesthouseRoomPricing: GuesthouseRoomPricing | null = null,
         public cityHallPricing: CityHallPricing | null = null,
         public payment: Payment | null = null,
+    ) {}
+}
+
+export class RentFilter {
+    constructor (
+        public page: number = 1,
+        public limit: number = 10,
+        public search: string | null = null,
+        public type: RentType | null = null,
+        public status: RentStatus | null = null,
+        public checkinCheckoutStatus: CheckinCheckoutStatus | null = null,
+        public startDate: Date | null = null,
+        public endDate: Date | null = null,
     ) {}
 }

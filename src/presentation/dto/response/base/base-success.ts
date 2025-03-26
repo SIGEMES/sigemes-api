@@ -9,3 +9,12 @@ export class BaseSuccessResponse {
         }
     }
 }
+
+export class BaseSuccessPaginatedResponse {
+    constructor(
+        public status: boolean,
+        public message: string,
+        public pagination: any,
+        public data: any,
+    ) {}
+}

@@ -1,12 +1,27 @@
 import { PrismaClient } from "@prisma/client";
 import { RentRepositoryInterface } from "../../domain/interface/repository/rent";
-import { Rent, RentStatus } from "../../domain/entity/rent";
+import { Rent, RentFilter, RentStatus } from "../../domain/entity/rent";
 
 export class RentRepository implements RentRepositoryInterface {
     constructor(private prisma: PrismaClient) { }
 
-    public async getAllRents(): Promise<Rent[]> {
+    public async getCountRents(whereConditions: any): Promise<number> {
+        const count: number = await this.prisma.rent.count({
+            where: {
+                ...whereConditions,
+            },
+        });
+
+        return count;
+    }
+
+    public async getAllRents(page: number, limit: number, whereConditions: any): Promise<Rent[]> {
         const rents: Rent[] = await this.prisma.rent.findMany({
+            skip: (page - 1) * limit,
+            take: limit,
+            where: {
+                ...whereConditions,
+            },
             include: {
                 guesthouseRoomPricing: {
                     include: {

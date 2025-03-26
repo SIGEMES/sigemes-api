@@ -1,7 +1,8 @@
-import { Rent, RentStatus } from "../../entity/rent";
+import { Rent, RentFilter, RentStatus } from "../../entity/rent";
 
 export interface RentRepositoryInterface {
-    getAllRents(): Promise<Rent[]>;
+    getCountRents(whereConditions: any): Promise<number>;
+    getAllRents(page: number, limit: number, whereConditions: any): Promise<Rent[]>;
     getAllRentsByRenterId(renterId: number): Promise<Rent[]>;
     getRentById(rentId: number): Promise<Rent>;
     getFilteredActiveRentsByGuesthouseRoomPricingIds(guesthouseRoomPricingIds: number[], startDate: Date, endDate: Date): Promise<Rent[]>;
