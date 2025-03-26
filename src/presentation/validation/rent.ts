@@ -13,4 +13,15 @@ export class RentValidation {
         end_date: z.date(),
         renter_gender: z.enum(['laki_laki', 'perempuan']),
     });
+
+    public static filter = z.object({
+        page: z.number().min(1).optional(),
+        limit: z.number().min(1).optional(),
+        search: z.string().optional(),
+        type: z.enum(['guesthouse', 'city_hall']).optional(),
+        status: z.enum(['pending', 'dikonfirmasi', 'selesai', 'dibatalkan']).optional(),
+        checkin_checkout_status: z.enum(['belum_checkin', 'sudah_checkin', 'belum_checkout', 'sudah_checkout']).optional(),
+        start_date: z.date().optional(),
+        end_date: z.date().optional(),
+    })
 }

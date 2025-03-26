@@ -1,19 +1,42 @@
 import { Request, Response, NextFunction } from 'express';
 import { Rent } from '../../domain/entity/rent';
 import { RentUsecase } from '../../usecase/rent';
-import { BaseSuccessResponse } from '../dto/response/base/base-success';
+import { BaseSuccessPaginatedResponse, BaseSuccessResponse } from '../dto/response/base/base-success';
 import { GetRentResponse } from '../dto/response/rent/get-rent';
 import { RentValidation } from '../validation/rent';
 import { CreateRentRequest } from '../dto/request/rent/create';
+import { RentFilter } from '../../domain/entity/rent';
+import { RentFilterRequest } from '../dto/request/rent/filter';
+import { Pagination } from '../../domain/entity/pagination';
+import { PaginationResponse } from '../dto/response/pagination/pagination';
 
 export class RentController {
     constructor(private rentUsecase: RentUsecase) { }
 
     public async getAllRents(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const rents: Rent[] = await this.rentUsecase.getAllRents(res.locals.user.id, res.locals.user.role);
-            const rentsResponse: GetRentResponse[] = rents.map(rent => GetRentResponse.fromEntity(rent));
-            res.status(200).json(new BaseSuccessResponse(true, "Get all rents success", rentsResponse));
+            const filter: RentFilterRequest = RentValidation.filter.parse({
+                page: Number(req.query.page),
+                limit: Number(req.query.limit),
+                search: req.query.search,
+                type: req.query.type,
+                status: req.query.status,
+                checkin_checkout_status: req.query.checkin_checkout_status,
+                start_date: req.query.start_date ? new Date(req.query.start_date as string) : undefined,
+                end_date: req.query.end_date ? new Date(req.query.end_date as string) : undefined
+            });
+
+            const filterEntity: RentFilter = RentFilterRequest.toEntity(filter);
+
+            const result: {
+                pagination: Pagination,
+                rents: Rent[]
+            } = await this.rentUsecase.getAllRents(res.locals.user.id, res.locals.user.role, filterEntity);
+
+            const rentsResponse: GetRentResponse[] = result.rents.map(rent => GetRentResponse.fromEntity(rent));
+            const paginationResponse: PaginationResponse = PaginationResponse.fromEntity(result.pagination);
+            
+            res.status(200).json(new BaseSuccessPaginatedResponse(true, "Get all rents success", paginationResponse , rentsResponse));
         } catch (error) {
             next(error);
         }

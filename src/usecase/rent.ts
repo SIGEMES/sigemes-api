@@ -1,4 +1,4 @@
-import { Rent } from "../domain/entity/rent";
+import { Rent, RentFilter } from "../domain/entity/rent";
 import { GuesthouseRoomPricing } from "../domain/entity/guesthouse-room-pricing";
 import { GuesthouseRoom } from "../domain/entity/guesthouse-room";
 import { ResponseError } from "../domain/error/response-error";
@@ -12,6 +12,7 @@ import { CityHallPricing } from "../domain/entity/city-hall-pricing";
 import { PaymentRepositoryInterface } from "../domain/interface/repository/payment";
 import { Payment } from "../domain/entity/payment";
 import { CryptoInterface } from "../domain/interface/library/crypto";
+import { Pagination } from "../domain/entity/pagination";
 
 export class RentUsecase {
     constructor(
@@ -24,12 +25,96 @@ export class RentUsecase {
         private cryptoService: CryptoInterface,
     ) { }
 
-    public async getAllRents(userId: number, userRole: string): Promise<Rent[]> {
+    public async getAllRents(userId: number, userRole: string, filter: RentFilter): Promise<{ pagination: Pagination, rents: Rent[] }> {
+        const whereConditions: any = {};
+        const pagination: Pagination= new Pagination();
+
         if (userRole === "renter") {
-            return this.rentRepository.getAllRentsByRenterId(userId);
+            const count: number = await this.rentRepository.getCountRents(whereConditions);
+            pagination.totalData = count;
+            pagination.page = 1;
+            pagination.limit = count;
+            pagination.lastPage = 1;
+
+            const rents: Rent[] = await this.rentRepository.getAllRentsByRenterId(userId);
+
+            return {
+                pagination,
+                rents,
+            }
         }
 
-        return this.rentRepository.getAllRents();
+        if (filter.search) {
+            whereConditions.renter = {
+                fullname: {
+                    contains: filter.search,
+                    mode: "insensitive",
+                }
+            }
+        }
+
+        if (filter.type) {
+            if (filter.type === "guesthouse") {
+                whereConditions.guesthouseRoomPricingId = {
+                    not: null,
+                }
+            } else if (filter.type === "city_hall") {
+                whereConditions.cityHallPricingId = {
+                    not: null,
+                }
+            }
+        }
+
+        if (filter.status) {
+            whereConditions.status = {
+                equals: filter.status,
+            }
+        }
+
+        if (filter.checkinCheckoutStatus) {
+            if (filter.checkinCheckoutStatus === "belum_checkin") {
+                whereConditions.checkIn = {
+                    equals: null,
+                }
+            } else if (filter.checkinCheckoutStatus === "sudah_checkin") {
+                whereConditions.checkIn = {
+                    not: null,
+                }
+            } else if (filter.checkinCheckoutStatus === "belum_checkout") {
+                whereConditions.checkOut = {
+                    equals: null,
+                }
+            } else if (filter.checkinCheckoutStatus === "sudah_checkout") {
+                whereConditions.checkOut = {
+                    not: null,
+                }
+            }
+        }
+
+        if (filter.startDate) {
+            whereConditions.startDate = {
+                gte: filter.startDate,
+            }
+        }
+
+        if (filter.endDate) {
+            whereConditions.endDate = {
+                lte: filter.endDate,
+            }
+        }
+
+        const count: number = await this.rentRepository.getCountRents(whereConditions);
+        pagination.totalData = count;
+        pagination.page = filter.page;
+        pagination.limit = filter.limit;
+        pagination.lastPage = Math.ceil(count / filter.limit);
+
+        const rents: Rent[] = await this.rentRepository.getAllRents(filter.page, filter.limit, whereConditions);
+
+        return {
+            pagination,
+            rents,
+        }
     }
 
     public async getRentById(rentId: number, userId: number, userRole: string): Promise<Rent> {
