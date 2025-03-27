@@ -18,6 +18,9 @@ export class WebServer {
 
         this.app.use(express.json());
         this.app.use(cors());
+        this.app.get("/api/v1/docs", (req, res) => {
+            res.redirect("https://documenter.getpostman.com/view/31634961/2sAYQamX7E");
+        });
         this.app.use("/api/v1/renters", this.APIRouter.renterRouter);
         this.app.use("/api/v1/admins", this.APIRouter.adminRouter);
         this.app.use("/api/v1/city-halls", this.APIRouter.cityHallRouter);
