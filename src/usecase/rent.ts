@@ -45,11 +45,33 @@ export class RentUsecase {
         }
 
         if (filter.search) {
-            whereConditions.renter = {
-                fullname: {
-                    contains: filter.search,
-                    mode: "insensitive",
-                }
+            whereConditions.OR = [
+                {
+                    renter: {
+                        fullname: {
+                            contains: filter.search,
+                            mode: "insensitive"
+                        }
+                    }
+                },
+                {
+                    renter: {
+                        email: {
+                            contains: filter.search,
+                            mode: "insensitive"
+                        }
+                    }
+                },
+            ]
+
+            if(this.cryptoService.isUUID(filter.search)) {
+                whereConditions.OR.push({
+                    payment: {
+                        is: {
+                            id: filter.search,
+                        }
+                    }
+                });
             }
         }
 
