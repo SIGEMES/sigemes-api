@@ -69,7 +69,7 @@ export class ReviewController {
                 }));
             }
 
-            const createdReview: Review = await this.reviewUsecase.createReview(reviewEntity, reviewMedia);
+            const createdReview: Review = await this.reviewUsecase.createReview(reviewEntity, reviewMedia, res.locals.user.id);
             const reviewResponse: GetReviewResponse = GetReviewResponse.fromEntity(createdReview);
             res.status(201).json(new BaseSuccessResponse(true, "Create review success", reviewResponse));
 

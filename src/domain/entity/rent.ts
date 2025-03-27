@@ -2,6 +2,7 @@ import { GuesthouseRoomPricing } from "./guesthouse-room-pricing";
 import { CityHallPricing } from "./city-hall-pricing";
 import { Payment } from "./payment";
 import { Renter } from "./renter";
+import { Review } from "./review";
 
 export type RentStatus = 'pending' | 'dikonfirmasi' | 'selesai' | 'dibatalkan';
 export type Gender = "laki_laki" | "perempuan";
@@ -28,6 +29,7 @@ export class Rent {
         public guesthouseRoomPricing: GuesthouseRoomPricing | null = null,
         public cityHallPricing: CityHallPricing | null = null,
         public payment: Payment | null = null,
+        public review: Review | null = null,
     ) {}
 }
 

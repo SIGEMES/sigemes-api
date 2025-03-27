@@ -91,7 +91,7 @@ export async function main(): Promise<void> {
     const rentUsecase: RentUsecase = new RentUsecase(rentRepository, guesthouseRoomRepository, cityHallRepository, paymentRepository, dbTransaction, paymentGatewayService, cryptoService);
     const paymentUsecase: PaymentUsecase = new PaymentUsecase(paymentRepository, rentRepository, dbTransaction, paymentGatewayService, cryptoService);
     const dashboardUsecase: DashboardUsecase = new DashboardUsecase(paymentRepository, guesthouseRepository, cityHallRepository);
-    const reviewUsecase: ReviewUsecase = new ReviewUsecase(reviewRepository, dbTransaction, objectStorageService);
+    const reviewUsecase: ReviewUsecase = new ReviewUsecase(reviewRepository, rentRepository, dbTransaction, objectStorageService);
     
     // Controller Instance
     const renterController: RenterController = new RenterController(renterUsecase);

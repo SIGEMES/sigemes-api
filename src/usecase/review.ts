@@ -1,3 +1,4 @@
+import { Rent } from "../domain/entity/rent";
 import { Review } from "../domain/entity/review";
 import { ReviewMedia } from "../domain/entity/review-media";
 import { ReviewReply } from "../domain/entity/review-reply";
@@ -5,11 +6,13 @@ import { ResponseError } from "../domain/error/response-error";
 import { ObjectStorageInterface } from "../domain/interface/external-service/object-storage";
 import { File } from "../domain/interface/library/file";
 import { DbTransactionInterface } from "../domain/interface/repository/db-transaction";
+import { RentRepositoryInterface } from "../domain/interface/repository/rent";
 import { ReviewRepositoryInterface } from "../domain/interface/repository/review";
 
 export class ReviewUsecase {
     constructor(
         private reviewRepository: ReviewRepositoryInterface,
+        private rentRepository: RentRepositoryInterface,
         private dbTransaction: DbTransactionInterface,
         private objectStorageService: ObjectStorageInterface,
     ) { }
@@ -35,12 +38,24 @@ export class ReviewUsecase {
         return review;
     }
 
-    public async createReview(review: Review, media: File[]): Promise<Review> {
-        const existingReview: Review | null = await this.reviewRepository.getReviewByRentId(review.rentId);
-        if (existingReview) {
+    public async createReview(review: Review, media: File[], renterId: number): Promise<Review> {
+        const rentWithReview: Rent | null = await this.rentRepository.getRentByIdWithReview(review.rentId);
+        if (!rentWithReview) {
+            throw new ResponseError("Rent not found", 404);
+        }
+
+        if (rentWithReview.status !== "selesai") {
+            throw new ResponseError("Rent is not finished yet", 400);
+        }
+
+        if (rentWithReview.review) {
             throw new ResponseError("Review already exists", 400);
         }
-        
+
+        if (rentWithReview.renterId !== renterId) {
+            throw new ResponseError("You do not have permission to access this resource", 403);
+        }
+
         if (media.length > 0) {
             if (media.length > 5) {
                 throw new ResponseError("Maximum media upload is 5 files", 400);
@@ -81,7 +96,7 @@ export class ReviewUsecase {
             }
 
             if (oldReview.rent.renter.id !== renterId) {
-                throw new ResponseError("You are not authorized to update this review", 403);
+                throw new ResponseError("You do not have permission to access this resource", 403);
             }
 
             let updatedReview: Review = oldReview;
@@ -112,21 +127,21 @@ export class ReviewUsecase {
                 newMedia = await this.reviewRepository.createReviewMedia(newMedia, tx);
             }
 
-            let deletedRoomIds: number[] = [];
+            let deletedMediaIds: number[] = [];
             if (deletedObjectMedia.length > 0) {
                 for (const media of deletedObjectMedia) {
                     const mediaName: string = media.url.split("/").pop() as string;
                     const mediaPath: string = `review-media/${mediaName}`;
                     await this.objectStorageService.deleteFile(mediaPath);
-                    deletedRoomIds.push(media.id);
+                    deletedMediaIds.push(media.id);
                 }
                 
-                await this.reviewRepository.deleteReviewMediaByIds(deletedRoomIds, tx);
+                await this.reviewRepository.deleteReviewMediaByIds(deletedMediaIds, tx);
             }
 
             let finalReviewMedia: ReviewMedia[] = [];
             for (const media of oldReview.reviewMedia) {
-                if (deletedRoomIds.includes(media.id)) {
+                if (deletedMediaIds.includes(media.id)) {
                     continue;
                 }
 

@@ -133,6 +133,20 @@ export class RentRepository implements RentRepositoryInterface {
         return rent;
     }
 
+    public async getRentByIdWithReview(rentId: number): Promise<Rent> {
+        const rent: Rent = await this.prisma.rent.findUnique({
+            where: {
+                id: rentId,
+            },
+            include: {
+                renter: true,
+                review: true,
+            },
+        }) as Rent;
+
+        return rent;
+    };
+
     public async getFilteredActiveRentsByGuesthouseRoomPricingIds(guesthouseRoomPricingIds: number[], startDate: Date, endDate: Date): Promise<Rent[]> {
         const rents: Rent[] = await this.prisma.rent.findMany({
             where: {

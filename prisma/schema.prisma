@@ -188,7 +188,7 @@ model Rent {
   guesthouseRoomPricing   GuesthouseRoomPricing? @relation(fields: [guesthouseRoomPricingId], references: [id])
   cityHallPricing         CityHallPricing?       @relation(fields: [cityHallPricingId], references: [id])
   payment                 Payment?
-  Review                  Review[]
+  review                  Review?
 
   @@map("rents")
 }
@@ -215,7 +215,7 @@ model Payment {
 
 model Review {
   id          Int           @id @default(autoincrement())
-  rentId      Int           @map("rent_id")
+  rentId      Int           @map("rent_id") @unique
   rating      Int
   comment     String        @db.Text
   createdAt   DateTime      @default(now()) @map("created_at")
