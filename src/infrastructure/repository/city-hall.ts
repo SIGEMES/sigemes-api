@@ -95,6 +95,7 @@ export class CityHallRepository implements CityHallRepositoryInterface {
                     address: cityHall.address,
                     latitude: cityHall.latitude,
                     longitude: cityHall.longitude,
+                    status: cityHall.status,
                     contactPerson: cityHall.contactPerson,
                     cityHallMedia: {
                         create: cityHall.cityHallMedia.map(media => ({
@@ -118,6 +119,7 @@ export class CityHallRepository implements CityHallRepositoryInterface {
                     address: true,
                     latitude: true,
                     longitude: true,
+                    status: true,
                     contactPerson: true,
                     cityHallMedia: {
                         select: {
@@ -198,6 +200,7 @@ export class CityHallRepository implements CityHallRepositoryInterface {
                     address: cityHall.address,
                     latitude: cityHall.latitude,
                     longitude: cityHall.longitude,
+                    status: cityHall.status,
                     contactPerson: cityHall.contactPerson,
                 },
                 select: {
@@ -209,6 +212,7 @@ export class CityHallRepository implements CityHallRepositoryInterface {
                     address: true,
                     latitude: true,
                     longitude: true,
+                    status: true,
                     contactPerson: true,
                 },
             }
