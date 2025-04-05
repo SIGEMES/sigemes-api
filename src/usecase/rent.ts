@@ -30,6 +30,9 @@ export class RentUsecase {
         const pagination: Pagination= new Pagination();
 
         if (userRole === "renter") {
+            whereConditions.renter = {
+                id: userId,
+            };
             const count: number = await this.rentRepository.getCountRents(whereConditions);
             pagination.totalData = count;
             pagination.page = 1;

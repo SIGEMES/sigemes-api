@@ -20,7 +20,7 @@ export class RenterUsecase {
         const renterData: Renter | null = await this.renterRepository.getRenterByEmail(email);
 
         if (!renterData) {
-            throw new ResponseError('Email not found', 400);
+            throw new ResponseError('Email not found', 404);
         }
 
         const passwordMatch = await this.bcryptService.comparePassword(password, renterData.password);
@@ -48,7 +48,7 @@ export class RenterUsecase {
         const renterData: Renter | null = await this.renterRepository.getRenterById(id);
 
         if (!renterData) {
-            throw new ResponseError('Renter data not found', 200);
+            throw new ResponseError('Renter data not found', 404);
         }
 
         return renterData;
@@ -73,7 +73,7 @@ export class RenterUsecase {
         const renterData: Renter | null = await this.renterRepository.getRenterByEmail(email);
 
         if (!renterData) {
-            throw new ResponseError('Email not found', 400);
+            throw new ResponseError('Email not found', 404);
         }
 
         const otp: string = Math.floor(10000 + Math.random() * 90000).toString();
@@ -92,11 +92,11 @@ export class RenterUsecase {
         const renterData: Renter | null = await this.renterRepository.getRenterOTPByEmail(email);
 
         if (!renterData) {
-            throw new ResponseError('Email not found', 400);
+            throw new ResponseError('Email not found', 404);
         }
 
         if (!renterData.otp || !renterData.otpExpiry) {
-            throw new ResponseError('OTP not found', 400);
+            throw new ResponseError('OTP not found', 404);
         }
 
         if (renterData.otp !== otp) {
@@ -116,13 +116,13 @@ export class RenterUsecase {
 
     public async changePassword(idParam: number, idToken: number, oldPassword: string, newPassword: string): Promise<void> {
         if (idParam !== idToken) {
-            throw new ResponseError('Unauthorized', 401);
+            throw new ResponseError('You do not have permission to access this resource', 403);
         }
 
         const renterData: Renter | null = await this.renterRepository.getRenterById(idToken);
 
         if (!renterData) {
-            throw new ResponseError('Renter not found', 400);
+            throw new ResponseError('Renter not found', 404);
         }
 
         if (oldPassword === newPassword) {
@@ -144,7 +144,7 @@ export class RenterUsecase {
         const renterData: Renter | null = await this.renterRepository.getRenterByEmail(email);
 
         if (!renterData) {
-            throw new ResponseError('Email not found', 400);
+            throw new ResponseError('Email not found', 404);
         }
 
         if (renterData.forgotPasswordVerified === false) {
@@ -158,13 +158,13 @@ export class RenterUsecase {
 
     public async updateProfile(idParam: number, idToken: number, renter: Renter, profilePicture?: File): Promise<Renter> {
         if (idParam !== idToken) {
-            throw new ResponseError('Unauthorized', 401);
+            throw new ResponseError('You do not have permission to access this resource', 403);
         }
 
         const renterData: Renter | null = await this.renterRepository.getRenterById(idToken);
 
         if (!renterData) {
-            throw new ResponseError('Renter not found', 400);
+            throw new ResponseError('Renter not found', 404);
         }
 
         renter.profilePicture = renterData.profilePicture;

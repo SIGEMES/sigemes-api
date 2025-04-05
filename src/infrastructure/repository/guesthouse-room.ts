@@ -194,10 +194,8 @@ export class GuesthouseRoomRepository implements GuesthouseRoomRepositoryInterfa
                     name: true,
                     type: true,
                     facilities: true,
-                    availableSlot: true,
                     totalSlot: true,
                     areaM2: true,
-                    status: true,
                 }
             }
         ) as GuesthouseRoom;

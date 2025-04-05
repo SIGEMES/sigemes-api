@@ -18,7 +18,7 @@ export class AdminUsecase {
         const adminData: Admin | null = await this.adminRepository.getAdminByEmail(email);
 
         if (!adminData) {
-            throw new ResponseError('Admin email not found', 400);
+            throw new ResponseError('Admin email not found', 404);
         }
 
         const passwordMatch = await this.bcryptService.comparePassword(password, adminData.password);
@@ -55,7 +55,7 @@ export class AdminUsecase {
         const admin: Admin | null = await this.adminRepository.getAdminById(id);
 
         if (!admin) {
-            throw new ResponseError('Admin not found', 400);
+            throw new ResponseError('Admin not found', 404);
         }
 
         return admin;
@@ -80,7 +80,7 @@ export class AdminUsecase {
         const adminData: Admin | null = await this.adminRepository.getAdminById(admin.id);
 
         if (!adminData) {
-            throw new ResponseError('Admin not found', 400);
+            throw new ResponseError('Admin not found', 404);
         }
 
         admin.profilePicture = adminData.profilePicture;
@@ -116,7 +116,7 @@ export class AdminUsecase {
         const admin: Admin | null = await this.adminRepository.getAdminById(id);
 
         if (!admin) {
-            throw new ResponseError('Admin not found', 400);
+            throw new ResponseError('Admin not found', 404);
         }
 
         const deletedAdmin: Admin = await this.adminRepository.deleteAdmin(id);
