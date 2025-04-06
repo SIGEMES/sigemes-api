@@ -319,7 +319,7 @@ export class RentUsecase {
         });
     }
 
-    public async cancelRent(rentId: number, userId: number, userRole: string): Promise<Rent> {
+    public async cancelRent(rentId: number, userId: number, userRole: string): Promise<void> {
         const rent: Rent = await this.rentRepository.getRentById(rentId);
 
         if (!rent) {
@@ -336,22 +336,20 @@ export class RentUsecase {
         }
 
         // Using transaction to ensure data consistency
-        return await this.dbTransaction.run(async (tx) => {
+        await this.dbTransaction.run(async (tx) => {
             if (!rent.payment?.id) {
                 throw new ResponseError("Payment not found", 404);
             }
             
             await this.paymentRepository.updatePaymentStatus(rent.payment?.id, "gagal", tx);
-            const updatedRent: Rent = await this.rentRepository.updateRentStatus(rentId, "dibatalkan", tx);
+            await this.rentRepository.updateRentStatus(rentId, "dibatalkan", tx);
             if (rent.payment.paymentTriggeredAt) {
                 await this.paymentGatewayService.cancelTransaction(rent.payment.id);
             }
-
-            return updatedRent;
         });
     }
 
-    public async checkInRent(rentId: number): Promise<Rent> {
+    public async checkInRent(rentId: number): Promise<void> {
         const rent: Rent = await this.rentRepository.getRentById(rentId);
 
         if (!rent) {
@@ -363,23 +361,31 @@ export class RentUsecase {
         }
 
         if (new Date() < rent.startDate) {
-            throw new ResponseError("Rent cannot be checked in yet", 400);
+            throw new ResponseError("Rent cannot be checked in", 400);
         }
 
-        return await this.rentRepository.updateRentCheckIn(rentId);
+        if (rent.checkIn) {
+            throw new ResponseError("Rent already checked in", 400);
+        }
+
+        await this.rentRepository.updateRentCheckIn(rentId);
     }
 
-    public async checkOutRent(rentId: number): Promise<Rent> {
+    public async checkOutRent(rentId: number): Promise<void> {
         const rent: Rent = await this.rentRepository.getRentById(rentId);
 
         if (!rent) {
             throw new ResponseError("Rent not found", 404);
         }
 
+        if (rent.checkOut) {
+            throw new ResponseError("Rent already checked out", 400);
+        }
+
         if (rent.status !== "dikonfirmasi" || !rent.checkIn) {
             throw new ResponseError("Rent cannot be checked out", 400);
         }
 
-        return await this.rentRepository.updateRentCheckOut(rentId);
+        await this.rentRepository.updateRentCheckOut(rentId);
     }
 }

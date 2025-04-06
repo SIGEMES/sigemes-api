@@ -9,7 +9,7 @@ export interface RentRepositoryInterface {
     getFilteredActiveRentsByGuesthouseRoomPricingIds(guesthouseRoomPricingIds: number[], startDate: Date, endDate: Date): Promise<Rent[]>;
     getFilteredActiveRentsByCityHallPricingIds(cityHallPricingIds: number[], startDate: Date, endDate: Date): Promise<Rent[]>;
     createRent(rent: Rent, transaction?: any): Promise<Rent>;
-    updateRentStatus(rentId: number, rentStatus: RentStatus, transaction?: any): Promise<Rent>;
-    updateRentCheckIn(rentId: number, transaction?: any): Promise<Rent>;
-    updateRentCheckOut(rentId: number, transaction?: any): Promise<Rent>;
+    updateRentStatus(rentId: number, rentStatus: RentStatus, transaction?: any): Promise<void>;
+    updateRentCheckIn(rentId: number, transaction?: any): Promise<void>;
+    updateRentCheckOut(rentId: number, transaction?: any): Promise<void>;
 }
