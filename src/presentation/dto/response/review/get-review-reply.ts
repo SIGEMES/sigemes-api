@@ -3,7 +3,8 @@ import { ReviewReply } from "../../../../domain/entity/review-reply";
 export class GetReviewReplyResponse {
     constructor(
         public id: number,
-        public reviewId: number,
+        public review_id: number,
+        public admin_id: number,
         public comment: string,
         public created_at: Date,
         public updated_at: Date,
@@ -13,6 +14,7 @@ export class GetReviewReplyResponse {
         return new GetReviewReplyResponse(
             reviewReply.id,
             reviewReply.reviewId,
+            reviewReply.adminId,
             reviewReply.comment,
             reviewReply.createdAt,
             reviewReply.updatedAt,

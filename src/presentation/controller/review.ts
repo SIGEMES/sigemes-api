@@ -10,6 +10,7 @@ import { DeletedReviewMediaRequest } from '../dto/request/review/deleted-media';
 import { ReviewMedia } from '../../domain/entity/review-media';
 import { ReviewReply } from '../../domain/entity/review-reply';
 import { ReviewReplyRequest } from '../dto/request/review/review-reply';
+import { GetReviewReplyResponse } from '../dto/response/review/get-review-reply';
 
 export class ReviewController {
     constructor(private reviewUsecase: ReviewUsecase) { }
@@ -134,7 +135,8 @@ export class ReviewController {
             reviewReplyEntity.reviewId = reviewId;
             reviewReplyEntity.adminId = Number(res.locals.user.id);
             const createdReviewReply: ReviewReply = await this.reviewUsecase.createReviewReply(reviewReplyEntity);
-            res.status(201).json(new BaseSuccessResponse(true, "Create review reply success", createdReviewReply));
+            const reviewReplyResponse: GetReviewReplyResponse = GetReviewReplyResponse.fromEntity(createdReviewReply);
+            res.status(201).json(new BaseSuccessResponse(true, "Create review reply success", reviewReplyResponse));
         } catch (error) {
             next(error);
         }
@@ -148,7 +150,8 @@ export class ReviewController {
             reviewReplyEntity.id = reviewReplyId;
             reviewReplyEntity.adminId = Number(res.locals.user.id);
             const updatedReviewReply: ReviewReply = await this.reviewUsecase.updateReviewReply(reviewReplyEntity);
-            res.status(200).json(new BaseSuccessResponse(true, "Update review reply success", updatedReviewReply));
+            const reviewReplyResponse: GetReviewReplyResponse = GetReviewReplyResponse.fromEntity(updatedReviewReply);
+            res.status(200).json(new BaseSuccessResponse(true, "Update review reply success", reviewReplyResponse));
         } catch (error) {
             next(error);
         }
@@ -158,7 +161,7 @@ export class ReviewController {
         try {
             const { id: reviewReplyId } = ReviewValidation.id.parse({ id: Number(req.params.reply_id) });
             const deleted: boolean = await this.reviewUsecase.deleteReviewReplyById(reviewReplyId);
-            res.status(200).json(new BaseSuccessResponse(true, "Delete review reply success", deleted));
+            res.status(200).json(new BaseSuccessResponse(true, "Delete review reply success", null));
         } catch (error) {
             next(error);
         }
