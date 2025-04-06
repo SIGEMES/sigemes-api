@@ -300,83 +300,26 @@ export class RentRepository implements RentRepositoryInterface {
         return updatedRent;
     }
 
-    public async updateRentCheckIn(rentId: number, transaction?: any): Promise<Rent> {
+    public async updateRentCheckIn(rentId: number, transaction?: any): Promise<void> {
         const prisma = transaction || this.prisma;
 
-        const updatedRent: Rent = await prisma.rent.update({
-            where: {
-                id: rentId,
-            },
-            data: {
-                checkIn: new Date(),
-            },
-            include: {
-                guesthouseRoomPricing: {
-                    include: {
-                        guesthouseRoom: {
-                            include: {
-                                guesthouseRoomMedia: true,
-                                guesthouse: {
-                                    include: {
-                                        guesthouseMedia: true,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                cityHallPricing: {
-                    include: {
-                        cityHall: {
-                            include: {
-                                cityHallMedia: true,
-                            },
-                        },
-                    },
-                },
-            },
-        }) as Rent;
-
-        return updatedRent;
+        await prisma.rent.update({
+            where: { id: rentId },
+            data: { checkIn: new Date() },
+            select: { id: true },
+        })
     }
 
-    public async updateRentCheckOut(rentId: number, transaction?: any): Promise<Rent> {
+    public async updateRentCheckOut(rentId: number, transaction?: any): Promise<void> {
         const prisma = transaction || this.prisma;
 
-        const updatedRent: Rent = await prisma.rent.update({
-            where: {
-                id: rentId,
-            },
-            data: {
+        await prisma.rent.update({
+            where: { id: rentId },
+            data: { 
                 checkOut: new Date(),
+                status: "selesai",
             },
-            include: {
-                guesthouseRoomPricing: {
-                    include: {
-                        guesthouseRoom: {
-                            include: {
-                                guesthouseRoomMedia: true,
-                                guesthouse: {
-                                    include: {
-                                        guesthouseMedia: true,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                cityHallPricing: {
-                    include: {
-                        cityHall: {
-                            include: {
-                                cityHallMedia: true,
-                            },
-                        },
-                    },
-                },
-            },
-        }) as Rent;
-
-        return updatedRent;
+            select: { id: true },
+        });
     }
 }

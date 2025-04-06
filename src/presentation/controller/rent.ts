@@ -84,9 +84,8 @@ export class RentController {
     public async checkInRent(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { id: rentId } = RentValidation.id.parse({ id: Number(req.params.id) });
-            const rent: Rent = await this.rentUsecase.checkInRent(rentId);
-            const rentResponse: GetRentResponse = GetRentResponse.fromEntity(rent);
-            res.status(200).json(new BaseSuccessResponse(true, "Check in rent success", rentResponse));
+            await this.rentUsecase.checkInRent(rentId);
+            res.status(200).json(new BaseSuccessResponse(true, "Check in rent success", null));
         } catch (error) {
             next(error);
         }
@@ -95,9 +94,8 @@ export class RentController {
     public async checkOutRent(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { id: rentId } = RentValidation.id.parse({ id: Number(req.params.id) });
-            const rent: Rent = await this.rentUsecase.checkOutRent(rentId);
-            const rentResponse: GetRentResponse = GetRentResponse.fromEntity(rent);
-            res.status(200).json(new BaseSuccessResponse(true, "Check out rent success", rentResponse));
+            await this.rentUsecase.checkOutRent(rentId);
+            res.status(200).json(new BaseSuccessResponse(true, "Check out rent success", null));
         } catch (error) {
             next(error);
         }
