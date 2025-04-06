@@ -44,16 +44,16 @@ export class ReviewUsecase {
             throw new ResponseError("Rent not found", 404);
         }
 
+        if (rentWithReview.renterId !== renterId) {
+            throw new ResponseError("You do not have permission to access this resource", 403);
+        }
+
         if (rentWithReview.status !== "selesai") {
             throw new ResponseError("Rent is not finished yet", 400);
         }
 
         if (rentWithReview.review) {
             throw new ResponseError("Review already exists", 400);
-        }
-
-        if (rentWithReview.renterId !== renterId) {
-            throw new ResponseError("You do not have permission to access this resource", 403);
         }
 
         if (media.length > 0) {

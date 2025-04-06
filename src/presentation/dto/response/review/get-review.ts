@@ -2,6 +2,7 @@ import { Review } from "../../../../domain/entity/review";
 import { ReviewReply } from "../../../../domain/entity/review-reply";
 import { GetRentResponse } from "./get-rent";
 import { GetReviewMediaResponse } from "./get-review-media";
+import { GetReviewReplyResponse } from "./get-review-reply";
 
 export class GetReviewResponse {
     constructor(
@@ -13,7 +14,7 @@ export class GetReviewResponse {
         public updated_at: Date,
         public review_media: GetReviewMediaResponse[],
         public rent: GetRentResponse | null,
-        public review_reply: ReviewReply | null,
+        public review_reply: GetReviewReplyResponse | null,
     ) {}
 
     public static fromEntity(review: Review): GetReviewResponse {
@@ -26,7 +27,7 @@ export class GetReviewResponse {
             review.updatedAt,
             review.reviewMedia.map(media => GetReviewMediaResponse.fromEntity(media)),
             GetRentResponse.fromEntity(review.rent),
-            review.reviewReply,
+            review.reviewReply ? GetReviewReplyResponse.fromEntity(review.reviewReply) : null,
         );
     }
 }
