@@ -319,7 +319,7 @@ export class RentUsecase {
         });
     }
 
-    public async cancelRent(rentId: number, userId: number, userRole: string): Promise<Rent> {
+    public async cancelRent(rentId: number, userId: number, userRole: string): Promise<void> {
         const rent: Rent = await this.rentRepository.getRentById(rentId);
 
         if (!rent) {
@@ -336,18 +336,16 @@ export class RentUsecase {
         }
 
         // Using transaction to ensure data consistency
-        return await this.dbTransaction.run(async (tx) => {
+        await this.dbTransaction.run(async (tx) => {
             if (!rent.payment?.id) {
                 throw new ResponseError("Payment not found", 404);
             }
             
             await this.paymentRepository.updatePaymentStatus(rent.payment?.id, "gagal", tx);
-            const updatedRent: Rent = await this.rentRepository.updateRentStatus(rentId, "dibatalkan", tx);
+            await this.rentRepository.updateRentStatus(rentId, "dibatalkan", tx);
             if (rent.payment.paymentTriggeredAt) {
                 await this.paymentGatewayService.cancelTransaction(rent.payment.id);
             }
-
-            return updatedRent;
         });
     }
 

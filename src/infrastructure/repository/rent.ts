@@ -259,45 +259,18 @@ export class RentRepository implements RentRepositoryInterface {
         return createdRent;
     }
 
-    public async updateRentStatus(rentId: number, rentStatus: RentStatus, transaction?: any): Promise<Rent> {
+    public async updateRentStatus(rentId: number, rentStatus: RentStatus, transaction?: any): Promise<void> {
         const prisma = transaction || this.prisma;
 
-        const updatedRent: Rent = await prisma.rent.update({
+        await prisma.rent.update({
             where: {
                 id: rentId,
             },
             data: {
                 status: rentStatus,
             },
-            include: {
-                guesthouseRoomPricing: {
-                    include: {
-                        guesthouseRoom: {
-                            include: {
-                                guesthouseRoomMedia: true,
-                                guesthouse: {
-                                    include: {
-                                        guesthouseMedia: true,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                cityHallPricing: {
-                    include: {
-                        cityHall: {
-                            include: {
-                                cityHallMedia: true,
-                            },
-                        },
-                    },
-                },
-                payment: true,
-            },
-        }) as Rent;
-
-        return updatedRent;
+            select: { id: true },
+        })
     }
 
     public async updateRentCheckIn(rentId: number, transaction?: any): Promise<void> {

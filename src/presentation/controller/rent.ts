@@ -73,9 +73,8 @@ export class RentController {
     public async cancelRent(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { id: rentId } = RentValidation.id.parse({ id: Number(req.params.id) });
-            const rent: Rent = await this.rentUsecase.cancelRent(rentId, res.locals.user.id, res.locals.user.role);
-            const rentResponse: GetRentResponse = GetRentResponse.fromEntity(rent);
-            res.status(200).json(new BaseSuccessResponse(true, "Cancel rent success", rentResponse));
+            await this.rentUsecase.cancelRent(rentId, res.locals.user.id, res.locals.user.role);
+            res.status(200).json(new BaseSuccessResponse(true, "Cancel rent success", null));
         } catch (error) {
             next(error);
         }
