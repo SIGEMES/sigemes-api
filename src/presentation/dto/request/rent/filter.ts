@@ -19,8 +19,8 @@ export class RentFilterRequest {
 
     public static toEntity(data: RentFilterRequest): RentFilter {
         return new RentFilter(
-            data.page ? data.page : 1,
-            data.limit ? data.limit : 5,
+            data.page ? data.page : null,
+            data.limit ? data.limit : null,
             data.search ? data.search : null,
             data.type ? data.type : null,
             data.status ? data.status : null,

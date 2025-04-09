@@ -16,8 +16,8 @@ export class RentController {
     public async getAllRents(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const filter: RentFilterRequest = RentValidation.filter.parse({
-                page: Number(req.query.page),
-                limit: Number(req.query.limit),
+                page: req.query.page ? Number(req.query.page) : undefined,
+                limit: req.query.limit ? Number(req.query.limit) : undefined,
                 search: req.query.search,
                 type: req.query.type,
                 status: req.query.status,

@@ -47,6 +47,14 @@ export class RentUsecase {
             }
         }
 
+        if (!filter.page) {
+            filter.page = 1;
+        }
+
+        if (!filter.limit) {
+            filter.limit = 10;
+        }
+
         if (filter.search) {
             whereConditions.OR = [
                 {

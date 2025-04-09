@@ -35,8 +35,8 @@ export class Rent {
 
 export class RentFilter {
     constructor (
-        public page: number = 1,
-        public limit: number = 10,
+        public page: number | null,
+        public limit: number | null,
         public search: string | null = null,
         public type: RentType | null = null,
         public status: RentStatus | null = null,
