@@ -64,7 +64,7 @@ export class RentController {
             rentEntity.renterId = res.locals.user.id;
             const rent: Rent = await this.rentUsecase.createRent(rentEntity);
             const rentResponse: GetRentResponse = GetRentResponse.fromEntity(rent);
-            res.status(201).json(new BaseSuccessResponse(true, "Create rent plan success", rentResponse));
+            res.status(201).json(new BaseSuccessResponse(true, "Create rent success", rentResponse));
         } catch (error) {
             next(error);
         }

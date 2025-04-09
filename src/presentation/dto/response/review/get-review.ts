@@ -7,7 +7,7 @@ import { GetReviewReplyResponse } from "./get-review-reply";
 export class GetReviewResponse {
     constructor(
         public id: number,
-        public rentId: number,
+        public rent_id: number,
         public rating: number,
         public comment: string,
         public created_at: Date,
