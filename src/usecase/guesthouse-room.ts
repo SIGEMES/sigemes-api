@@ -60,14 +60,14 @@ export class GuesthouseRoomUsecase {
 
                     for (const rent of rents) {
                         let paymentGatewayTokenExpiry: Date = new Date();
-                        if (rent.payment?.paymentConfirmedAt) {
-                            const pendingDateTime: Date = rent.payment?.paymentConfirmedAt;
+                        if (rent.payment?.paymentTriggeredAt) {
+                            const pendingDateTime: Date = rent.payment?.paymentTriggeredAt;
                             paymentGatewayTokenExpiry = new Date(pendingDateTime);
-                            paymentGatewayTokenExpiry.setMinutes(paymentGatewayTokenExpiry.getMinutes() + 5);
+                            paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
                         } else {
                             const pendingDateTime: Date = rent.createdAt;
                             paymentGatewayTokenExpiry = new Date(pendingDateTime);
-                            paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+                            paymentGatewayTokenExpiry.setMinutes(paymentGatewayTokenExpiry.getMinutes() + 5);
                         }
 
                         if (rent.renterGender === renterGender) {
@@ -116,14 +116,14 @@ export class GuesthouseRoomUsecase {
             guesthouseRoom.availableSlot = guesthouseRoom.totalSlot;
             for (const rentedRoom of rentedGuesthouseRooms) {
                 let paymentGatewayTokenExpiry: Date = new Date();
-                if (rentedRoom.payment?.paymentConfirmedAt) {
-                    const pendingDateTime: Date = rentedRoom.payment?.paymentConfirmedAt;
+                if (rentedRoom.payment?.paymentTriggeredAt) {
+                    const pendingDateTime: Date = rentedRoom.payment?.paymentTriggeredAt;
                     paymentGatewayTokenExpiry = new Date(pendingDateTime);
-                    paymentGatewayTokenExpiry.setMinutes(paymentGatewayTokenExpiry.getMinutes() + 5);
+                    paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
                 } else {
                     const pendingDateTime: Date = rentedRoom.createdAt;
                     paymentGatewayTokenExpiry = new Date(pendingDateTime);
-                    paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+                    paymentGatewayTokenExpiry.setMinutes(paymentGatewayTokenExpiry.getMinutes() + 5);
                 }
 
                 if (rentedRoom.renterGender !== renterGender) {

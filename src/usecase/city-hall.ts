@@ -56,14 +56,14 @@ export class CityHallUsecase {
 
                     for (const rentedCityHall of rentedCityHalls) {
                         let paymentGatewayTokenExpiry: Date = new Date();
-                        if (rentedCityHall.payment?.paymentConfirmedAt) {
-                            const pendingDateTime: Date = rentedCityHall.payment?.paymentConfirmedAt;
+                        if (rentedCityHall.payment?.paymentTriggeredAt) {
+                            const pendingDateTime: Date = rentedCityHall.payment?.paymentTriggeredAt;
                             paymentGatewayTokenExpiry = new Date(pendingDateTime);
-                            paymentGatewayTokenExpiry.setMinutes(paymentGatewayTokenExpiry.getMinutes() + 5);
+                            paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
                         } else {
                             const pendingDateTime: Date = rentedCityHall.createdAt;
                             paymentGatewayTokenExpiry = new Date(pendingDateTime);
-                            paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+                            paymentGatewayTokenExpiry.setMinutes(paymentGatewayTokenExpiry.getMinutes() + 5);
                         }
 
                         if (!(rentedCityHall.status === "pending" && new Date() >= paymentGatewayTokenExpiry)) {
@@ -102,14 +102,14 @@ export class CityHallUsecase {
 
             for (const rentedCityHall of rentedCityHalls) {
                 let paymentGatewayTokenExpiry: Date = new Date();
-                if (rentedCityHall.payment?.paymentConfirmedAt) {
-                    const pendingDateTime: Date = rentedCityHall.payment?.paymentConfirmedAt;
+                if (rentedCityHall.payment?.paymentTriggeredAt) {
+                    const pendingDateTime: Date = rentedCityHall.payment?.paymentTriggeredAt;
                     paymentGatewayTokenExpiry = new Date(pendingDateTime);
-                    paymentGatewayTokenExpiry.setMinutes(paymentGatewayTokenExpiry.getMinutes() + 5);
+                    paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
                 } else {
                     const pendingDateTime: Date = rentedCityHall.createdAt;
                     paymentGatewayTokenExpiry = new Date(pendingDateTime);
-                    paymentGatewayTokenExpiry.setDate(paymentGatewayTokenExpiry.getDate() + 1);
+                    paymentGatewayTokenExpiry.setMinutes(paymentGatewayTokenExpiry.getMinutes() + 5);
                 }
 
                 if (!(rentedCityHall.status === "pending" && new Date() >= paymentGatewayTokenExpiry)) {
